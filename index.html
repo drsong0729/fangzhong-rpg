@@ -261,6 +261,17 @@ button{font-family:inherit;color:inherit}
 .row .go{flex:none;background:var(--panel);border:2px solid var(--line2);border-radius:3px;
   padding:7px 9px;font-size:12px;cursor:pointer;font-weight:700}
 .row .go:hover:not(:disabled){border-color:var(--amber-d);color:var(--amber)}
+.row .c{font-family:var(--f-mono);font-size:7.5px;color:var(--dim);letter-spacing:.04em;margin-top:3px;
+  opacity:.85;word-break:break-all}
+.booknote{font-family:var(--f-mono);font-size:8px;letter-spacing:.06em;color:var(--dimmer);
+  margin:0 0 8px;padding-left:2px}
+.nsec{font-family:var(--f-disp);font-size:11px;font-weight:900;letter-spacing:.14em;color:var(--amber);
+  margin:12px 0 6px;padding-bottom:5px;border-bottom:2px solid var(--line)}
+.nsec:first-of-type{margin-top:0}
+.nsec b{font-family:var(--f-mono);font-size:9px;color:var(--cream)}
+.rows{max-height:none}
+.card-bd .rows{max-height:38vh}
+.empty.sm{padding:14px 10px;font-size:12px}
 .row .go:disabled{opacity:.34;cursor:not-allowed}
 .empty{color:var(--dimmer);font-family:var(--f-body);font-size:14px;text-align:center;padding:24px 0}
 .logbox{max-height:56vh;overflow:auto;font-size:13px;line-height:1.75;color:var(--dim);font-family:var(--f-body)}
@@ -2556,12 +2567,14 @@ const P={x:0,y:0,dir:2,frame:0,walkT:0,stepT:0};
 const Game={
   scene:'title', name:'', seed:'', day:1, ap:AP_DAY, signed:0,
   hstate:{}, letters:[], nav:null, logs:[], duel:null, dayOver:false, lastBoss:-1, doneDay:0,
+  notes:{addrs:[],phones:[]}, seenSeq:0,
   hs(id){ return this.hstate[id]||(this.hstate[id]={seen:false,letter:false,signed:false,
-    refused:false,visits:0,knocks:0,tries:0}) },
+    refused:false,visits:0,knocks:0,tries:0,seenOrd:0}) },
   reset(seed,name){
     this.seed=seed; this.name=name; this.day=1; this.ap=AP_DAY; this.signed=0;
     this.hstate={}; this.letters=[]; this.nav=null; this.logs=[]; this.duel=null;
     this.dayOver=false; this.lastBoss=-1; this.doneDay=0;
+    this.notes={addrs:[],phones:[]}; this.seenSeq=0;
   }
 };
 
@@ -2731,7 +2744,7 @@ function save(silent){
   try{
     localStorage.setItem(SAVE_KEY,JSON.stringify({v:2,seed:Game.seed,name:Game.name,day:Game.day,
       ap:Game.ap,signed:Game.signed,hstate:Game.hstate,letters:Game.letters,nav:Game.nav,
-      logs:Game.logs.slice(0,30),scene:Game.scene==='office'?'office':'city',px:P.x,py:P.y}));
+      notes:Game.notes,seenSeq:Game.seenSeq,logs:Game.logs.slice(0,30),scene:Game.scene==='office'?'office':'city',px:P.x,py:P.y}));
     if(!silent){ A.sfx('confirm'); toast('已存檔') }
     checkSave();
   }catch(e){ if(!silent) toast('這個環境無法存檔') }
@@ -2866,12 +2879,14 @@ function setActs(){
   const L=[];
   if(Game.scene==='city'){
     L.push({t:'謄本紀錄',s:'調閱過的物件',f:deedBook});
+    L.push({t:'手機記事本',s:notesCount()?'線索 '+notesCount()+' 筆':'尚無線索',f:noteBook});
     L.push({t:'結束今天',s:'回公司休息',f:()=>ask('結束今天？','回公司打日報，明天一早重新出發。',()=>endDay('你走回公司'))});
     if(Game.nav) L.push({t:'取消導航',s:'清除目標',f:()=>{A.sfx('cancel');Game.nav=null;setActs()}});
     L.push({t:'說明',s:'HOW TO PLAY',f:helpCard});
   }else if(Game.scene==='office'){
     L.push({t:'走出公司',s:'進入城市',f:()=>{A.sfx('door');toCity()}});
     L.push({t:'謄本紀錄',s:'調閱過的物件',f:deedBook});
+    L.push({t:'手機記事本',s:notesCount()?'線索 '+notesCount()+' 筆':'尚無線索',f:noteBook});
     L.push({t:'跟店長聊聊',s:'FREE',f:bossTalk});
     L.push({t:'說明',s:'HOW TO PLAY',f:helpCard});
   }
@@ -2897,7 +2912,9 @@ function helpCard(){
    <b style="color:var(--amber)">怎麼講才有分</b>　先接住他的情緒 → 針對他這個理由 → 給一個他今天就能答應、而且零成本的具體下一步。<br>
    <b style="color:var(--red)">地雷</b>　保證賣掉、叫他毀約、貶低同業、當場叫他降價、要鑰匙、未經同意刊登或找租客——講了會直接扣耐心。<br>
    屋主一邊講一邊想新理由（戒心會自己回升），談輸了隔天可以再來，戒心會比上次低。<br><br>
-   <b style="color:var(--amber)">謄本紀錄</b>　調閱過的物件都留在這裡，可以隨時重新導航。<br>
+   <b style="color:var(--amber)">謄本紀錄</b>　調閱過的物件都留在這裡（最新的排最上面），可以隨時重新導航。<br>
+   <b style="color:var(--amber)">手機記事本</b>　鄰居、管理員、開門的人給你的<u>地址</u>與<u>電話</u>會自動記在這裡，
+   每一筆都註明是從哪一件謄本、哪一個人問到的。地址可以直接導航，電話可以直接撥（−40 AP）。<br>
    一天 100 AP，用完當天結束、隔天從公司出發。30 天內拿到 6 件委託即通關，天數會登上排行榜。</div>`,
    [{key:'✕',label:'關閉',fn:()=>{A.sfx('cancel');closeOvl()}}]);
 }
@@ -2930,14 +2947,95 @@ function logCard(){
 }
 
 /* ── 謄本紀錄 ── */
+/* ═══ 手機記事本：別人給的地址與電話 ═══════════════════════ */
+function notesCount(){ return (Game.notes.addrs.length+Game.notes.phones.length) }
+
+function noteAddr(srcId,targetId,from){
+  const d=World.deed(World.houses[srcId]);
+  if(Game.notes.addrs.some(n=>n.src===srcId&&n.id===targetId)) return;
+  Game.notes.addrs.push({id:targetId,src:srcId,from,day:Game.day,
+    sur:d.ownerName, srcAddr:World.houses[srcId].addr.full, used:false});
+}
+function notePhone(srcId,ph,from,hereId){
+  const d=World.deed(World.houses[srcId]);
+  if(Game.notes.phones.some(n=>n.src===srcId&&n.ph===ph)) return;
+  Game.notes.phones.push({ph,src:srcId,here:(hereId!==undefined?hereId:srcId),from,day:Game.day,
+    sur:d.ownerName, srcAddr:World.houses[srcId].addr.full, used:false});
+}
+
+function noteBook(){
+  const A_=Game.notes.addrs, P_=Game.notes.phones;
+  if(!A_.length&&!P_.length){
+    card('手機記事本','0 筆',
+      `<div class="empty">還沒有從任何人身上問到東西。<br><br>
+        管理員、鄰居、開門的人願意透露的地址與電話，都會自動記在這裡。</div>`,
+      [{key:'✕',label:'關閉',fn:()=>{A.sfx('cancel');closeOvl()}}]); return;
+  }
+  $ovlIn.innerHTML=`<div class="card"><div class="card-hd"><h3>手機記事本</h3>
+      <span class="tag">${A_.length+P_.length} 筆</span></div>
+    <div class="card-bd">
+      <div class="booknote">別人給你的線索。每一筆都記著是從哪一件謄本、哪一個人問到的。</div>
+      <div class="nsec">地址　<b>${A_.length}</b></div>
+      <div class="rows" id="nAddr"></div>
+      <div class="nsec">電話　<b>${P_.length}</b></div>
+      <div class="rows" id="nPhone"></div>
+      <div class="choices"><button class="ch" id="closeNote"><span class="k">✕</span><span>關閉</span></button></div>
+    </div></div>`;
+  $ovl.classList.add('show'); $ovl.scrollTop=0;
+
+  const ab=el('nAddr');
+  if(!A_.length) ab.innerHTML='<div class="empty sm">還沒問到任何地址。</div>';
+  A_.slice().reverse().forEach(n=>{
+    const tgt=World.houses[n.id], st=Game.hs(n.src);
+    const r=document.createElement('div'); r.className='row';
+    r.innerHTML=`<div class="meta"><div class="a">${esc(tgt.addr.full)}</div>
+      <div class="b">DAY ${n.day} · ${esc(n.from)}</div>
+      <div class="c">物件 ${esc(n.srcAddr)} · 所有權人 ${esc(n.sur)}</div></div>
+      <span class="st ${st.signed?'ok':''}">${st.signed?'已簽約':'待拜訪'}</span>`;
+    const b=document.createElement('button'); b.className='go'; b.textContent='導航';
+    b.disabled=st.signed;
+    b.onclick=()=>{
+      A.sfx('confirm');
+      Game.nav={id:n.id,kind:'clue',src:n.src,label:'線索：'+tgt.addr.full};
+      closeOvl(); if(Game.scene==='office') toCity(); else { A.play('city'); setActs() }
+      toast('已設定導航，跟著紅色箭頭走');
+    };
+    r.appendChild(b); ab.appendChild(r);
+  });
+
+  const pb=el('nPhone');
+  if(!P_.length) pb.innerHTML='<div class="empty sm">還沒問到任何電話。</div>';
+  P_.slice().reverse().forEach(n=>{
+    const st=Game.hs(n.src);
+    const r=document.createElement('div'); r.className='row';
+    r.innerHTML=`<div class="meta"><div class="a">☎ ${esc(n.ph)}</div>
+      <div class="b">DAY ${n.day} · ${esc(n.from)}</div>
+      <div class="c">物件 ${esc(n.srcAddr)} · 所有權人 ${esc(n.sur)}</div></div>
+      <span class="st ${st.signed?'ok':''}">${st.signed?'已簽約':n.used?'撥過':'未撥'}</span>`;
+    const b=document.createElement('button'); b.className='go'; b.textContent='撥打';
+    b.disabled=st.signed||Game.scene!=='city';
+    b.title=Game.scene!=='city'?'走出公司才能打':'';
+    b.onclick=()=>{
+      if(Game.ap<AP_TALK){ A.sfx('deny'); toast('行動點數不足，這通電話今天打不了'); return }
+      A.sfx('click'); n.used=true; closeOvl();
+      const src=World.houses[n.src];
+      phoneCall(src,World.houses[n.here]||src,n.ph,true);
+    };
+    r.appendChild(b); pb.appendChild(r);
+  });
+  el('closeNote').onclick=()=>{A.sfx('cancel');closeOvl()};
+}
+
 function deedBook(){
-  const seen=World.houses.filter(h=>h.sale&&Game.hs(h.id).seen);
+  const seen=World.houses.filter(h=>h.sale&&Game.hs(h.id).seen)
+    .sort((a,b)=>(Game.hs(b.id).seenOrd||0)-(Game.hs(a.id).seenOrd||0));   // 最新的排最上面
   if(!seen.length){
     card('謄本紀錄','0 件',`<div class="empty">還沒有調閱過任何謄本。<br>走到掛「售」的房子門口，按空白鍵調閱電傳。</div>`,
       [{key:'✕',label:'關閉',fn:()=>{A.sfx('cancel');closeOvl()}}]); return;
   }
   $ovlIn.innerHTML=`<div class="card"><div class="card-hd"><h3>謄本紀錄</h3><span class="tag">${seen.length} 件</span></div>
-    <div class="card-bd"><div class="rows" id="rows"></div>
+    <div class="card-bd"><div class="booknote">由上而下：最近調閱的排在最前面。</div>
+    <div class="rows" id="rows"></div>
     <div class="choices"><button class="ch" id="closeBook"><span class="k">✕</span><span>關閉</span></button></div></div></div>`;
   $ovl.classList.add('show');
   const box=el('rows');
@@ -2994,7 +3092,7 @@ function saleHouse(h){
       `<div class="say nar"><b style="color:var(--amber)">${esc(h.addr.full)}</b>牆上掛著一塊「售」的廣告牌，紅字已經有點褪色，電話號碼被撕掉一半。<br>要調閱電傳查建物謄本嗎？</div>`,
       [{key:'▶',label:'調閱電傳',sub:'−'+AP_INVESTIGATE+' AP　二類謄本',fn:()=>{
           if(!spend(AP_INVESTIGATE)) return;
-          st.seen=true; A.sfx('paper'); A.play('doc');
+          st.seen=true; st.seenOrd=++Game.seenSeq; A.sfx('paper'); A.play('doc');
           addLog('調閱 '+h.addr.full+' 的二類謄本');
           setTimeout(()=>showDeed(h),260);
         }},
@@ -3122,6 +3220,8 @@ function arriveTarget(h){
       if(ns.k){
         say('隔壁鄰居',lines,()=>{
           Game.nav={id:nx.id,kind:'clue',src:src.id,label:'線索：'+nx.addr.full};
+      noteAddr(src.id,nx.id,'從開門的人套出來的');
+          noteAddr(src.id,nx.id,'隔壁鄰居告訴你的');
           addLog('鄰居提供線索：屋主現住 '+nx.addr.full,'l-good');
           A.sfx('good'); setActs(); offerLetter(src,'順便留一封');
         });
@@ -3542,6 +3642,7 @@ function guardOutcome(D,st){
       // 給電話 → 撥打電話環節
       const ph='09'+String(10000000+Math.floor(r()*89999999)).slice(0,8);
       gs.phone=ph; Game.hs(D.src.id).phone=ph;
+      notePhone(D.src.id,ph,'大樓管理員給的（'+h.addr.full+'）',h.id);
       addLog('管理員給了屋主電話 '+ph,'l-good');
       card('管理員鬆口了','４ / ４',
         `<div class="say">「他早就搬走了，不過他每個月會回來繳管理費。」<br>「我這邊有他的電話……你打，但不要說是我給的。」</div>
@@ -3553,6 +3654,7 @@ function guardOutcome(D,st){
       const pool=World.houses.filter(o=>o.id!==h.id&&o.id!==D.src.id);
       const nx=pool[Math.floor(r()*pool.length)];
       Game.nav={id:nx.id,kind:'clue',src:D.src.id,label:'線索：'+nx.addr.full};
+      noteAddr(D.src.id,nx.id,'大樓管理員透露的');
       addLog('管理員透露屋主現住 '+nx.addr.full,'l-good');
       card('管理員鬆口了','４ / ４',
         `<div class="say">「他搬去 <b style="color:var(--amber)">${esc(nx.addr.full)}</b> 了。」<br>「不要說是我講的喔。」</div>`,
@@ -3580,9 +3682,11 @@ function guardOutcome(D,st){
 }
 
 /* 撥打電話 → 約到屋主 → 進入屋主攻防戰 */
-function phoneCall(src,here,ph){
+function phoneCall(src,here,ph,charge){
+  if(charge&&!spend(AP_TALK)) return;
   const d=World.deed(src);
-  A.sfx('phone');
+  notePhone(src.id,ph,'管理員給的',here&&here.id);
+  A.sfx('phone'); setActs();
   card('撥打電話','☎ '+ph,
     `<div class="say nar">你走到大樓外面的騎樓，深呼吸，按下撥號。<br>嘟——嘟——嘟——</div>
      <div class="say">「喂？」</div>`,
@@ -3808,6 +3912,7 @@ el('mLoad').onclick=()=>{
   Game.reset(s.seed,s.name); World.gen(s.seed);
   Game.day=s.day; Game.ap=s.ap; Game.signed=s.signed;
   Game.hstate=s.hstate||{}; Game.letters=s.letters||[]; Game.nav=s.nav||null; Game.logs=s.logs||[];
+  Game.notes=s.notes&&s.notes.addrs?s.notes:{addrs:[],phones:[]}; Game.seenSeq=s.seenSeq||0;
   $title.style.display='none'; $hud.classList.remove('hidden'); hudSync(); fitStage();
   if(s.scene==='office'){ Game.scene='office'; P.x=9.5*TS; P.y=(OFFICE.h-3)*TS; A.play('office') }
   else { Game.scene='city'; P.x=s.px; P.y=s.py; A.play('city') }
