@@ -60,14 +60,14 @@ button{font-family:inherit;color:inherit}
 
 /* ── 舞台（由 JS 依可用空間定尺寸，永遠不捲動） ── */
 .stagewrap{flex:1 1 auto;min-height:0;display:flex;align-items:center;justify-content:center}
-.stage{position:relative;background:#060a0f;border:3px solid var(--line);border-radius:5px;
+.stage{position:relative;background:#9fb0b6;border:3px solid var(--line);border-radius:5px;
   overflow:hidden;box-shadow:0 0 0 1px #000,0 14px 40px -16px rgba(0,0,0,.9);touch-action:none}
 #cv{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated;display:block}
 .scan{position:absolute;inset:0;pointer-events:none;
-  background:repeating-linear-gradient(0deg,rgba(0,0,0,.16) 0 2px,transparent 2px 4px);
-  mix-blend-mode:multiply;opacity:.5}
+  background:repeating-linear-gradient(0deg,rgba(0,0,0,.10) 0 2px,transparent 2px 4px);
+  mix-blend-mode:multiply;opacity:.35}
 .vig{position:absolute;inset:0;pointer-events:none;
-  background:radial-gradient(120% 95% at 50% 45%,transparent 55%,rgba(0,0,0,.6) 100%)}
+  background:radial-gradient(125% 100% at 50% 42%,transparent 62%,rgba(20,26,32,.30) 100%)}
 
 /* ── 標題畫面 ── */
 .title-lyr{position:absolute;inset:0;z-index:5;display:flex;flex-direction:column;
@@ -153,6 +153,11 @@ button{font-family:inherit;color:inherit}
 .ch:hover:not(:disabled){border-color:var(--amber-d);background:#26364a}
 .ch:active:not(:disabled){transform:translateY(2px)}
 .ch:disabled{opacity:.38;cursor:not-allowed}
+.choices.tight{gap:5px;margin-top:8px}
+.choices.tight .ch{padding:7px 9px;font-size:12.5px;line-height:1.6}
+.orline{display:flex;align-items:center;gap:8px;margin:9px 0 4px;
+  font-family:var(--f-mono);font-size:7.5px;letter-spacing:.14em;color:var(--dimmer)}
+.orline::before,.orline::after{content:'';flex:1;height:2px;background:var(--line)}
 .ch .k{font-family:var(--f-mono);font-size:8.5px;color:var(--amber);padding-top:3px;flex:none}
 .ch small{display:block;font-size:11px;color:var(--dimmer);font-family:var(--f-mono);letter-spacing:.04em;margin-top:4px}
 
@@ -1110,6 +1115,417 @@ function probeScore(i,text){
 }
 
 /* ═══════════════════════════════════════════════════════════
+   選項強化：把「一眼看得出來的錯答案」換成似是而非的陷阱
+   ok  = 近似解（聽起來很得體，但沒解決他這一題）
+   bad = 有經驗的人也會脫口而出、但實務上是扣分的講法
+   w   = 事後給玩家看的評語
+   ═══════════════════════════════════════════════════════════ */
+const OPT_PATCH={
+exclusive:{
+ ok:{t:'「我知道專任的規矩，我不會去干擾。等您那邊結束了，我們再談。」',
+     r:'屋主點頭：「好啊，那就等結束再說。」',d:9,
+     w:'很得體，但你把主導權整個交回去了——沒問到期日、也沒有約下一次，這句話講完就沒有下文了。'},
+ bad:[{t:'「專任綁得比較緊，一般委託其實對您比較有利，您可以了解一下差別。」',
+     r:'屋主往後退半步：「你是要我把那邊退掉？」',d:-8,rap:26,
+     w:'在別人合約期內遊說改簽，等於暗示他毀約——屋主會把你歸到「不守規矩」那一類。'},
+   {t:'「那我先幫您留意市場，有好買方我再打給您，不會給您壓力。」',
+     r:'屋主：「好啊。」（他等著你走。）',d:-5,rap:20,
+     w:'完全被動。你沒有留下任何理由再出現一次，這通電話永遠不會打。'}]},
+
+toomany:{
+ ok:{t:'「我理解。我可以幫您把幾家的進度整理成一張表，您一眼就看得出誰有在做事。」',
+     r:'屋主皺眉：「我還要陪你整理喔？」',d:8,
+     w:'聽起來很專業，但你增加了他的工作，而且管到別家的案子——他要的是少一點麻煩。'},
+ bad:[{t:'「簽太多家其實會亂價，留兩三家反而比較好談。」',
+     r:'屋主：「你來教我留誰喔？」',d:-9,rap:27,
+     w:'教屋主退掉同業，聽起來像專業建議，實際上是在替自己清場。'},
+   {t:'「那我留一份資料就好，不用簽，等您覺得可以再說。」',
+     r:'屋主接過去：「嗯，放著。」',d:-4,rap:18,
+     w:'方向對，但少了最關鍵的一句——你要留什麼資料、為什麼那份資料值得他看。'}]},
+
+buyerfirst:{
+ ok:{t:'「好，那我先幫您把屋況跟權狀備齊，買方一出現我馬上可以動。」',
+     r:'屋主：「對，你先準備，有買方再說。」',d:9,
+     w:'你答應了他的條件卻沒解釋為什麼需要委託——他下次還是會用同一句話擋你。'},
+ bad:[{t:'「我這邊有在追一組買方，等他確定我第一個帶來給您看。」',
+     r:'屋主：「哪一組？幾坪？預算多少？」你答不上來。',d:-8,rap:25,
+     w:'只要屋主追問細節就會穿幫。沒有的買方不要拿出來說。'},
+   {t:'「那我先登記在公司系統裡，這樣有買方配對到才找得到您。」',
+     r:'屋主：「我沒同意你把我的資料登記進去。」',d:-9,rap:27,
+     w:'未經同意把屋主資料建檔，這是實務上真的會被客訴的一步。'}]},
+
+fee:{
+ ok:{t:'「服務費我可以幫您爭取到最低，您先看看我做事的方式再決定。」',
+     r:'屋主：「最低是多少？講一個數字。」',d:7,
+     w:'一開口就讓價，等於承認你的服務不值那個錢，而且他會一路往下殺。'},
+ bad:[{t:'「四趴包含廣告、帶看、簽約到過戶，拆開來算其實不貴。」',
+     r:'屋主：「那是你的成本，不是我的。」',d:-5,rap:20,
+     w:'講你的成本結構，沒有講他的風險。屋主在意的是「我要付多少」，不是「你花了多少」。'},
+   {t:'「自售省下來的服務費，通常會在成交價上面賠回去。」',
+     r:'屋主：「你的意思是我自己賣一定賣比較差？」',d:-9,rap:27,
+     w:'話裡有「你不行」的味道。屋主會直接把這句聽成打壓。'}]},
+
+selfsell:{
+ ok:{t:'「自己刊也可以。我幫您看一下刊登內容怎麼寫比較容易被找到，不收費。」',
+     r:'屋主：「喔，好啊，那你幫我看看。」',d:9,
+     w:'你幫他把自售做得更好，卻沒點出自售真正的風險，也沒有給自己下一次出現的理由。'},
+ bad:[{t:'「網路上問價的電話八成是同業，您接下來會很累。」',
+     r:'屋主：「那我掛掉就好了啊。」',d:-8,rap:25,
+     w:'既恐嚇又貶低同業，一句話踩兩個地雷。'},
+   {t:'「那您先自己賣看看，一個月後沒動靜我再過來。」',
+     r:'屋主：「好，那你一個月後再說。」',d:-5,rap:19,
+     w:'消極退場。一個月後你會發現他已經簽給別人了。'}]},
+
+notrush:{
+ ok:{t:'「不急也好。我每個月把這一區的成交整理一份給您，等您想動的時候資料就都在。」',
+     r:'屋主：「嗯，那你寄給我。」',d:10,
+     w:'很體貼，但你把時程無限延後了，而且沒有要到任何承諾——他永遠不會「想動」。'},
+ bad:[{t:'「放太久買方會覺得這間有問題，反而更難談。」',
+     r:'屋主：「我又沒有掛在網路上，誰知道我放多久。」',d:-8,rap:25,
+     w:'恐嚇式話術。不急的屋主最不吃這一套。'},
+   {t:'「那我們先把價格訂在您理想的位置，看有沒有人願意出。」',
+     r:'屋主：「我還沒說要給你做欸。」',d:-6,rap:21,
+     w:'跳步了。委託都還沒談就在定價，屋主會覺得你在自說自話。'}]},
+
+friend:{
+ ok:{t:'「那很好，有熟人比較放心。我留張名片，哪天想多一個通路再打給我。」',
+     r:'屋主：「好，謝謝。」（名片被放到鞋櫃上。）',d:8,
+     w:'禮貌到沒有存在感。你沒有留下任何他非看不可的東西。'},
+ bad:[{t:'「熟的人有時候反而不好意思催進度，多一個人盯著對您有利。」',
+     r:'屋主：「你這是在說他不認真？」',d:-8,rap:26,
+     w:'包裝過的挑撥。屋主聽得出來你在說他朋友的壞話。'},
+   {t:'「他最近有帶幾組給您？我可以看看是不是價格的問題。」',
+     r:'屋主：「這個我為什麼要跟你講？」',d:-7,rap:24,
+     w:'打探別家進度。你要的是資訊，屋主感覺得到。'}]},
+
+young:{
+ ok:{t:'「我雖然年輕，但整間店的資源都在後面，帶看簽約都有資深同事一起。」',
+     r:'屋主：「那我直接找你資深同事就好啦。」',d:8,
+     w:'你把信任推給別人，屋主就會去找那個人。這一題要你自己扛。'},
+ bad:[{t:'「其實年資跟成交沒有絕對關係，看的是有沒有用心在跑。」',
+     r:'屋主：「這句話每個新人都會講。」',d:-5,rap:19,
+     w:'講道理但沒有證據。屋主要的是可以驗證的東西，不是價值觀。'},
+   {t:'「這個我理解，很多屋主一開始也是這樣看我。」',
+     r:'屋主：「所以後來呢？」你接不下去。',d:-6,rap:21,
+     w:'同理了但沒有下文。承接情緒之後一定要接一個具體的東西。'}]},
+
+market:{
+ ok:{t:'「市場確實在調整。我先幫您做一份三個月的觀察報告，訊號出來我們再動。」',
+     r:'屋主：「三個月喔……好啊，那你先做。」',d:9,
+     w:'看起來很認真，其實是同意「三個月內什麼都不做」。時間站在別家仲介那邊。'},
+ bad:[{t:'「越冷的時候買方越有籌碼，早點進場反而談得到好價。」',
+     r:'屋主：「講白一點就是叫我降價嘛。」',d:-8,rap:25,
+     w:'拐了一個彎叫他降價，屋主一秒就聽出來了。'},
+   {t:'「我手上還是有在成交，只是量比較少而已。」',
+     r:'屋主：「成交幾件？」',d:-5,rap:19,
+     w:'自我辯護。他問的是市場，你回答的是自己。'}]},
+
+price:{
+ ok:{t:'「這個價我先照您的意思掛，我們一邊帶看一邊看反應，有需要再一起討論。」',
+     r:'屋主瞇眼：「『有需要再討論』就是之後要叫我降嘛。」',d:8,
+     w:'表面順從，但埋了之後要他降價的伏筆——開過價的屋主聽這句聽到膩了。'},
+ bad:[{t:'「這個價要賣掉需要一點時間，但不是不可能，我陪您等。」',
+     r:'屋主：「等？我又不是在等。」',d:-4,rap:18,
+     w:'沒有任何具體動作。「陪您等」在屋主耳裡等於「我什麼都不會做」。'},
+   {t:'「我可以先用這個價試市場，反正掛著也不會有損失。」',
+     r:'屋主：「我的房子是拿來給你試的？」',d:-8,rap:25,
+     w:'把他的房子講成實驗品。輕率是這一題最大的忌諱。'}]},
+
+family:{
+ ok:{t:'「沒問題，您討論好我再過來。要不要我先把資料做成簡報方便您說明？」',
+     r:'屋主：「不用啦，我自己講就好。」',d:10,
+     w:'很貼心，但沒有把下一次的時間釘下來——「討論好再說」的案子九成沒有下文。'},
+ bad:[{t:'「其實委託可以隨時終止，先簽了再跟家人講也不遲。」',
+     r:'屋主：「你叫我先斬後奏？」',d:-11,rap:31,
+     w:'教屋主瞞著家人簽約。這一句會直接讓他把你歸類成不能信的人。'},
+   {t:'「家人通常最在意的就是價格，這部分我可以先幫您算清楚。」',
+     r:'屋主：「你怎麼知道我家人在意什麼？」',d:-6,rap:21,
+     w:'替他家人代言。你不知道那間房子背後的關係，不要猜。'}]},
+
+distrust:{
+ ok:{t:'「我理解，被坑過一次真的很難再相信。您那時候是遇到什麼狀況？」',
+     r:'屋主的臉沉下來：「講那個做什麼。」',d:9,
+     w:'同理的方向對，但你把他的傷口又挖了一次，而且沒有提出任何他能檢查的機制。'},
+ bad:[{t:'「現在法規比以前嚴很多，公司也有履約保證，不太可能發生。」',
+     r:'屋主：「法規？我上次那個也是有公司的。」',d:-7,rap:23,
+     w:'用制度否定他的親身經驗。他要的不是法規，是「你這個人」的保證。'},
+   {t:'「您可以先小額試試看，做得不好隨時換人就好。」',
+     r:'屋主：「賣房子有分大額小額喔？」',d:-6,rap:21,
+     w:'「小額試試」在賣房子這件事上沒有意義，聽起來像話術模板。'}]},
+
+tenant:{
+ ok:{t:'「有租客其實不影響，我們可以先簽委託，等租約快到期再開始帶看。」',
+     r:'屋主：「那簽了要幹嘛？擺著喔？」',d:8,
+     w:'先簽再說，卻把帶看凍結——屋主會直接問你「那簽了做什麼」。'},
+ bad:[{t:'「租客通常都很配合啦，跟他講一聲就好，不會有問題的。」',
+     r:'屋主：「你怎麼知道我租客好不好講話？」',d:-8,rap:25,
+     w:'替一個你沒見過的人打包票。輕率的保證比不保證更糟。'},
+   {t:'「那我先把資料建起來，等租約結束再說。」',
+     r:'屋主：「還有一年多欸。」',d:-5,rap:19,
+     w:'把問題推到一年後。租約不是障礙，是可以拿來談的條件。'}]},
+
+neighbor:{
+ ok:{t:'「您這間條件其實不輸他。我做一份跟隔壁的逐項比較表，讓您心裡有底。」',
+     r:'屋主滿意地點頭：「對嘛，我這間格局比他好。」',d:8,
+     w:'你讓他更相信自己的高價了。這一題要拉他回成交價，不是幫他加碼。'},
+ bad:[{t:'「隔壁掛多久了您知道嗎？掛越久越沒人問。」',
+     r:'屋主：「你在講他還是在講我？」',d:-7,rap:23,
+     w:'用鄰居的失敗來嚇他，屋主會覺得下一個被你這樣講的就是自己。'},
+   {t:'「那我們就開跟他一樣，看誰先成交。」',
+     r:'屋主：「你自己都沒有意見喔？」',d:-8,rap:25,
+     w:'完全放棄專業判斷。屋主要的是一個有看法的人。'}]},
+
+later:{
+ ok:{t:'「好，那我不耽誤您。我留個 LINE，您方便的時候傳訊息給我。」',
+     r:'屋主：「好好好。」（他已經在關門了。）',d:9,
+     w:'太客氣了。把主動權交給一個正在趕時間的人，等於沒有下一次。'},
+ bad:[{t:'「那我明天同一個時間再過來，這樣您比較好安排。」',
+     r:'屋主：「我明天不在。」',d:-6,rap:21,
+     w:'自作主張排他的行程。要約時間可以，但要讓他選。'},
+   {t:'「就一個問題就好，您這間大概想賣多少？」',
+     r:'屋主：「我就說我很忙了。」',d:-7,rap:24,
+     w:'他說忙，你還在追資訊。這一刻要的是撤退的姿態，不是問題。'}]},
+
+nodoc:{
+ ok:{t:'「資料我們有保密義務，簽委託時會附個資同意書，您可以先看條款。」',
+     r:'屋主：「我就說我不想給，你還在講簽約。」',d:9,
+     w:'用制度回答情緒，而且又把話題繞回簽約——他剛剛拒絕的就是這件事。'},
+ bad:[{t:'「不然您口頭跟我講就好，我不會寫下來。」',
+     r:'屋主：「那更奇怪吧。」',d:-9,rap:26,
+     w:'「不會寫下來」聽起來更可疑，等於承認這件事見不得光。'},
+   {t:'「沒有資料我也可以先做，只是到時候要重問一次比較麻煩。」',
+     r:'屋主：「麻煩的是你又不是我。」',d:-7,rap:23,
+     w:'包在體貼裡的施壓。屋主聽得出那個「比較麻煩」是說給誰聽的。'}]},
+
+onlyone:{
+ ok:{t:'「我們雖然小，但只做這一區，服務會比大品牌細很多。」',
+     r:'屋主：「細不細我怎麼知道？」',d:8,
+     w:'自誇加暗貶大品牌，而且沒有任何他可以查證的東西。'},
+ bad:[{t:'「您可以打去我們公司問，或是上網查我們的評價。」',
+     r:'屋主：「我為什麼要花時間查你？」',d:-6,rap:21,
+     w:'把驗證你的工作丟給屋主。證據要你自己端出來。'},
+   {t:'「品牌大不代表跑得勤，很多大店的人一個月才來一次。」',
+     r:'屋主：「你們同行都這樣互相講喔。」',d:-9,rap:27,
+     w:'貶低同業。屋主會直接把你跟你講的那些人放在一起。'}]},
+
+taxes:{
+ ok:{t:'「稅的部分我們有配合的代書，簽約時會一起幫您算，您不用擔心。」',
+     r:'屋主：「我現在就想知道，不是簽約的時候。」',d:8,
+     w:'把問題外包，而且又回到簽約。他問的是數字，你給的是流程。'},
+ bad:[{t:'「其實稅是從獲利裡面扣的，有賺才要繳，不算真的損失。」',
+     r:'屋主：「錢從我口袋出去就是損失。」',d:-6,rap:22,
+     w:'講道理否定他的感受。稅這一題不能用觀念解，要用數字解。'},
+   {t:'「如果稅真的太重，也可以考慮先做二親等移轉再賣。」',
+     r:'屋主看了你一眼：「你在教我什麼？」',d:-13,rap:35,
+     w:'這已經踩到規避稅負的邊。不論實務上有沒有人做，你都不該是提的那個人。'}]},
+
+memory:{
+ ok:{t:'「我懂，這種房子不只是資產。要不要我先幫您估個價，至少知道現在值多少？」',
+     r:'屋主沉默了一下：「……我現在不想聽數字。」',d:8,
+     w:'他在講感情，你在講錢。方向錯了——這一題要的是「不逼你」。'},
+ bad:[{t:'「留著也是要繳稅維護，換成現金給小孩其實更實在。」',
+     r:'屋主的語氣冷下來：「這是我家的事。」',d:-11,rap:31,
+     w:'替屋主做人生決定。這句話會讓他把門關到底。'},
+   {t:'「那您先慢慢想，我下個月再來看看。」',
+     r:'屋主：「嗯。」（他把門闔上。）',d:-5,rap:19,
+     w:'消極。猶豫中的屋主需要的是一個不施壓但持續在的人，不是消失一個月。'}]},
+
+suspicious:{
+ ok:{t:'「我是這一區固定在跑的，掛牌的房子我都會做紀錄，這是基本功。」',
+     r:'屋主：「所以我被你記在哪裡？」',d:9,
+     w:'講了你的流程，沒講資料來源，也沒給他喊停的權利——警戒只會更高。'},
+ bad:[{t:'「這個資料本來就是公開的，任何人都調得到。」',
+     r:'屋主：「所以你就理直氣壯囉？」',d:-7,rap:23,
+     w:'技術上完全正確，態度上完全失分。他問的不是合不合法。'},
+   {t:'「我也是聽附近的人說的，不然我不會特地過來。」',
+     r:'屋主：「哪個鄰居？」',d:-9,rap:27,
+     w:'模糊來源會讓他開始懷疑鄰居，你等於在他家門口製造麻煩。'}]},
+
+sold:{
+ ok:{t:'「那太好了，我先不打擾。等您那邊有結果再跟我說一聲就好。」',
+     r:'屋主：「好啊。」（他不會說。）',d:9,
+     w:'得體，但你把下一次的主動權交出去了。這種案子最後都是別人回來收的。'},
+ bad:[{t:'「那組談到哪個階段了？有下斡旋還是只是口頭？」',
+     r:'屋主：「這你不用知道吧。」',d:-7,rap:23,
+     w:'打探別家的進度。就算你只是想判斷，屋主感受到的是被盤問。'},
+   {t:'「談的時候要小心，有些會先簽再慢慢殺價。」',
+     r:'屋主：「你是說人家騙我？」',d:-9,rap:27,
+     w:'用一句「提醒」影射同業，屋主會覺得你是在搶案子。'}]},
+
+photo:{
+ ok:{t:'「照片我可以做馬賽克，把窗外跟門牌都遮掉，這樣鄰居認不出來。」',
+     r:'屋主：「不是遮不遮的問題，是我不想被拍。」',d:9,
+     w:'你在解「怎麼拍」，他說的是「不要拍」。沒有接住真正的顧慮。'},
+ bad:[{t:'「沒有照片的物件點閱率差很多，這點要先跟您說。」',
+     r:'屋主：「那就不要賣。」',d:-7,rap:23,
+     w:'用數據壓他。這一題他在意的是隱私，不是曝光效率。'},
+   {t:'「那我用手機隨手拍幾張自己看就好，不會外流。」',
+     r:'屋主：「你還是要拍就對了。」',d:-9,rap:27,
+     w:'包裝成「自己留著」，本質上還是違背他剛講的話。'}]},
+
+rushvisit:{
+ ok:{t:'「沒關係，我盡量把買方集中在同一天帶，這樣您只要配合一次。」',
+     r:'屋主：「一次也是要跑一趟啊。」',d:9,
+     w:'你把負擔減半，但他要的是「完全不用來」。差一步就差很多。'},
+ bad:[{t:'「不方便帶看的話，成交速度會慢很多，這個要先有心理準備。」',
+     r:'屋主：「那就慢慢賣。」',d:-7,rap:23,
+     w:'把他的不便講成他的問題。他本來就不急，這句只會推遠他。'},
+   {t:'「那我先跟大樓管理員打聲招呼，之後帶看比較好進出。」',
+     r:'屋主：「你要去跟管理員講我要賣房子？」',d:-9,rap:27,
+     w:'越過屋主去接觸第三方，等於幫他把消息傳出去。'}]},
+
+commission2:{
+ ok:{t:'「我可以在委託書加註，一個月內沒有帶看，您可以無條件終止。」',
+     r:'屋主：「所以你保證的是你自己的最低標準？」',d:10,
+     w:'看起來很敢，但你保證的是「不出事」而不是「做到什麼」，而且變相承諾了帶看量。'},
+ bad:[{t:'「保證不能亂講，但我從來沒有讓屋主等超過一個月。」',
+     r:'屋主：「你做多久了？」',d:-7,rap:23,
+     w:'前半句對，後半句又變成自我吹噓，而且很容易被追問到破功。'},
+   {t:'「這樣好了，賣不掉我服務費打折給您。」',
+     r:'屋主：「你連自己的錢都拿來賭？」',d:-9,rap:26,
+     w:'用讓價換信任。屋主要的是做事的方法，不是你的折扣。'}]}
+};
+
+const GUARD_OPT_PATCH={
+g1:{ok:{t:'「我不會為難您，我只是想確認我要找的那一戶還住在這裡而已。」',
+     r:'管理員：「這也是住戶資料。」',d:8,
+     w:'換句話問還是在問住戶資訊。他不能給的東西，換個問法一樣不能給。'},
+   bad:[{t:'「我不會說是您講的，這樣不會給您添麻煩。」',
+     r:'管理員站起來：「先生。」',d:-10,rap:30,
+     w:'你在請他一起違規，而且明說了要瞞著別人——這是管理員最怕的事。'},
+     {t:'「那我在門口等一下好了，等住戶自己出來。」',
+     r:'管理員：「你要在這邊等？」',d:-11,rap:31,
+     w:'賴著不走。管理員的職責就是把你請出去，你等於逼他動手。'}]},
+g2:{ok:{t:'「那我先跟您登記一下，等我約到住戶再過來，這樣可以嗎？」',
+     r:'管理員：「登記什麼？我們沒有這種本子。」',d:9,
+     w:'方向對，但你講的是一個不存在的流程。要提替代做法，要提他真的能執行的。'},
+   bad:[{t:'「我東西放您這邊，麻煩您等一下拿給他就好。」',
+     r:'管理員：「我是警衛，不是跑腿的。」',d:-8,rap:26,
+     w:'直接指派工作給他。要請人幫忙，得先問「可不可以」而不是「麻煩您」。'},
+     {t:'「我看剛剛有人刷卡進去，我跟著上去就好。」',
+     r:'管理員擋在電梯前，臉色變了。',d:-13,rap:35,
+     w:'尾隨進入。這一句講出口，這棟大樓你以後都不用來了。'}]},
+g3:{ok:{t:'「我不會每天來，一個月最多一次，不會造成您困擾。」',
+     r:'管理員：「那也是要來啊。」',d:9,
+     w:'你還在爭取進出的權利。這一題他要的是「你現在就走」。'},
+   bad:[{t:'「那些人是那些人，我只留東西不上樓，應該沒關係吧？」',
+     r:'管理員：「每個都說自己不一樣。」',d:-7,rap:24,
+     w:'討價還價的語氣。「應該沒關係吧」等於要他替你破例。'},
+     {t:'「管委會的規定是寫不能推銷，我不是推銷。」',
+     r:'管理員：「你在跟我玩文字？」',d:-10,rap:29,
+     w:'鑽規定的字眼。你贏了句子，輸了這個人。'}]},
+g4:{ok:{t:'「我是附近日勝的，您應該有印象，我們店就在前面轉角。」',
+     r:'管理員：「我要看的是名片。」',d:9,
+     w:'他要的是可以登記的東西。用「你應該知道我」代替證件，等於什麼都沒給。'},
+   bad:[{t:'「名片給您。不過我不方便留手機，公司電話可以嗎？」',
+     r:'管理員：「有什麼不方便的？」',d:-8,rap:25,
+     w:'遮遮掩掩。你要別人信任你，卻先保留自己的資訊。'},
+     {t:'「需要這麼麻煩嗎？我又不是要上去。」',
+     r:'管理員：「那你更應該講清楚你是誰。」',d:-12,rap:33,
+     w:'嫌他麻煩。這句話會讓一個本來只是照規矩辦事的人變成擋你的人。'}]},
+g5:{ok:{t:'（拿出名片，隔著玻璃舉起來讓他看。）',
+     r:'管理員瞄了一眼，又低下頭。',d:9,
+     w:'還是在打擾他，只是換了一種方式。他在測的是你會不會安靜地等。'},
+   bad:[{t:'（直接走到窗口正前方站著等。）',
+     r:'管理員抬頭：「你站這邊做什麼？」',d:-9,rap:27,
+     w:'壓迫感。等待跟施壓只差一個距離。'},
+     {t:'（伸手對著對講機按下住戶樓層。）',
+     r:'管理員猛然起身：「你在按什麼！」',d:-13,rap:35,
+     w:'越權操作大樓設備。這已經不是禮貌問題了。'}]},
+g6:{ok:{t:'「好，那我下次再來。請問您大概幾點交接班比較方便？」',
+     r:'管理員：「你還要再來喔？」',d:8,
+     w:'你答應要走，下一句又預告要再來煩他。撤退就要撤乾淨。'},
+   bad:[{t:'「那我留兩張名片，麻煩您有機會幫我發一下。」',
+     r:'管理員把名片推回來：「我不做這個。」',d:-9,rap:27,
+     w:'指派工作給他，而且是他最不想做的那種。'},
+     {t:'「這棟是不是有規定不能給仲介進來？我想確認一下。」',
+     r:'管理員：「你要去問管委會喔？」',d:-8,rap:25,
+     w:'質疑規定等於質疑他。就算你只是想確認，聽起來都像要投訴。'}]}
+};
+
+/* ── 最後一問：戒心快破時，屋主會再擋一次 ────────────────── */
+const FINAL_MOVES=[
+{id:'f1',tag:'最後一問',
+ line:'「好，我聽你講這麼多。那你老實跟我講，你上一個成交是什麼時候？」',
+ good:{t:'「上個月，這條街轉角那間。我不會拿別人的案子來充數，您要的話我把過程講給您聽。」',
+   r:'屋主看了你很久：「……講到成交你反而最短。好。」',d:34},
+ ok:{t:'「這個不太方便講，客戶的資料我們有保密義務。」',
+   r:'屋主：「我又沒問客戶是誰。」',d:8,
+   w:'他問的是你的紀錄，不是客戶的隱私。拿保密當擋箭牌，聽起來就是沒有。'},
+ bad:[{t:'「最近市場比較冷，不過我帶看量一直沒有停。」',r:'屋主：「所以是沒有。」',d:-9,rap:28,
+   w:'閃避。這一題可以誠實說沒有，但不能繞。'},
+   {t:'「成交紀錄我可以請公司整理一份寄給您。」',r:'屋主：「你自己不知道喔？」',d:-7,rap:23,
+   w:'把自己的紀錄外包給公司，屋主會直接懷疑你根本不熟自己的業績。'}]},
+
+{id:'f2',tag:'最後一問',
+ line:'「那我問你，如果我今天簽給你，你第一件事會做什麼？」',
+ good:{t:'「先把權狀、謄本、格局圖備齊，再排一次現場丈量，禮拜五之前把資料表交給您。」',
+   r:'屋主：「……你連禮拜幾都講出來了。」',d:34},
+ ok:{t:'「我會先幫您在各大平台曝光，讓最多買方看到。」',
+   r:'屋主：「我就說我不想曝光。」',d:8,
+   w:'標準答案，但不是他的答案。這一題考的是你有沒有把前面聽進去。'},
+ bad:[{t:'「我會先看看有沒有客戶適合，有的話馬上帶來。」',r:'屋主：「這句你剛剛講過了。」',d:-6,rap:21,
+   w:'重複前面的說法，等於沒有準備。'},
+   {t:'「這個要看您的需求，您希望我先做什麼我就先做什麼。」',r:'屋主：「我付錢還要教你做事？」',d:-8,rap:25,
+   w:'把球丟回去。他問的就是「你的專業是什麼」。'}]},
+
+{id:'f3',tag:'最後一問',
+ line:'「你剛剛講的那些，寫進合約裡你敢不敢？」',
+ good:{t:'「敢。每週回報、做不到就終止，我寫成附註我們兩個都簽名，您隨時可以拿出來說話。」',
+   r:'屋主愣了一下，然後笑了：「你是第一個敢寫的。」',d:35},
+ ok:{t:'「合約是公司的制式版本，不過我可以另外寫一張切結書給您。」',
+   r:'屋主：「切結書有效嗎？」',d:9,
+   w:'方向對，但你先講了「不能改」再補救。他要的是你當場答應。'},
+ bad:[{t:'「合約條款我沒辦法改，但我口頭跟您保證一定做到。」',r:'屋主：「口頭。」（他重複了一次。）',d:-9,rap:27,
+   w:'他問的就是敢不敢寫，你回答口頭——等於當場否定自己剛才所有的話。'},
+   {t:'「這個我要問一下主管，明天回覆您可以嗎？」',r:'屋主：「那明天再說吧。」',d:-6,rap:21,
+   w:'最後一哩路把決定權交給不在場的人，這個案子就沒了。'}]},
+
+{id:'f4',tag:'最後一問',
+ line:'「如果我簽了，一個月後沒動靜，我要怎麼辦？」',
+ good:{t:'「一般委託三十天到期自動結束，您什麼都不用做。中間想終止，跟我說一聲我當天把委託書還您。」',
+   r:'屋主：「當天喔……好。」',d:35},
+ ok:{t:'「那我們可以再延一個月，我一定會把量做出來。」',
+   r:'屋主：「我問的是怎麼結束，你回答我怎麼繼續。」',d:8,
+   w:'他要的是退場機制。你給他的是續約，方向剛好相反。'},
+ bad:[{t:'「一個月要成交本來就不容易，通常要三個月比較合理。」',r:'屋主：「所以你要綁我三個月？」',d:-8,rap:25,
+   w:'在他問「怎麼脫身」的時候談延長期限，等於證實他的擔心。'},
+   {t:'「不會沒動靜啦，我這邊客戶一直都有。」',r:'屋主：「你又來了。」',d:-9,rap:27,
+   w:'又回到空頭承諾。最後一關重複前面的錯誤，扣得最重。'}]},
+
+{id:'f5',tag:'最後一問',
+ line:'「講到最後，你跟前面那幾個到底差在哪？我為什麼要選你？」',
+ good:{t:'「因為我今天沒有要您現在決定，也沒有跟您保證做不到的事。您先看我做一個禮拜，不滿意就換人。」',
+   r:'屋主看著你，把手從門把上放下來：「……筆呢？」',d:36},
+ ok:{t:'「因為我對這一區最熟，而且我一定會比別人勤勞。」',
+   r:'屋主：「勤勞我看不到。」',d:8,
+   w:'兩件他無法驗證的事。最後一題要給的是可以馬上檢查的東西。'},
+ bad:[{t:'「因為我們公司的買方資料庫是這一區最完整的。」',r:'屋主：「那是公司，不是你。」',d:-7,rap:23,
+   w:'他問的是「你」，你回答的是公司。'},
+   {t:'「您可以先簽給我試試看，反正一個月就到期了。」',r:'屋主：「試試看？」',d:-9,rap:26,
+   w:'把簽委託講成隨便試試，屋主會覺得你根本不重視這件事。'}]}
+];
+
+/* 套用：把原本一眼看穿的選項換成陷阱版 */
+(function(){
+  for(const m of MOVES){ const p=OPT_PATCH[m.id]; if(!p) continue;
+    if(p.ok) m.ok=p.ok; if(p.bad) m.bad=p.bad; }
+  for(const m of GUARD_MOVES){ const p=GUARD_OPT_PATCH[m.id]; if(!p) continue;
+    if(p.ok) m.ok=p.ok; if(p.bad) m.bad=p.bad; }
+  // 正解也修短，讓四個選項長度接近，不能用「最長的就是答案」來猜
+  const TRIM={
+    exclusive:'「了解，那我今天不談委託。方便問專任大概什麼時候到期？到期前一週我再來。」',
+    selfsell:'「自售最麻煩的是兩件事：陌生人進門的安全，還有收了訂之後對方反悔。我先免費幫您看條件。」',
+    young:'「經驗我還在補，這我不騙您。但這條街我一週跑七天，您可以先用小事情測試我。」',
+    market:'「市場冷的時候，能成交的只剩價格對的跟資料齊的。價格您決定，資料我來備。」',
+    distrust:'「有人做壞了我沒辦法替他解釋。我只能把每一步都寫在紙上，您隨時可以叫停。」',
+    price:'「這個價我不敢保證。但我三週內幫您帶足看屋量，讓市場回答。要不要調您決定。」',
+    commission2:'「賣掉我不敢保證。我保證的是進度：每週一份帶看紀錄，做不到您隨時終止。」'
+  };
+  for(const m of MOVES){ if(TRIM[m.id]) m.good.t=TRIM[m.id] }
+})();
+
+/* ═══════════════════════════════════════════════════════════
    世界：城市生成、門牌編碼、謄本資料、像素繪圖
    ═══════════════════════════════════════════════════════════ */
 
@@ -1139,7 +1555,7 @@ const World={
     this.blockTint=[];
     for(let by=0;by<BY;by++)for(let bx=0;bx<BX;bx++){
       const x0=bx*PX+ROADW, y0=by*PY+ROADW, bw=PX-ROADW, bh=PY-ROADW;
-      this.blockTint.push(pick(r,['#3b342d','#443a31','#38333d','#374037','#453a3a','#333c46','#4a4036']));
+      this.blockTint.push(pick(r,['#c9bda6','#d6cbb4','#bfc4c9','#c4cbbc','#d2bfb4','#b9c3cc','#cdc3ad']));
       if(r()<.72){ const ax=x0+ri(r,2,bw-3); for(let y=y0-ROADW;y<y0+bh+ROADW;y++){ if(y>=0&&y<MH&&t[y*MW+ax]===T_BLD) t[y*MW+ax]=T_ALLEY } }
       if(r()<.60){ const ay=y0+ri(r,2,bh-3); for(let x=x0-ROADW;x<x0+bw+ROADW;x++){ if(x>=0&&x<MW&&t[ay*MW+x]===T_BLD) t[ay*MW+x]=T_ALLEY } }
     }
@@ -1247,7 +1663,7 @@ const World={
     const mr=rngFor(this.seed,'mv'+h.id);
     const opens=MOVES.filter(m=>type.open.indexOf(m.id)>=0);
     const first=opens.length?opens[Math.floor(mr()*opens.length)]:MOVES[0];
-    const rest=shuffled(mr,MOVES.filter(m=>m.id!==first.id)).slice(0,5);
+    const rest=shuffled(mr,MOVES.filter(m=>m.id!==first.id)).slice(0,6);
     const moves=[first].concat(rest);
     const cold=Math.min(3,type.cold+(r()<0.28?1:0));
     const d={
@@ -1287,43 +1703,43 @@ function tileHash(x,y){return ((x*73856093)^(y*19349663))>>>0}
 function drawCity(t){
   const ox=Math.floor(Cam.x), oy=Math.floor(Cam.y);
   const tx0=Math.floor(ox/TS), ty0=Math.floor(oy/TS);
-  rect(0,0,VW,VH,'#10151c');
+  rect(0,0,VW,VH,'#9fb0b6');
   for(let ty=ty0-1;ty<ty0+VH/TS+2;ty++){
     for(let tx=tx0-1;tx<tx0+VW/TS+2;tx++){
       const sx=tx*TS-ox, sy=ty*TS-oy;
       const v=World.at(tx,ty);
       const hsh=tileHash(tx,ty);
       if(v===T_ROAD){
-        rect(sx,sy,TS,TS,'#22272f');
-        if((hsh&7)===0) rect(sx+3,sy+5,3,2,'#2b313a');
+        rect(sx,sy,TS,TS,'#8d9298');
+        if((hsh&7)===0) rect(sx+3,sy+5,3,2,'#9aa0a6');
         // 中央虛線
-        if(tx%PX===1&&ty%2===0) rect(sx+7,sy+2,2,9,'#5c5540');
-        if(ty%PY===1&&tx%2===0) rect(sx+2,sy+7,9,2,'#5c5540');
+        if(tx%PX===1&&ty%2===0) rect(sx+7,sy+2,2,9,'#e6d089');
+        if(ty%PY===1&&tx%2===0) rect(sx+2,sy+7,9,2,'#e6d089');
         // 人行道邊
-        if(World.at(tx,ty-1)>=T_BLD) rect(sx,sy,TS,3,'#39404a');
-        if(World.at(tx,ty+1)>=T_BLD) rect(sx,sy+TS-3,TS,3,'#39404a');
-        if(World.at(tx-1,ty)>=T_BLD) rect(sx,sy,3,TS,'#39404a');
-        if(World.at(tx+1,ty)>=T_BLD) rect(sx+TS-3,sy,3,TS,'#39404a');
+        if(World.at(tx,ty-1)>=T_BLD) rect(sx,sy,TS,3,'#c2c0b4');
+        if(World.at(tx,ty+1)>=T_BLD) rect(sx,sy+TS-3,TS,3,'#c2c0b4');
+        if(World.at(tx-1,ty)>=T_BLD) rect(sx,sy,3,TS,'#c2c0b4');
+        if(World.at(tx+1,ty)>=T_BLD) rect(sx+TS-3,sy,3,TS,'#c2c0b4');
       }else if(v===T_ALLEY){
-        rect(sx,sy,TS,TS,'#1b1f25');
-        if((hsh&3)===0) rect(sx+4,sy+9,4,2,'#262c34');
-        if((hsh&15)===3) rect(sx+2,sy+2,5,7,'#3a3128'); // 紙箱
+        rect(sx,sy,TS,TS,'#7f858c');
+        if((hsh&3)===0) rect(sx+4,sy+9,4,2,'#8b9198');
+        if((hsh&15)===3) rect(sx+2,sy+2,5,7,'#b08d5e'); // 紙箱
       }else{
         const bi=(Math.floor(ty/PY)*BX+Math.floor(tx/PX))%World.blockTint.length;
         const base=World.blockTint[(bi+World.blockTint.length)%World.blockTint.length]||'#3b342d';
         rect(sx,sy,TS,TS,base);
         const front=World.at(tx,ty+1)===T_ROAD||World.at(tx,ty+1)===T_ALLEY;
         if(front){
-          rect(sx,sy+TS-4,TS,4,'#20242b');
+          rect(sx,sy+TS-4,TS,4,'#8e8a80');
           for(let i=0;i<2;i++){
             const lit=((hsh>>(i*3))&7)>2;
-            rect(sx+2+i*7,sy+3,5,6, lit?'#e8c063':'#2a2e36');
-            if(lit) rect(sx+2+i*7,sy+3,5,2,'#f8dfa0');
+            rect(sx+2+i*7,sy+3,5,6, lit?'#8fb6cc':'#6d8496');
+            rect(sx+2+i*7,sy+3,5,2, lit?'#c8e2ee':'#93a9b8');
           }
         }else{
-          rect(sx+1,sy+1,TS-2,TS-2,'rgba(0,0,0,.14)');
-          if((hsh&7)===1) rect(sx+4,sy+4,7,5,'#2a2f36'); // 水塔／機房
-          if((hsh&15)===6) rect(sx+2,sy+10,12,3,'#2d3138');
+          rect(sx+1,sy+1,TS-2,TS-2,'rgba(255,255,255,.10)');
+          if((hsh&7)===1) rect(sx+4,sy+4,7,5,'#9aa2a8'); // 水塔／機房
+          if((hsh&15)===6) rect(sx+2,sy+10,12,3,'#a8aeb2');
         }
       }
     }
@@ -1333,24 +1749,22 @@ function drawCity(t){
     const sx=p.x*TS-ox, sy=p.y*TS-oy;
     if(sx<-TS||sy<-TS||sx>VW||sy>VH) continue;
     if(p.k===0){ // 機車
-      rect(sx+2,sy+7,11,4,'#3d4450'); rect(sx+2,sy+10,3,3,'#15181d'); rect(sx+10,sy+10,3,3,'#15181d');
+      rect(sx+2,sy+7,11,4,'#6b7480'); rect(sx+2,sy+10,3,3,'#3a3d42'); rect(sx+10,sy+10,3,3,'#3a3d42');
       rect(sx+5,sy+4,4,4,p.o>.5?'#b8483c':'#4a6f9c');
     }else if(p.k===1){ // 電線桿
-      rect(sx+7,sy+1,2,14,'#4a4a4a'); rect(sx+4,sy+2,8,2,'#565656');
+      rect(sx+7,sy+1,2,14,'#8d8b86'); rect(sx+4,sy+2,8,2,'#9d9b96');
     }else if(p.k===2){ // 盆栽／小樹
-      rect(sx+5,sy+9,6,5,'#5a4030'); rect(sx+3,sy+2,10,8,'#3f6b46'); rect(sx+5,sy+3,4,3,'#528a58');
+      rect(sx+5,sy+9,6,5,'#8a6142'); rect(sx+3,sy+2,10,8,'#5d9c5f'); rect(sx+5,sy+3,4,3,'#7fc07d');
     }else{ // 招牌燈箱
-      rect(sx+2,sy+2,12,6,p.o>.5?'#c2453c':'#2f6ba0'); rect(sx+3,sy+3,10,2,'rgba(255,255,255,.35)');
+      rect(sx+2,sy+2,12,6,p.o>.5?'#e0574c':'#3f8ac9'); rect(sx+3,sy+3,10,2,'rgba(255,255,255,.55)');
     }
   }
   // 路燈光暈
   for(const L of World.lampPos){
     const sx=L.x*TS-ox, sy=L.y*TS-oy;
     if(sx<-70||sy<-70||sx>VW+70||sy>VH+70) continue;
-    const g=cx.createRadialGradient(sx+8,sy+8,2,sx+8,sy+8,52);
-    g.addColorStop(0,'rgba(255,206,120,.20)'); g.addColorStop(1,'rgba(255,206,120,0)');
-    cx.fillStyle=g; cx.fillRect(sx-44,sy-44,104,104);
-    rect(sx+7,sy+2,2,12,'#59616b'); rect(sx+4,sy,8,3,'#ffd88a');
+    rect(sx+9,sy+13,5,2,'rgba(40,46,52,.18)');
+    rect(sx+7,sy+2,2,12,'#8e949c'); rect(sx+4,sy,8,3,'#d8dade');
   }
   // 門面
   for(const h of World.houses){
@@ -1367,11 +1781,11 @@ function drawFacade(h,sx,sy,t){
   rect(sx-1,sy+1,TS+2,4, isOffice?'#c4831f':'#8a3b32');
   rect(sx-1,sy+1,TS+2,2, isOffice?'#f6b23c':'#b8564a');
   // 門
-  rect(sx+3,sy+6,10,10,'#1a1d23');
-  rect(sx+4,sy+7,8,9, isOffice?'#2b3a52':'#33281f');
+  rect(sx+3,sy+6,10,10,'#6f6a62');
+  rect(sx+4,sy+7,8,9, isOffice?'#4d7099':'#7a5c3e');
   rect(sx+10,sy+11,2,2,'#d8c48a');
   if(isOffice){
-    rect(sx+1,sy+11,14,5,'#101419');
+    rect(sx+1,sy+11,14,5,'#3a4048');
     rect(sx+2,sy+12,12,3,'#f6b23c');
     cx.fillStyle='#141a22'; cx.font='700 6px "Noto Sans TC",sans-serif'; cx.textAlign='center'; cx.textBaseline='middle';
     cx.fillText('日勝',sx+8,sy+14);
@@ -1384,9 +1798,9 @@ function drawFacade(h,sx,sy,t){
     rect(sx+7,sy-4,2,6,'#6b6b6b');
     // 招牌
     const done=st.signed, no=st.refused;
-    rect(sx+1,py0,14,12,'#0c1015');
+    rect(sx+1,py0,14,12,'#4a4f57');
     rect(sx+2,py0+1,12,10, done?'#54b98d':no?'#6b5a52':'#f6b23c');
-    cx.fillStyle= done?'#0d2b1f':no?'#241d18':'#3a2a06';
+    cx.fillStyle= done?'#0d2b1f':no?'#2e2620':'#3a2a06';
     cx.font='900 9px "Noto Sans TC",sans-serif'; cx.textAlign='center'; cx.textBaseline='middle';
     cx.fillText(done?'簽':no?'拒':'售',sx+8,py0+6.5);
     cx.textAlign='left'; cx.textBaseline='alphabetic';
@@ -1413,25 +1827,25 @@ function drawGuy(sx,sy,dir,frame,pal){
 /* 小地圖 */
 function drawMinimap(){
   const W=Math.round(Math.min(96,VW*0.235)), H=Math.round(W/1.38), mx=VW-W-6, my=6;
-  cx.fillStyle='rgba(5,8,12,.90)'; cx.fillRect(mx-2,my-2,W+4,H+4);
-  cx.strokeStyle='#4b6280'; cx.lineWidth=1; cx.strokeRect(mx-1.5,my-1.5,W+3,H+3);
+  cx.fillStyle='rgba(243,234,217,.93)'; cx.fillRect(mx-2,my-2,W+4,H+4);
+  cx.strokeStyle='#6f6553'; cx.lineWidth=1; cx.strokeRect(mx-1.5,my-1.5,W+3,H+3);
   const sx=W/MW, sy=H/MH;
-  cx.fillStyle='#41506a';
+  cx.fillStyle='#b6ac96';
   for(let y=0;y<MH;y+=1)for(let x=0;x<MW;x+=1){
     const v=World.at(x,y); if(v===T_ROAD) cx.fillRect(mx+x*sx,my+y*sy,sx+.6,sy+.6);
   }
   for(const h of World.houses){
     if(!h.sale) continue; const st=Game.hs(h.id);
-    cx.fillStyle= st.signed?'#54b98d':st.refused?'#6b5a52':st.seen?'#f6b23c':'#8d7a4a';
+    cx.fillStyle= st.signed?'#1f8b5f':st.refused?'#8a7c72':st.seen?'#c4831f':'#7a6a44';
     cx.fillRect(mx+h.x*sx-.5,my+h.y*sy-.5,2,2);
   }
   const of=World.houses[World.officeId];
-  if(of){ cx.fillStyle='#7fb6ff'; cx.fillRect(mx+of.x*sx-1,my+of.y*sy-1,3,3) }
+  if(of){ cx.fillStyle='#2f6ba0'; cx.fillRect(mx+of.x*sx-1,my+of.y*sy-1,3,3) }
   if(Game.nav){ const n=World.houses[Game.nav.id];
-    cx.fillStyle= (Date.now()%700<350)?'#ffffff':'#e2564a';
+    cx.fillStyle= (Date.now()%700<350)?'#1b2330':'#d43b2d';
     cx.fillRect(mx+n.x*sx-1.5,my+n.y*sy-1.5,4,4);
   }
-  cx.fillStyle='#ffffff';
+  cx.fillStyle='#101418';
   cx.fillRect(mx+(P.x/TS)*sx-1,my+(P.y/TS)*sy-1,3,3);
 }
 
@@ -1443,16 +1857,16 @@ function drawNavArrow(){
   const sx=tx-Cam.x, sy=ty-Cam.y;
   if(sx>10&&sx<VW-10&&sy>10&&sy<VH-10){
     const b=Math.sin(Date.now()/220)*2;
-    rect(sx-4,sy-26+b,8,3,'#e2564a'); rect(sx-2,sy-23+b,4,4,'#e2564a');
+    rect(sx-4,sy-26+b,8,3,'#d43b2d'); rect(sx-2,sy-23+b,4,4,'#d43b2d');
     return;
   }
   const dx=tx-(Cam.x+VW/2), dy=ty-(Cam.y+VH/2), a=Math.atan2(dy,dx);
   const rx=VW/2+Math.cos(a)*(VW/2-22), ry=VH/2+Math.sin(a)*(VH/2-22);
   cx.save(); cx.translate(rx,ry); cx.rotate(a);
-  cx.fillStyle='#e2564a'; cx.beginPath(); cx.moveTo(9,0); cx.lineTo(-6,-6); cx.lineTo(-6,6); cx.closePath(); cx.fill();
+  cx.fillStyle='#d43b2d'; cx.beginPath(); cx.moveTo(9,0); cx.lineTo(-6,-6); cx.lineTo(-6,6); cx.closePath(); cx.fill();
   cx.restore();
   const d=Math.round(Math.hypot(dx,dy)/TS);
-  cx.fillStyle='#f3ead9'; cx.font='700 8px "Noto Sans TC",sans-serif'; cx.textAlign='center';
+  cx.fillStyle='#1b2330'; cx.font='900 8px "Noto Sans TC",sans-serif'; cx.textAlign='center';
   cx.fillText(d+'格',rx,ry+16); cx.textAlign='left';
 }
 
@@ -1481,27 +1895,27 @@ function officeSolid(tx,ty){
 }
 function drawOffice(t){
   const ox=0,oy=0;
-  rect(0,0,VW,VH,'#151a21');
+  rect(0,0,VW,VH,'#a8b6bb');
   const w=OFFICE.w*TS, h=OFFICE.h*TS;
   const gx=(VW-w)/2, gy=(VH-h)/2;
-  rect(gx,gy,w,h,'#3a3730');
+  rect(gx,gy,w,h,'#d8cfbc');
   for(let y=0;y<OFFICE.h;y++)for(let x=0;x<OFFICE.w;x++){
     const sx=gx+x*TS, sy=gy+y*TS, v=OFFICE.map[y*OFFICE.w+x];
-    if(v===1){ rect(sx,sy,TS,TS,'#4b4a55'); rect(sx,sy,TS,4,'#5d5c69'); rect(sx,sy+TS-2,TS,2,'#2d2c35') }
-    else if(v===2){ rect(sx,sy,TS,TS,'#2b3a52'); rect(sx+2,sy+2,12,12,'#3d557a'); rect(sx+2,sy+13,12,3,'#f6b23c') }
-    else { rect(sx,sy,TS,TS,(x+y)%2?'#3d3a33':'#413e36'); }
+    if(v===1){ rect(sx,sy,TS,TS,'#cfd2d6'); rect(sx,sy,TS,4,'#e2e4e7'); rect(sx,sy+TS-2,TS,2,'#a9adb2') }
+    else if(v===2){ rect(sx,sy,TS,TS,'#4d7099'); rect(sx+2,sy+2,12,12,'#6d92bb'); rect(sx+2,sy+13,12,3,'#f6b23c') }
+    else { rect(sx,sy,TS,TS,(x+y)%2?'#e6ddc9':'#ded5c1'); }
   }
   // 玻璃窗
-  for(let x=2;x<OFFICE.w-2;x++){ const sx=gx+x*TS; rect(sx+1,gy+2,14,10,'#1d2a3a'); rect(sx+1,gy+2,14,3,'#2f4664') }
+  for(let x=2;x<OFFICE.w-2;x++){ const sx=gx+x*TS; rect(sx+1,gy+2,14,10,'#bfe0ef'); rect(sx+1,gy+2,14,3,'#8fc6e0') }
   // 辦公桌
   for(const d of DESKS){
     const sx=gx+d[0]*TS, sy=gy+d[1]*TS;
-    rect(sx,sy+3,TS*2,11,'#6b5a45'); rect(sx,sy+3,TS*2,3,'#836f55');
-    rect(sx+3,sy-2,9,7,'#20252c'); rect(sx+4,sy-1,7,5,'#4a7fa8'); // 螢幕
+    rect(sx,sy+3,TS*2,11,'#a8845c'); rect(sx,sy+3,TS*2,3,'#c39e70');
+    rect(sx+3,sy-2,9,7,'#4a5058'); rect(sx+4,sy-1,7,5,'#7fb6d8'); // 螢幕
     rect(sx+18,sy+6,7,5,'#c9c2b2'); // 紙
   }
   // 白板：本月業績
-  rect(gx+w-64,gy+18,56,44,'#e8e3d6'); rect(gx+w-64,gy+18,56,4,'#9a9384');
+  rect(gx+w-64,gy+18,56,44,'#fbf8f0'); rect(gx+w-64,gy+18,56,4,'#b0a894');
   cx.fillStyle='#8a2f22'; cx.font='900 8px "Noto Sans TC",sans-serif'; cx.textAlign='center';
   cx.fillText('本月委託',gx+w-36,gy+34);
   cx.fillStyle='#1b2330'; cx.font='900 13px "Noto Sans TC",sans-serif';
@@ -1509,11 +1923,11 @@ function drawOffice(t){
   // 店長
   const bob=Math.floor(t/500)%2;
   drawGuy(gx+16*TS+2,gy+9*TS+2,2,bob,{hair:'#33302b',skin:'#dcae82',top:'#2f3b4e',bot:'#232a35',acc:'#c4483c'});
-  rect(gx+15*TS,gy+10*TS+3,TS*3,11,'#5a4a38'); rect(gx+15*TS,gy+10*TS+3,TS*3,3,'#75604a');
-  cx.fillStyle='#f3ead9'; cx.font='700 7px "Noto Sans TC",sans-serif'; cx.textAlign='center';
+  rect(gx+15*TS,gy+10*TS+3,TS*3,11,'#8d7050'); rect(gx+15*TS,gy+10*TS+3,TS*3,3,'#ab8b66');
+  cx.fillStyle='#1b2330'; cx.font='900 7px "Noto Sans TC",sans-serif'; cx.textAlign='center';
   cx.fillText('店長',gx+16*TS+7,gy+9*TS-3); cx.textAlign='left';
   // 出口指示
-  cx.fillStyle='#f6b23c'; cx.font='700 7px "Noto Sans TC",sans-serif'; cx.textAlign='center';
+  cx.fillStyle='#8a5a10'; cx.font='900 7px "Noto Sans TC",sans-serif'; cx.textAlign='center';
   cx.fillText('出口 ▼',gx+9.5*TS+2,gy+(OFFICE.h-1)*TS-4); cx.textAlign='left';
   return {gx,gy};
 }
@@ -1521,23 +1935,24 @@ function drawOffice(t){
 /* 戰鬥背景 */
 function drawDuel(t,who){
   const g0=cx.createLinearGradient(0,0,0,VH);
-  g0.addColorStop(0,'#1e2836'); g0.addColorStop(1,'#0d1219');
+  g0.addColorStop(0,'#a9cfe2'); g0.addColorStop(1,'#cfd6d2');
   cx.fillStyle=g0; cx.fillRect(0,0,VW,VH);
   const sc=Math.min(VW/480,VH/320);
   cx.save(); cx.translate(VW/2,VH/2); cx.scale(sc,sc); cx.translate(-240,-160);
   // 門口場景
-  rect(60,60,360,190,'#2e2a26');
-  rect(60,60,360,10,'#4a423a');
-  rect(200,90,80,160,'#1a1d23'); rect(206,96,68,154,who==='guard'?'#2b3a52':'#3b2c22');
+  rect(60,60,360,190,'#cbc0aa');
+  rect(60,60,360,10,'#9d947f');
+  rect(200,90,80,160,'#6e675c'); rect(206,96,68,154,who==='guard'?'#4d7099':'#7a5c3e');
   rect(262,168,6,6,'#d8c48a');
   // 雨遮
   rect(150,52,180,14,'#8a3b32'); rect(150,52,180,6,'#b8564a');
   // 門牌
   rect(292,110,26,14,'#e8e3d6');
   // 燈
-  const gg=cx.createRadialGradient(240,40,4,240,40,120);
-  gg.addColorStop(0,'rgba(255,206,120,.28)'); gg.addColorStop(1,'rgba(255,206,120,0)');
-  cx.fillStyle=gg; cx.fillRect(120,-40,240,200);
+  const gg=cx.createLinearGradient(0,60,0,250);
+  gg.addColorStop(0,'rgba(255,248,214,.30)'); gg.addColorStop(1,'rgba(255,248,214,0)');
+  cx.fillStyle=gg; cx.fillRect(60,60,360,190);
+  cx.fillStyle='rgba(60,52,40,.16)'; cx.fillRect(60,236,360,14);
   const bob=Math.floor(t/420)%2;
   // 屋主（右）
   const pal= who==='guard'
@@ -1548,7 +1963,7 @@ function drawDuel(t,who){
   // 主角（左）
   cx.save(); cx.translate(150,150); cx.scale(3.4,3.4);
   drawGuy(0,0,1,bob,null); cx.restore();
-  rect(0,314,480,6,'#0a0e13');
+  rect(0,314,480,6,'#8e9296');
   cx.restore();
 }
 
@@ -2262,38 +2677,54 @@ function probeGame(src,here){
 
 /* ═══ 自由對話面板（屋主／管理員／套話共用） ═══════════════ */
 function freeformPanel(o){
+  const opts=o.opts||null;
+  const optHtml = opts
+    ? `<div class="choices tight" id="ffOpts">`+opts.map((op,k)=>
+        `<button class="ch" data-i="${k}"><span class="k">${'ABCD'[k]}</span><span>${esc(op.t)}</span></button>`).join('')
+      +`</div><div class="orline"><span>或者，自己想一句</span></div>`
+    : '';
   $ovlIn.innerHTML=`<div class="card"><div class="card-hd"><h3>${o.title}</h3>
       ${o.tag?`<span class="tag">${o.tag}</span>`:''}</div>
     <div class="card-bd"><div class="duel">
       ${o.bars||''}
       ${o.intro?`<div class="say nar">${esc(o.intro)}</div>`:''}
       <div class="say"><b>${esc(o.who)}</b>${esc(o.line)}</div>
+      ${optHtml}
       <div class="ffwrap">
         <textarea id="ffIn" rows="2" maxlength="120" placeholder="${o.placeholder||'輸入你要跟他說的話⋯⋯'}"></textarea>
         <button class="ffgo" id="ffGo">說出口</button>
       </div>
-      <div class="coach" id="ffMsg">${AI.ready
-        ? '自己想一句話回他。對方會照你講的內容反應，下面會給你評語與建議。'
-        : '自己想一句話回他。系統會依房仲實務評分，下面會給你評語與建議。'}</div>
+      <div class="coach" id="ffMsg">${o.hint || (opts
+        ? '四句聽起來都像行話，但只有一句真的解得開他這一題。也可以不選，自己打一句。'
+        : (AI.ready
+          ? '自己想一句話回他。對方會照你講的內容反應，下面會給你評語與建議。'
+          : '自己想一句話回他。系統會依房仲實務評分，下面會給你評語與建議。'))}</div>
     </div></div></div>`;
   $ovl.classList.add('show'); $ovl.scrollTop=0;
   const inp=el('ffIn'), go=el('ffGo'), msg=el('ffMsg');
   let busy=false;
+  const lock=()=>{ go.disabled=true; inp.disabled=true;
+    if(opts) el('ffOpts').querySelectorAll('.ch').forEach(b=>b.disabled=true) };
   const ui={
     thinking(t){ msg.className='coach think'; msg.textContent=t;
       let d=0; ui._tk=setInterval(()=>{d=(d+1)%4; msg.textContent=t+'．'.repeat(d)},380) },
     stop(){ clearInterval(ui._tk) },
-    error(t){ ui.stop(); msg.className='coach warn'; msg.textContent=t; busy=false; go.disabled=false; inp.disabled=false }
+    error(t){ ui.stop(); msg.className='coach warn'; msg.textContent=t; busy=false;
+      go.disabled=false; inp.disabled=false;
+      if(opts) el('ffOpts').querySelectorAll('.ch').forEach(b=>b.disabled=false) }
   };
   const fire=async()=>{
     if(busy) return;
     const v=(inp.value||'').trim();
     if(v.length<4){ msg.className='coach warn'; msg.textContent='再多說一點，對方聽不出你要表達什麼。'; A.sfx('deny'); return }
-    busy=true; go.disabled=true; inp.disabled=true; A.sfx('click');
+    busy=true; lock(); A.sfx('click');
     try{ await o.onSend(v,ui) }catch(e){ ui.error('出了一點狀況，請再說一次。') }
     finally{ ui.stop() }
   };
   go.onclick=fire;
+  if(opts) el('ffOpts').querySelectorAll('.ch').forEach(b=>{
+    b.onclick=()=>{ if(busy) return; busy=true; lock(); A.sfx('click'); o.onPick(+b.dataset.i,ui) };
+  });
   // Enter 不送出（換行用 Shift+Enter，一般 Enter 也只是換行）
   inp.addEventListener('keydown',e=>{ if(e.key==='Enter'&&!e.shiftKey) e.stopPropagation() });
   setTimeout(()=>{ try{ inp.focus() }catch(e){} },80);
@@ -2324,13 +2755,14 @@ function startDuel(kind,src,here,bonus){
     ? shuffled(rngFor(Game.seed,'gd'+here.id),GUARD_MOVES).slice(0,4)
     : d.moves;
   let maxG;
-  if(kind==='guard') maxG=76;
+  if(kind==='guard') maxG=84;
   else{
     maxG = d.guard*0.9 - 8*(st.knocks||0) - (st.letter?8:0) - 11*(st.tries||0) + (bonus||0);
-    maxG = Math.max(46,Math.round(maxG));
+    maxG = Math.max(52,Math.round(maxG*1.12));
   }
   if(kind==='owner') st.tries=(st.tries||0)+1;
-  Game.duel={kind,src,here,d,moves,i:0,g:maxG,maxG,rap:100,freeLeft:99,history:[],said:[]};
+  Game.duel={kind,src,here,d,moves,i:0,g:maxG,maxG,rap:100,history:[],said:[],
+    steel:false,final:null,finalDone:(kind!=='owner'),seq:0};
   A.play('battle'); A.sfx('guard');
   duelTurn(kind==='guard'
     ? '（警衛室的燈很亮。管理員上下打量你。）'
@@ -2349,27 +2781,127 @@ function duelBars(D){
   </div>`;
 }
 
+/* 四個回話選項：正解／近似解／兩個似是而非，順序打亂 */
+function duelOptions(D,mv){
+  const list=[Object.assign({k:'good'},mv.good),Object.assign({k:'ok'},mv.ok)]
+    .concat((mv.bad||[]).map(x=>Object.assign({k:'bad'},x)));
+  const r=rngFor(Game.seed,'opt'+(D.src?D.src.id:0)+'_'+mv.id+'_'+(D.seq||0));
+  return shuffled(r,list).slice(0,4);
+}
+
 function duelTurn(intro){
   const D=Game.duel; if(!D) return;
-  if(D.i>=D.moves.length) return duelEnd(D.g<=D.maxG*0.26);
-  if(D.i>=2) D.g=Math.min(D.maxG,D.g+3);          // 他一邊講一邊想新理由
-  const mv=D.moves[D.i];
-  const line = D.i===0 ? mv.line : (mv.follow||mv.line);
+
+  // 最後一問：戒心快破時，他還會再考你一題
+  if(D.kind==='owner' && !D.final && !D.finalDone && D.g<=D.maxG*0.30){
+    const fr=rngFor(Game.seed,'fin'+D.src.id+'_'+(D.d.tries||0));
+    D.final=FINAL_MOVES[Math.floor(fr()*FINAL_MOVES.length)];
+    D.g=Math.max(D.g,Math.round(D.maxG*0.26));
+  }
+
+  if(!D.final){
+    if(D.i>=D.moves.length) return duelEnd(false);   // 講完還沒鬆口＝沒談成
+    if(D.i>=1) D.g=Math.min(D.maxG,D.g+4);           // 他一邊聽一邊想新理由
+  }
+
+  const mv = D.final || D.moves[D.i];
+  const line = D.final ? mv.line : (D.i===0 ? mv.line : (mv.follow||mv.line));
+  D.seq=(D.seq||0)+1;
   if(!D.history.length||D.history[D.history.length-1].t!==line){
     D.history.push({who:'o',t:line}); if(D.history.length>8) D.history.shift();
   }
+  const opts=duelOptions(D,mv);
+  D.opts=opts; D.mv=mv;
+  const steelNote = D.steel
+    ? '他剛剛被你惹到了，這一句要先把場子拉回來，講什麼都比平常難進去。'
+    : (D.final?'這是他最後一道題。答得漂亮他就簽，答壞了前面全部要重來。':null);
   freeformPanel({
-    title: D.kind==='guard'?'管理員關卡':'屋主攻防戰',
-    tag:'第 '+(D.i+1)+' / '+D.moves.length+' 回合',
+    title: D.final?'最後一問' : (D.kind==='guard'?'管理員關卡':'屋主攻防戰'),
+    tag: D.final?'決勝題' : ('第 '+(D.i+1)+' / '+D.moves.length+' 回合'),
     who: duelWho(D), line, intro, bars: duelBars(D),
     placeholder:'你要怎麼回他？',
+    hint: steelNote,
+    opts: opts.map(o=>({t:o.t})),
+    onPick: (k,ui)=>duelPick(opts[k],ui),
     onSend: (text,ui)=>duelAnswer(text,ui)
   });
 }
 
+/* 共用結算：選項與自由輸入都走這裡 */
+function duelSettle(text,R){
+  const D=Game.duel;
+  let dmg = (R.d!=null) ? Math.max(0,Math.round(R.d*0.75))
+                        : Math.round(Math.max(0,R.score-20)*0.38);
+  if(D.steel){ dmg=Math.round(dmg*0.45); }
+  const rap = (R.rap!=null) ? R.rap
+            : (R.score<35 ? Math.round((35-R.score)*1.05) : 0);
+
+  D.said.push(text);
+  D.history.push({who:'p',t:text});
+  D.history.push({who:'o',t:R.reply||'……'});
+  if(D.history.length>8) D.history=D.history.slice(-8);
+
+  const wasSteel=D.steel;
+  D.steel = R.score<45;               // 講差了→他硬起來，下一句先扣半
+
+  D.g-=dmg; D.rap-=rap;
+
+  let win=false, lose=D.rap<=0, bounce=false;
+  if(D.final){
+    if(R.score>=62){ win=true; D.g=0 }
+    else{ bounce=true; D.finalDone=true; D.final=null;
+          D.g=Math.round(D.maxG*0.52); D.steel=true;
+          // 被打回去之後還有機會，但要重新把他磨下來
+          const er=rngFor(Game.seed,'ext'+D.src.id);
+          const used=D.moves.map(m=>m.id);
+          const extra=shuffled(er,MOVES.filter(m=>used.indexOf(m.id)<0)).slice(0,3);
+          D.moves=D.moves.concat(extra); }
+  }else{
+    if(D.kind==='owner' && !D.finalDone){
+      D.g=Math.max(D.g,Math.round(D.maxG*0.26));   // 沒過最後一問前不會直接破
+      win=false;
+    }else win = D.g<=0;
+  }
+  if(win) D.g=0;
+
+  if(dmg>=18) A.sfx('good'); else if(dmg>0) A.sfx('hit'); else A.sfx('bad');
+
+  let title = bounce ? '他退回去了'
+            : win ? '他把筆拿起來了'
+            : dmg>=18 ? '說到他心裡了'
+            : dmg>=8 ? '有一點推進'
+            : dmg>0 ? '幾乎沒有作用' : '講錯話了';
+  let note = R.note||'';
+  if(bounce) note = (note?note+' ':'') + '最後一題沒答好，他前面鬆掉的戒心又全部收回去了。';
+  else if(wasSteel && dmg>0) note = (note?note+' ':'') + '（他還在氣頭上，這一句只發揮了一半效果。）';
+  else if(D.steel && !win) note = (note?note+' ':'') + '（他硬起來了，下一句先把他的火降下來，不然講什麼都進不去。）';
+
+  resultCard({
+    title, tagText:'評分 '+R.score+'　戒心 −'+dmg+(rap?'　耐心 −'+rap:''),
+    tagColor: bounce?'var(--red)':dmg>=18?'var(--jade)':dmg>0?'var(--amber)':'var(--red)',
+    bars:duelBars(D), me:text, reply:R.reply, note, tip:R.tip,
+    nextLabel: win?'⋯⋯他把筆拿起來了' : lose?'⋯⋯門關上了' : bounce?'再來一次':'繼續',
+    onNext:()=>{ if(win) return duelEnd(true); if(lose) return duelEnd(false);
+                 if(!bounce) D.i++; duelTurn(null) }
+  });
+}
+
+/* 玩家選了其中一個回法 */
+function duelPick(o,ui){
+  const D=Game.duel, mv=D.mv;
+  const score = o.k==='good' ? 84 : o.k==='ok' ? 48 : 16;
+  const tip = (MOVE_HINTS[mv.id]||{}).tip || '';
+  duelSettle(o.t,{
+    score, d:o.d, rap:o.rap!=null?o.rap:(o.k==='bad'?12:0),
+    reply:o.r||'「⋯⋯」',
+    note:o.w || (o.k==='good' ? '這一句正好戳到他真正在意的地方——他沒有話回你。' : ''),
+    tip
+  });
+}
+
 async function duelAnswer(text,ui){
-  const D=Game.duel, mv=D.moves[D.i];
-  const line = D.i===0 ? mv.line : (mv.follow||mv.line);
+  const D=Game.duel, mv=D.mv||D.moves[D.i];
+  const line = D.final ? mv.line : (D.i===0 ? mv.line : (mv.follow||mv.line));
   let R=null;
   if(AI.ready){
     ui.thinking(D.kind==='guard'?'管理員正在想⋯⋯':'屋主正在想⋯⋯');
@@ -2390,24 +2922,7 @@ async function duelAnswer(text,ui){
     R={score:lr.score,note:lr.note,tip:lr.tip,
        reply:coachReply(mv,lr.band,D.kind==='guard')};
   }
-  D.said.push(text);
-  D.history.push({who:'p',t:text});
-  D.history.push({who:'o',t:R.reply||'……'});
-  if(D.history.length>8) D.history=D.history.slice(-8);
-
-  const dmg=Math.round(Math.max(0,R.score-20)*0.42);
-  const rap=R.score<35?Math.round((35-R.score)*1.05):0;
-  D.g-=dmg; D.rap-=rap;
-  if(dmg>=18) A.sfx('good'); else if(dmg>0) A.sfx('hit'); else A.sfx('bad');
-  const win=D.g<=0, lose=D.rap<=0;
-  resultCard({
-    title: dmg>=18?'說到他心裡了' : dmg>=8?'有一點推進' : dmg>0?'幾乎沒有作用':'講錯話了',
-    tagText:'評分 '+R.score+'　戒心 −'+dmg+(rap?'　耐心 −'+rap:''),
-    tagColor: dmg>=18?'var(--jade)':dmg>0?'var(--amber)':'var(--red)',
-    bars:duelBars(D), me:text, reply:R.reply, note:R.note, tip:R.tip,
-    nextLabel: win?'⋯⋯他把筆拿起來了' : lose?'⋯⋯門關上了' : '繼續',
-    onNext:()=>{ if(win) return duelEnd(true); if(lose) return duelEnd(false); D.i++; duelTurn(null) }
-  });
+  duelSettle(text,R);
 }
 
 function duelEnd(win){
