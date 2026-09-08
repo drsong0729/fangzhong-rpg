@@ -71,34 +71,38 @@ button{font-family:inherit;color:inherit}
 
 /* ── 標題畫面 ── */
 .title-lyr{position:absolute;inset:0;z-index:5;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;padding:10px 12px 26px;
+  align-items:center;justify-content:center;padding:calc(var(--u)*.022) 12px;
+  overflow:hidden;
+  /* --u：同時受舞台寬與高限制的縮放基準，矮畫面會整體縮小而不是被切掉 */
+  --u:min(var(--sw,480px),calc(var(--sh,320px) * 1.42));
   background:linear-gradient(180deg,rgba(6,10,15,.35),rgba(6,10,15,.82))}
-.tt-sub{font-family:var(--f-mono);font-size:clamp(7px,calc(var(--sw,480px)*.0165),11px);
-  letter-spacing:.24em;color:var(--amber);margin-bottom:calc(var(--sw,480px)*.026);text-shadow:0 2px 0 #000}
+.tt-sub{font-family:var(--f-mono);font-size:clamp(7px,calc(var(--u)*.0165),11px);
+  letter-spacing:.24em;color:var(--amber);margin-bottom:calc(var(--u)*.024);text-shadow:0 2px 0 #000}
 .tt{font-family:var(--f-disp);font-weight:900;letter-spacing:.05em;
-  font-size:clamp(25px,calc(var(--sw,480px)*.104),68px);line-height:1.06;margin:0;
+  font-size:clamp(22px,calc(var(--u)*.104),68px);line-height:1.06;margin:0;
   max-width:100%;text-align:center;color:var(--cream);
   text-shadow:3px 0 0 #000,-3px 0 0 #000,0 3px 0 #000,0 -3px 0 #000,
     3px 3px 0 #000,-3px 3px 0 #000,3px -3px 0 #000,-3px -3px 0 #000,
     0 7px 0 var(--amber-d),0 9px 0 #000,0 16px 26px rgba(0,0,0,.7)}
 .tt em{font-style:normal;color:var(--amber)}
-.tt-rule{width:calc(var(--sw,480px)*.72);max-width:460px;height:3px;
-  margin:calc(var(--sw,480px)*.032) 0 calc(var(--sw,480px)*.03);
+.tt-rule{width:calc(var(--u)*.72);max-width:460px;height:3px;flex:none;
+  margin:calc(var(--u)*.028) 0 calc(var(--u)*.026);
   background:linear-gradient(90deg,transparent,var(--line2) 18%,var(--amber) 50%,var(--line2) 82%,transparent)}
-.menu{display:flex;flex-direction:column;gap:calc(var(--sw,480px)*.019);width:min(78%,calc(var(--sw,480px)*.62));max-width:330px}
+.menu{display:flex;flex-direction:column;gap:calc(var(--u)*.018);width:min(78%,calc(var(--u)*.62));max-width:330px}
 .mbtn{font-family:var(--f-disp);font-weight:700;letter-spacing:.12em;
-  font-size:clamp(14px,calc(var(--sw,480px)*.043),21px);
-  padding:calc(var(--sw,480px)*.022) 12px;background:var(--panel);color:var(--cream);border:2px solid var(--line2);
+  font-size:clamp(13px,calc(var(--u)*.043),21px);
+  padding:calc(var(--u)*.021) 12px;background:var(--panel);color:var(--cream);border:2px solid var(--line2);
   border-radius:3px;cursor:pointer;text-align:center;box-shadow:0 4px 0 0 #060a0f;
   transition:transform .06s steps(2),background .12s}
 .mbtn:hover:not(:disabled){background:var(--panel2);border-color:var(--amber-d);color:var(--amber)}
 .mbtn:active:not(:disabled){transform:translateY(3px);box-shadow:0 1px 0 0 #060a0f}
 .mbtn:disabled{opacity:.32;cursor:not-allowed;filter:grayscale(1)}
 .mbtn small{display:block;font-family:var(--f-mono);letter-spacing:.09em;
-  font-size:clamp(6px,calc(var(--sw,480px)*.0155),9.5px);color:var(--dimmer);margin-top:5px;font-weight:400}
-.tt-foot{position:absolute;bottom:8px;left:8px;right:8px;text-align:center;line-height:1.7;
-  font-family:var(--f-mono);font-size:clamp(6px,calc(var(--sw,480px)*.0145),9px);
+  font-size:clamp(6px,calc(var(--u)*.0155),9.5px);color:var(--dimmer);margin-top:4px;font-weight:400}
+.tt-foot{flex:none;margin-top:calc(var(--u)*.034);max-width:96%;text-align:center;line-height:1.7;
+  font-family:var(--f-mono);font-size:clamp(6px,calc(var(--u)*.0145),9px);
   letter-spacing:.1em;color:var(--dimmer)}
+.tt-sub,.tt,.tt-foot{flex:none}
 
 /* ── 覆蓋面板 ── */
 .ovl{position:fixed;inset:0;z-index:50;display:none;flex-direction:column;
@@ -460,12 +464,16 @@ const A={
 };
 const _ = null;
 const BGM={
-  /* 主畫面：夜色霓虹，緩慢 */
-  title:{bpm:92,len:32,leadLen:2.2,
-    lead:['E5',_,_,'B4',_,'C5',_,_,'D5',_,_,'A4',_,_,_,_,'C5',_,_,'G4',_,'A4',_,_,'B4',_,_,_,_,_,_,_],
-    harm:['G4',_,_,_,_,_,_,_,'F4',_,_,_,_,_,_,_,'E4',_,_,_,_,_,_,_,'D4',_,_,_,_,_,_,_],
-    bass:['E3',_,_,_,'E3',_,_,_,'C3',_,_,_,'C3',_,_,_,'A2',_,_,_,'A2',_,_,_,'B2',_,_,_,'B2',_,_,_],
-    drum:[_,_,'h',_,_,_,'h',_,_,_,'h',_,_,_,'h',_,_,_,'h',_,_,_,'h',_,_,_,'h',_,_,_,'h',_]},
+  /* 主畫面：輕快、有精神的開場曲 */
+  title:{bpm:138,len:32,leadLen:.95,
+    lead:['C5',_,'E5','G5',_,'E5','G5',_,'A5',_,'G5',_,'E5',_,'D5',_,
+          'F5',_,'A5','C6',_,'A5','G5',_,'E5',_,'G5',_,'C5',_,_,_],
+    harm:['E4',_,_,'G4',_,_,'E4',_,'C4',_,_,'E4',_,_,'G4',_,
+          'A4',_,_,'C5',_,_,'A4',_,'G4',_,_,'B4',_,_,'G4',_],
+    bass:['C3',_,'G2',_,'C3',_,'E3',_,'A2',_,'E2',_,'A2',_,'G2',_,
+          'F2',_,'C3',_,'F2',_,'A2',_,'G2',_,'D3',_,'G2',_,'B2',_],
+    drum:['k','h','s','h','k','h','s','h','k','h','s','h','k','k','s','h',
+          'k','h','s','h','k','h','s','h','k','h','s','h','k','s','s','h']},
   /* 辦公室：正經、有點壓力 */
   office:{bpm:104,len:16,leadLen:1.3,
     lead:['A4',_,'C5','B4',_,'A4',_,'G4','F4',_,'G4',_,'A4',_,_,_],
@@ -522,6 +530,7 @@ const RD_NAMES=['萬達路','明德路','雲來路','荷風路','錦繡路','拾
 const ST_NAMES=['長虹街','富春街','蟬鳴街','竹音街','白鷺街','樂陶街'];
 const SURNAMES=['吳','陳','林','黃','張','李','王','蔡','楊','許','鄭','謝','郭','洪','曾','廖','賴','徐','周','葉','蘇','莊','呂','江','何','蕭','羅','高','詹','簡'];
 const BUILD_USE=['住家用','住商用','商業用','集合住宅','店鋪'];
+const BT_NAME={tower:'電梯大樓',walkup:'公寓',town:'透天厝',shop:'店面'};
 const BUILD_MAT=['鋼筋混凝土造','加強磚造','鋼骨鋼筋混凝土造','磚造'];
 
 /* ── 屋主性格：決定戒心、開場招式、閉門羹傾向 ── */
@@ -1564,15 +1573,13 @@ const World={
     const walk=(x,y)=>x>=0&&y>=0&&x<MW&&y<MH&&(t[y*MW+x]===T_ROAD||t[y*MW+x]===T_ALLEY);
     for(let y=1;y<MH-1;y++)for(let x=1;x<MW-1;x++){
       if(t[y*MW+x]!==T_BLD) continue;
-      let d=-1;
-      if(walk(x,y+1)) d=2; else if(walk(x,y-1)) d=0; else if(walk(x-1,y)) d=3; else if(walk(x+1,y)) d=1;
-      if(d>=0) cand.push({x,y,d});
+      if(walk(x,y+1)) cand.push({x,y,d:2});   // 門一律朝南，才畫得出完整立面
     }
     // 依序取門，保持間距
     const taken=new Set(); const houses=[];
     for(const c of shuffled(r,cand)){
       let near=false;
-      for(let dy=-1;dy<=1;dy++)for(let dx=-2;dx<=2;dx++) if(taken.has((c.y+dy)+'_'+(c.x+dx))) near=true;
+      for(let dy=-4;dy<=1;dy++)for(let dx=-2;dx<=2;dx++) if(taken.has((c.y+dy)+'_'+(c.x+dx))) near=true;
       if(near) continue;
       taken.add(c.y+'_'+c.x);
       houses.push({id:houses.length,x:c.x,y:c.y,dir:c.d});
@@ -1582,6 +1589,19 @@ const World={
     const used=new Set();
     for(const h of houses){ h.addr=this.makeAddr(h,used); }
     this.byTile=new Map(); houses.forEach(h=>this.byTile.set(h.y*MW+h.x,h));
+
+    // 建物型態：大樓／公寓／透天／店面
+    for(const h of houses){
+      const hr=rngFor(seed,'bt'+h.id), u=hr();
+      const onAlley=this.at(h.x,h.y+1)===T_ALLEY;
+      const corner=this.at(h.x-1,h.y)===T_ROAD||this.at(h.x+1,h.y)===T_ROAD;
+      if(onAlley)      h.bt = u<.46?'town'  : u<.88?'walkup':'tower';   // 巷子裡少有大樓
+      else if(corner)  h.bt = u<.42?'shop'  : u<.72?'tower' :'walkup';
+      else             h.bt = u<.30?'tower' : u<.56?'shop'  : u<.82?'walkup':'town';
+      h.floors = h.bt==='tower'?ri(hr,9,15) : h.bt==='walkup'?ri(hr,4,5)
+               : h.bt==='town'?ri(hr,3,4) : ri(hr,1,2);
+      h.tone = hr();
+    }
 
     // 公司：挑一個靠近地圖中央、面向大馬路的門
     let best=null,bd=1e9;
@@ -1627,10 +1647,10 @@ const World={
     const wx=h.x+(h.dir===1?1:h.dir===3?-1:0), wy=h.y+(h.dir===2?1:h.dir===0?-1:0);
     const onAlley=this.at(wx,wy)===T_ALLEY;
     let street,num,lane=0;
-    if(h.dir===1||h.dir===3){ // 面向左右 → 縱向道路（路）
+    const corner=!onAlley&&(this.at(h.x-1,h.y)===T_ROAD||this.at(h.x+1,h.y)===T_ROAD);
+    if(corner){ // 轉角店面掛在縱向的「路」上
       street=RD_NAMES[Math.max(0,Math.min(RD_NAMES.length-1,Math.round(h.x/PX)))];
-      num=(h.y+2)*2-(h.dir===1?1:0);
-      if(onAlley){ lane=(h.y+2)*2-1; num=Math.max(1,(h.x%PX)*2+(h.dir===1?1:2)) }
+      num=(h.y+2)*2-1;
     }else{
       street=ST_NAMES[Math.max(0,Math.min(ST_NAMES.length-1,Math.round(h.y/PY)))];
       num=(h.x+2)*2-(h.dir===2?1:0);
@@ -1648,9 +1668,14 @@ const World={
   deed(h){
     if(h._deed) return h._deed;
     const r=rngFor(this.seed,'deed'+h.id);
-    const m2=Math.round((ri(r,58,205)+r())*100)/100;
+    const bt=h.bt||'walkup';
+    const m2 = bt==='tower'  ? Math.round((ri(r,72,168)+r())*100)/100
+             : bt==='walkup' ? Math.round((ri(r,58,122)+r())*100)/100
+             : bt==='town'   ? Math.round((ri(r,118,235)+r())*100)/100
+             :                 Math.round((ri(r,66,180)+r())*100)/100;
     const ping=Math.round(m2/3.305785*100)/100;
-    const total=ri(r,4,14), floor=ri(r,1,Math.min(total,12));
+    const total = h.floors || ri(r,4,14);
+    const floor = bt==='town' ? 1 : ri(r,1,Math.min(total,12));
     const year=ri(r,1982,2019);
     const owner=pick(r,SURNAMES);
     const masked=r()<.32;
@@ -1668,7 +1693,10 @@ const World={
     const cold=Math.min(3,type.cold+(r()<0.28?1:0));
     const d={
       m2,ping,floor,total,year,
-      use:pick(r,BUILD_USE), mat:pick(r,BUILD_MAT),
+      bt, btName: BT_NAME[bt],
+      use: bt==='tower'?'集合住宅' : bt==='shop'?'店鋪' : bt==='town'?pick(r,['住家用','住商用']) : '住家用',
+      mat: bt==='tower'?pick(r,['鋼筋混凝土造','鋼骨鋼筋混凝土造'])
+         : bt==='town'?pick(r,['鋼筋混凝土造','加強磚造']) : pick(r,BUILD_MAT),
       ownerSur:owner, ownerName:owner+'**',
       masked, regId:reg.id,
       regFull:reg.addr.full, regMasked:reg.addr.street+'**',
@@ -1726,21 +1754,54 @@ function drawCity(t){
         if((hsh&15)===3) rect(sx+2,sy+2,5,7,'#b08d5e'); // 紙箱
       }else{
         const bi=(Math.floor(ty/PY)*BX+Math.floor(tx/PX))%World.blockTint.length;
-        const base=World.blockTint[(bi+World.blockTint.length)%World.blockTint.length]||'#3b342d';
-        rect(sx,sy,TS,TS,base);
-        const front=World.at(tx,ty+1)===T_ROAD||World.at(tx,ty+1)===T_ALLEY;
+        const base=World.blockTint[(bi+World.blockTint.length)%World.blockTint.length]||'#c9bda6';
+        const open=v=>v===T_ROAD||v===T_ALLEY;
+        const front=open(World.at(tx,ty+1));
+        const back =open(World.at(tx,ty-1));
         if(front){
+          // 臨街立面：連續的街屋牆
+          rect(sx,sy,TS,TS,base);
+          rect(sx,sy,TS,3,'rgba(255,255,255,.20)');
           rect(sx,sy+TS-4,TS,4,'#8e8a80');
           for(let i=0;i<2;i++){
-            const lit=((hsh>>(i*3))&7)>2;
-            rect(sx+2+i*7,sy+3,5,6, lit?'#8fb6cc':'#6d8496');
-            rect(sx+2+i*7,sy+3,5,2, lit?'#c8e2ee':'#93a9b8');
+            rect(sx+3+i*7,sy+5,4,4,'#93a2ac');
+            rect(sx+3+i*7,sy+5,4,1,'#b8c6ce');
           }
+        }else if(back){
+          // 背面：後陽台、冷氣、鐵窗
+          rect(sx,sy,TS,TS,base);
+          rect(sx,sy,TS,3,'#a49b88');
+          rect(sx,sy+3,TS,2,'rgba(0,0,0,.10)');
+          if((hsh&3)!==0){ rect(sx+2,sy+7,5,5,'#9aa6ad'); rect(sx+3,sy+8,3,3,'#7f8b93') }
+          if((hsh&7)>3){ rect(sx+9,sy+6,5,4,'#c9c2b2'); rect(sx+9,sy+6,5,1,'#e0dacb') }
         }else{
-          rect(sx+1,sy+1,TS-2,TS-2,'rgba(255,255,255,.10)');
-          if((hsh&7)===1) rect(sx+4,sy+4,7,5,'#9aa2a8'); // 水塔／機房
-          if((hsh&15)===6) rect(sx+2,sy+10,12,3,'#a8aeb2');
+          // 屋頂：從上面看下去的頂樓
+          rect(sx,sy,TS,TS,base);
+          rect(sx+1,sy+1,TS-2,TS-2,'rgba(255,255,255,.09)');
+          const k=hsh%11;
+          if(k===0){ // 水塔
+            rect(sx+4,sy+4,8,8,'#8fa0ab'); rect(sx+4,sy+4,8,2,'#b4c2cb');
+            rect(sx+5,sy+12,2,3,'#78848d'); rect(sx+9,sy+12,2,3,'#78848d');
+          }else if(k===1){ // 頂樓加蓋
+            rect(sx+2,sy+3,12,10,'#cfc4ac'); rect(sx+2,sy+3,12,3,'#8d8471');
+            rect(sx+6,sy+8,4,5,'#8fa9b8');
+          }else if(k===2){ // 樓梯間
+            rect(sx+3,sy+2,9,9,'#bfb6a2'); rect(sx+3,sy+2,9,2,'#9a917e');
+          }else if(k===3){ // 冷氣室外機
+            rect(sx+3,sy+6,6,5,'#b9c0c5'); rect(sx+3,sy+6,6,1,'#d6dbde');
+            rect(sx+10,sy+7,4,4,'#b9c0c5');
+          }else if(k===4){ // 曬衣桿
+            rect(sx+2,sy+5,12,1,'#8d8674'); rect(sx+2,sy+9,12,1,'#8d8674');
+            rect(sx+4,sy+5,2,4,'#dfe3e6'); rect(sx+9,sy+9,3,4,'#e6d3c0');
+          }else if(k===5){ // 女兒牆分戶線
+            rect(sx,sy+7,TS,2,'#a49b88');
+          }else if(k===6){ // 舊招牌／雜物
+            rect(sx+3,sy+4,10,3,'#a8907a'); rect(sx+5,sy+9,6,4,'#9aa2a8');
+          }
         }
+        // 街廓邊緣壓深，屋頂才有「一棟一棟」的層次
+        if(open(World.at(tx-1,ty))) rect(sx,sy,2,TS,'rgba(60,56,48,.22)');
+        if(open(World.at(tx+1,ty))) rect(sx+TS-2,sy,2,TS,'rgba(60,56,48,.22)');
       }
     }
   }
@@ -1769,13 +1830,84 @@ function drawCity(t){
   // 門面
   for(const h of World.houses){
     const sx=h.x*TS-ox, sy=h.y*TS-oy;
-    if(sx<-40||sy<-56||sx>VW+40||sy>VH+40) continue;
+    if(sx<-40||sy<-80||sx>VW+40||sy>VH+40) continue;
     drawFacade(h,sx,sy,t);
+  }
+}
+
+const BT_PAL={
+  tower :{wall:'#c3ccd2',trim:'#98a4ad',dark:'#7d8a94',glass:'#7fa8c4',lit:'#bfe0f0'},
+  walkup:{wall:'#d8cdb4',trim:'#b4a68c',dark:'#8f8672',glass:'#8fa9b8',lit:'#c6dbe6'},
+  town  :{wall:'#e0cfb6',trim:'#b39a7c',dark:'#8e785d',glass:'#87a4b4',lit:'#c2d8e2'},
+  shop  :{wall:'#d6c8b6',trim:'#a89179',dark:'#847057',glass:'#9fc3d4',lit:'#d2e7f0'}
+};
+
+/* 建物立面：一律朝南，往上長出樓層 */
+function drawBody(h,sx,sy){
+  const bt=h.bt||'walkup', P=BT_PAL[bt]||BT_PAL.walkup;
+  const tone=h.tone||0.5;
+  if(bt==='tower'){
+    const H=52, y0=sy-H+TS;
+    rect(sx-3,y0,TS+6,H,P.wall);
+    rect(sx-3,y0,TS+6,3,P.trim);                       // 女兒牆
+    rect(sx+2,y0-5,7,5,P.dark); rect(sx+3,y0-4,5,3,'#b7c2c9');   // 水塔
+    rect(sx+11,y0-3,4,3,P.trim);                       // 機房
+    for(let f=0;f<5;f++){                              // 一格一格的窗
+      const wy=y0+6+f*8;
+      for(let i=0;i<3;i++){
+        const on=((h.id*7+f*3+i)%5)>2;
+        rect(sx-1+i*6,wy,4,5, on?P.lit:P.glass);
+        rect(sx-1+i*6,wy,4,1,'#e2eef5');
+      }
+      rect(sx-3,wy+6,TS+6,1,P.trim);                   // 樓層分隔線
+    }
+    rect(sx-3,sy-2,TS+6,3,P.dark);                     // 一樓門廳雨遮
+    rect(sx-3,sy+1,6,TS-1,'#9fb8c8'); rect(sx-2,sy+2,4,TS-3,P.glass); // 警衛室窗
+  }else if(bt==='walkup'){
+    const H=38, y0=sy-H+TS;
+    rect(sx-2,y0,TS+4,H,P.wall);
+    rect(sx-2,y0,TS+4,3,P.trim);
+    rect(sx+1,y0-4,8,4,'#c8bda6'); rect(sx+1,y0-4,8,1,'#ddd3bf');  // 頂樓加蓋
+    for(let f=0;f<3;f++){
+      const wy=y0+7+f*10;
+      for(let i=0;i<2;i++){
+        rect(sx+i*8,wy,6,7,P.glass);
+        rect(sx+i*8,wy,6,1,P.lit);
+        // 鐵窗
+        rect(sx+i*8,wy,6,7,'rgba(70,64,54,.0)');
+        for(let b=0;b<3;b++) rect(sx+i*8+1+b*2,wy,1,7,'rgba(60,56,48,.55)');
+        rect(sx+i*8,wy+3,6,1,'rgba(60,56,48,.55)');
+      }
+    }
+    rect(sx-2,sy-1,TS+4,2,P.dark);
+  }else if(bt==='town'){
+    const H=34, y0=sy-H+TS;
+    rect(sx-1,y0+3,TS+2,H-3,P.wall);
+    rect(sx-2,y0,TS+4,4,'#9c6b4f'); rect(sx-2,y0,TS+4,2,'#bb8560');  // 斜屋簷
+    for(let f=0;f<2;f++){
+      const wy=y0+9+f*11;
+      rect(sx+2,wy,11,6,P.glass); rect(sx+2,wy,11,1,P.lit);
+      rect(sx+1,wy+7,13,2,P.trim);                    // 陽台欄杆
+      rect(sx+3,wy+7,1,2,P.dark); rect(sx+7,wy+7,1,2,P.dark); rect(sx+11,wy+7,1,2,P.dark);
+    }
+    rect(sx+1,sy+2,7,TS-3,'#a9a49a');                 // 鐵捲門車庫
+    for(let g=0;g<5;g++) rect(sx+1,sy+3+g*2,7,1,'#8e8a80');
+  }else{ // 店面
+    const H=26, y0=sy-H+TS;
+    rect(sx-2,y0+7,TS+4,H-7,P.wall);
+    rect(sx-2,y0,TS+4,8, tone>.5?'#c2453c':'#2f6ba0');   // 大招牌
+    rect(sx-2,y0,TS+4,2,'rgba(255,255,255,.45)');
+    rect(sx-1,y0+3,TS+2,2,'rgba(255,255,255,.30)');
+    rect(sx-2,sy-3,TS+4,4, tone>.5?'#e8d9b8':'#cdd8dd'); // 遮陽棚
+    for(let i=0;i<4;i++) rect(sx-2+i*4,sy-3,2,4,'rgba(190,120,80,.45)');
+    rect(sx-1,sy+1,TS+2,TS-1,P.glass);                  // 落地玻璃
+    rect(sx-1,sy+1,TS+2,2,P.lit);
   }
 }
 
 function drawFacade(h,sx,sy,t){
   const isOffice=!!h.office;
+  drawBody(h,sx,sy);
   if(!isOffice && !h.sale) return;
   // 雨遮
   rect(sx-1,sy+1,TS+2,4, isOffice?'#c4831f':'#8a3b32');
@@ -1991,6 +2123,7 @@ function fitStage(){
   w=Math.floor(w); h=Math.floor(h);
   $stage.style.width=w+'px'; $stage.style.height=h+'px';
   $stage.style.setProperty('--sw',w+'px');
+  $stage.style.setProperty('--sh',h+'px');
   // 窄螢幕用較低的內部解析度，格子才不會小到看不清楚
   const lw = w<470 ? 336 : 480;
   const lh = Math.max(224,Math.min(832,Math.round(lw/a/16)*16));
@@ -2460,6 +2593,7 @@ function showDeed(h){
     <h4>建物標示部</h4>
     <dl>
       <dt>建物門牌</dt><dd class="big">${esc(h.addr.full)}</dd>
+      <dt>建物型態</dt><dd>${d.btName}</dd>
       <dt>主要用途</dt><dd>${d.use}</dd>
       <dt>主要建材</dt><dd>${d.mat}</dd>
       <dt>層數／層次</dt><dd>共 ${d.total} 層　本棟第 ${d.floor} 層</dd>
@@ -2516,6 +2650,12 @@ function arriveTarget(h){
     if(!spend(AP_TALK)) return;
     Game.nav=null; setActs();
     const r=rngFor(Game.seed,'clue'+h.id+Game.day);
+    if(h.bt==='tower'){
+      A.sfx('guard');
+      say('管理員',[`（${h.addr.full}。這裡也是大樓，一樣要先過警衛室。）`,'「你找哪一戶？有沒有跟住戶約？」'],
+        ()=>startDuel('guard',src,h,0));
+      return;
+    }
     if(r()<.8) say('　',[`（你按了 ${h.addr.full} 的電鈴。）`,'（門開了。是他。）'],()=>knockOwner(src,h));
     else say('　',['（門沒開。窗簾動了一下，然後沒有然後了。）'],()=>offerLetter(src,'撲空'));
     return;
@@ -2524,7 +2664,17 @@ function arriveTarget(h){
   const st=Game.hs(src.id); st.visits=(st.visits||0)+1;
   Game.nav=null; setActs();
   const r=rngFor(Game.seed,'enc'+src.id+'#'+st.visits+'#'+Game.day);
-  const roll=Math.floor(r()*6), addr=h.addr.full;
+  const addr=h.addr.full;
+  if(h.bt==='tower'){          // 電梯大樓一定有管理員，來幾次都一樣
+    A.sfx('guard');
+    const gw=Game.hs(h.id).guardWins||0;
+    say('管理員',[`（${addr} 是一棟有電梯的大樓，一樓有警衛室。）`,
+      gw ? '（同一個管理員。他認得你了，但還是把窗戶拉開。）' : '（你一走進大廳，警衛室的窗戶就開了。）',
+      gw ? '「又是你喔？今天找哪一戶？」' : '「先生，你找哪一戶？」'],
+      ()=>startDuel('guard',src,h,0));
+    return;
+  }
+  const roll=Math.floor(r()*6);
   switch(roll){
     case 0:
       A.sfx('door');
@@ -2563,9 +2713,9 @@ function arriveTarget(h){
       break;
     }
     default:
-      A.sfx('guard');
-      say('管理員',[`（${addr} 是一棟有電梯的大樓。你一進去，警衛室的窗戶就開了。）`,'「先生，你找哪一戶？」'],
-        ()=>startDuel('guard',src,h,0));
+      say('　',[`（${addr}。鐵門拉下來了，信箱塞了兩張水電通知。）`,
+        '（隔壁的阿姨從窗戶看你一眼，把窗戶關上。）'],
+        ()=>offerLetter(src,'大門深鎖'));
   }
 }
 
@@ -2755,7 +2905,10 @@ function startDuel(kind,src,here,bonus){
     ? shuffled(rngFor(Game.seed,'gd'+here.id),GUARD_MOVES).slice(0,4)
     : d.moves;
   let maxG;
-  if(kind==='guard') maxG=84;
+  if(kind==='guard'){
+    const gw=Game.hs(here.id).guardWins||0;
+    maxG=Math.max(44,84-16*gw);
+  }
   else{
     maxG = d.guard*0.9 - 8*(st.knocks||0) - (st.letter?8:0) - 11*(st.tries||0) + (bonus||0);
     maxG = Math.max(52,Math.round(maxG*1.12));
@@ -2931,6 +3084,7 @@ function duelEnd(win){
   if(D.kind==='guard'){
     if(win){
       A.sfx('good');
+      const gs=Game.hs(D.here.id); gs.guardWins=(gs.guardWins||0)+1;
       const r=rngFor(Game.seed,'gw'+D.here.id+Game.day);
       if(r()<.55){
         card('管理員鬆口了','BREAK',
