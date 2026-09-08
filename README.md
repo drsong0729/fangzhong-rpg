@@ -16,22 +16,14 @@
 
 ## 共享排行榜（Firebase）
 
-預設是**本機排行榜**（只記錄這台裝置）。要變成跨裝置共享，做兩件事：
+**已經設定好了**，共享排行榜是開著的。
 
-### 1. 填入設定
+- Firebase 專案：`fangzhong-rpg`（asia-east1 / 台灣，Spark 免費方案，沒有開 Google Analytics）
+- 集合：`leaderboard`
+- 設定寫在 `index.html` 的 `const FIREBASE={...}`
 
-打開 `index.html`，搜尋 `const FIREBASE=`，填入專案資訊：
-
-```js
-const FIREBASE={ apiKey:'AIza...', projectId:'你的專案ID', collection:'leaderboard' };
-```
-
-（建議**另開一個 Firebase 專案**專門放排行榜，不要用 estate-tracker，
-因為那個專案有 App Check 與白名單規則，會擋掉未登入的玩家。）
-
-### 2. 設定 Firestore 安全規則
-
-在 Firebase Console → Firestore → 規則，貼上：
+Firebase 的 web API key 本來就是公開識別碼，不是密鑰；真正的防護在下面這組安全規則
+（只允許新增、不能改不能刪，而且欄位型別與數值範圍都會驗證）：
 
 ```
 rules_version = '2';
@@ -55,10 +47,10 @@ service cloud.firestore {
 }
 ```
 
-只允許新增、不允許改寫或刪除，而且欄位與數值範圍都會被驗證，
-所以 API key 直接寫在前端沒有問題（Firebase 的 web API key 本來就是公開的）。
+排行榜連不上時（例如在 Claude Artifact 的沙箱裡，對外 fetch 會被擋）
+會自動退回本機榜，不會讓遊戲壞掉。
 
-排行榜連不上時會自動退回本機榜，不會讓遊戲壞掉。
+要換成別的 Firebase 專案，改 `index.html` 裡的 `FIREBASE` 那一行就好。
 
 ---
 
