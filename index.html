@@ -177,6 +177,41 @@ button{font-family:inherit;color:inherit}
 .freeform button:disabled{opacity:.4;cursor:not-allowed}
 .thinking{font-family:var(--f-mono);font-size:7.5px;color:var(--violet);letter-spacing:.08em;margin-top:6px;line-height:1.7}
 
+/* 自由輸入 */
+.ffwrap{display:flex;gap:7px;align-items:stretch;margin-top:2px}
+.ffwrap textarea{flex:1;min-width:0;resize:none;background:#0e1620;border:2px solid var(--violet);
+  border-radius:3px;color:var(--cream);padding:9px 11px;font-family:var(--f-body);
+  font-size:14.5px;line-height:1.55}
+.ffwrap textarea::placeholder{color:var(--dimmer)}
+.ffwrap textarea:disabled{opacity:.55}
+.ffgo{flex:none;background:var(--violet);border:2px solid #a596f0;color:#0e0b1c;font-weight:900;
+  border-radius:3px;padding:0 15px;cursor:pointer;font-size:13.5px;letter-spacing:.06em;white-space:nowrap}
+.ffgo:disabled{opacity:.4;cursor:wait}
+.coach{font-size:12px;line-height:1.75;color:var(--dim);font-family:var(--f-body);
+  background:#0e1620;border:2px solid var(--line);border-left:5px solid var(--violet);
+  border-radius:3px;padding:8px 10px}
+.coach .cl{display:inline-block;font-family:var(--f-mono);font-size:7px;letter-spacing:.08em;
+  background:var(--violet);color:#0e0b1c;padding:3px 5px;border-radius:2px;margin-right:6px;
+  vertical-align:1px}
+.coach .cl.tipc{background:var(--amber);color:#22190a}
+.coach .cl.warn{background:var(--red);color:#fff}
+.coach.think{border-left-color:var(--amber);color:var(--amber);font-family:var(--f-mono);font-size:8.5px;letter-spacing:.08em}
+.coach.warn{border-left-color:var(--red);color:var(--red)}
+
+/* 排行榜 */
+.board{border:2px solid var(--line);border-radius:3px;overflow:hidden;max-height:52vh;overflow-y:auto}
+.bhd,.brow{display:grid;grid-template-columns:44px 1fr 74px 62px;align-items:center;gap:6px;padding:8px 10px}
+.bhd{background:var(--panel2);font-family:var(--f-mono);font-size:7.5px;letter-spacing:.08em;
+  color:var(--dimmer);position:sticky;top:0}
+.brow{border-top:1px solid var(--line);font-size:13.5px}
+.brow:nth-child(even){background:rgba(255,255,255,.02)}
+.brow.mine{background:rgba(246,178,60,.09)}
+.brow .rk{font-family:var(--f-mono);font-size:11px;color:var(--dimmer);text-align:center}
+.brow:nth-child(2) .rk,.brow:nth-child(3) .rk,.brow:nth-child(4) .rk{font-size:15px}
+.brow .nm{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.brow .dy{font-family:var(--f-mono);font-size:12px;color:var(--amber);font-variant-numeric:tabular-nums}
+.brow .sg{font-family:var(--f-mono);font-size:10px;color:var(--jade)}
+
 /* 行動列 */
 .acts{flex:none;display:flex;gap:7px;align-items:center;overflow-x:auto;overflow-y:hidden;
   padding-bottom:2px;scrollbar-width:thin}
@@ -295,6 +330,7 @@ button{font-family:inherit;color:inherit}
         <div class="menu">
           <button class="mbtn" id="mNew">新遊戲<small>NEW GAME</small></button>
           <button class="mbtn" id="mLoad" disabled>載入遊戲<small id="mLoadSub">NO DATA</small></button>
+          <button class="mbtn" id="mBoard">排行榜<small>LEADERBOARD</small></button>
           <button class="mbtn" id="mCredits">製作人員<small>CREDITS</small></button>
         </div>
         <div class="tt-foot">方向鍵／WASD 移動　空白鍵 互動　手機用畫面左下方向鍵</div>
@@ -860,6 +896,220 @@ const NPC_SMALLTALK=[
 ];
 
 /* ═══════════════════════════════════════════════════════════
+   對話教練：本機評分引擎（沒有 AI 時頂替）＋ 每一招的關鍵與建議
+   ═══════════════════════════════════════════════════════════ */
+
+/* 全域地雷：講了就重扣，屋主會直接翻臉 */
+const LANDMINES=[
+  {re:/(保證|一定).{0,6}(賣掉|成交|賣得掉|幫您賣)/, w:34, why:'不要保證賣掉——你做不到，屋主也知道'},
+  {re:/(包在我身上|沒問題啦|絕對沒問題)/, w:26, why:'空頭支票，屋主聽過太多次'},
+  {re:/(毀約|解約|終止.{0,4}(合約|委託|專任)|違約|跟他解除)/, w:38, why:'叫屋主毀約是踩紅線'},
+  {re:/(寫低|做假|逃稅|漏稅|實價.{0,4}(低|少)報|陰陽)/, w:46, why:'涉及不實登載，絕對不能講'},
+  {re:/(鑰匙|備份鑰)/, w:30, why:'第一次見面就要鑰匙，任何人都會退一步'},
+  {re:/(我先.{0,4}刊|幫您.{0,4}(刊登|上網|PO)|上網刊)/, w:30, why:'沒有委託就刊登，屋主會覺得你不守規矩'},
+  {re:/(找|聯絡|跟).{0,4}租客/, w:28, why:'越過屋主去找租客是大忌'},
+  {re:/(叫|請|讓).{0,4}(他|租客).{0,4}(搬|退租)/, w:30, why:'等於叫屋主違約'},
+  {re:/(降價|殺價|價格.{0,4}(降|修|砍)|開太高|賣不掉|不可能賣)/, w:30, why:'還沒建立關係就談降價，屋主只會覺得你在打壓他'},
+  {re:/(別家|他們|前面那家).{0,6}(不專業|亂來|沒用|不行|很爛)/, w:30, why:'貶低同業，屋主只會覺得你也一樣'},
+  {re:/(騙人|被坑是你|你自己沒看)/, w:34, why:'把責任推給屋主'},
+  {re:/(打給|聯絡).{0,4}(您的|你的)?家人/, w:30, why:'越過屋主去找他家人'},
+  {re:/(現在不賣|以後|明年).{0,6}(更難|更慘|更差)/, w:24, why:'恐嚇式話術，屋主聽了只會更硬'},
+  {re:/(我做很久|經驗很豐富|我很專業)/, w:20, why:'自吹沒有用，屋主要的是證據'}
+];
+
+/* 承接情緒 / 具體下一步 / 有禮貌地問 */
+const EMPATHY=/(了解|我懂|我知道|明白|難怪|辛苦|不好意思|抱歉|是我不對|不打擾|不勉強|不為難|尊重|您說得對|有道理|恭喜|謝謝)/;
+const CONCRETE=/(禮拜|星期|下週|下次|三分鐘|三天|一週|每週|三十天|30天|三週|整理|印|報告|回報|備齊|資料|實價|實登|謄本|行情表|名片|不收費|成交才收|不用您|我來排|我來備|留一份|留給您|寄給您|拿給您|安排|記下來|下一步)/;
+const ASKQ=/(請問|方便|可以嗎|好嗎|您覺得|要不要|大概什麼時候|幾號)/;
+const NOCOMMIT=/(不敢保證|不敢跟您保證|我不騙您|我做不到|沒辦法保證)/;
+
+/* 每一招的關鍵字與教練建議 */
+const MOVE_HINTS={
+ exclusive:{k:['到期','期限','幾月','什麼時候','結束','下次','再來','行情','實價','資料','不打擾','不搶'],
+   tip:'他不是不想賣，是合約還沒結束。問到期日、把下一次拜訪先約下來，比說服他更有用。'},
+ toomany:{k:['一件事','只做','實價','成交','行情','整理','不多佔','不用簽','看完再','資料'],
+   tip:'他煩的是「又多一個人打電話」。先把要求降到零——只給資料、不要求簽約。'},
+ buyerfirst:{k:['立場','斡旋','三十天','30天','自動結束','不綁','開門','帶看','沒成交','委託'],
+   tip:'講清楚委託是「讓你有立場做事」，而且期限一到自動結束，他不會被綁住。'},
+ aftersee:{k:['準備','屋況','權狀','謄本','備齊','前置','正式','才能','先做'],
+   tip:'讓他知道帶看前面有一堆前置作業，委託只是啟動這些作業的門票。'},
+ fee:{k:['成交才收','沒成交','不用付','一毛','成交價','再議','之後再談','不用先'],
+   tip:'服務費的破綻是「成交才收」。強調沒成交零成本，並把費率談判往後推。'},
+ selfsell:{k:['安全','陌生人','收訂','斡旋','違約','免費','幫您看','條件','不收費'],
+   tip:'不要說他賣不掉。點出自售真正的風險——看屋安全與收訂之後的違約處理。'},
+ notrush:{k:['一般委託','沒到價','不賣','通知您','沒有損失','多一個','看著','行情'],
+   tip:'不急正好適合一般委託：價格沒到就不賣，對他完全沒有損失。'},
+ friend:{k:['不搶','專業','前輩','買方','名單','對得上','叫我','通路'],
+   tip:'千萬別跟他的朋友比。改成「我不搶案子，只留一組買方條件給您」。'},
+ young:{k:['還在補','不騙您','這條街','七天','最清楚','測試我','小事情','熟'],
+   tip:'承認資歷淺反而加分。用「這一區我最熟」和「先用小事情測試我」換一次機會。'},
+ market:{k:['價格對','資料齊','資料','備','第一批','您決定','我來'],
+   tip:'把市場問題拆成「價格」與「資料」，價格他決定、資料你來備，他就沒有理由拒絕。'},
+ price:{k:['不敢保證','帶看','三週','市場回答','您自己決定','看屋量','再調','試市場'],
+   tip:'不要評論他的開價。改成用帶看量讓市場回答，要不要調由他自己決定。'},
+ family:{k:['當然','兩份','家人','禮拜','再來','不急','等您','資料'],
+   tip:'要問家人不是拒絕，是流程。陪他走流程——留兩份資料、約下一次。'},
+ distrust:{k:['寫在紙上','每一步','叫停','不解釋','隨時','看得到','透明','紀錄'],
+   tip:'不要替同業辯解。承諾一件他可以檢查的事：每一步都寫下來、他隨時能喊停。'},
+ tenant:{k:['租客','時段','我來排','帶看條件','接手租約','賣點','不用您'],
+   tip:'租約不是障礙是賣點。把排時段的麻煩全部接過來，他就少一個理由。'},
+ neighbor:{k:['開價','成交價','兩回事','實價','實登','過戶','一起看','印給您'],
+   tip:'不要評論隔壁開多少。用實價登錄把「開價」和「成交價」分開，讓數字說話。'},
+ later:{k:['三分鐘','不佔用','留一份','名片','行情表','下次','經過','打招呼'],
+   tip:'把時間需求壓到最低，並預告下一次會再出現，不要當場硬留。'},
+ nodoc:{k:['不用給','公開','謄本','已經調','等您','願意再說','不勉強'],
+   tip:'直接說你不需要他的資料——謄本是公開的你已經調了。誠實會換到分數。'},
+ onlyone:{k:['沒聽過','正常','直營','只做這一區','成交紀錄','再決定','小店'],
+   tip:'不要比品牌大小。用「只做這一區」和實際成交紀錄換信任。'},
+ taxes:{k:['持有年限','取得成本','整理','算給您','數字','不會亂算','試算'],
+   tip:'不要說「一定有辦法」。提出可以動手做的事：幫他把年限與成本整理成真實數字。'},
+ memory:{k:['不急','不簽','不逼','資料留','想清楚','等您','慢慢','您決定'],
+   tip:'這一招不能推。明確說出「委託可以先不簽」，把主導權還給他。'},
+ suspicious:{k:['牌子','門牌','謄本','公開','收起來','不打擾','照著調'],
+   tip:'來源要講得一清二楚，並主動給他喊停的權利，他的警戒才會降下來。'},
+ sold:{k:['恭喜','道賀','沒成','禮拜','再來','不用通知','先祝'],
+   tip:'先真心恭喜他，再把自己安排成「Plan B」，並約好下一次自己來。'},
+ photo:{k:['不拍','不放照片','不寫門牌','格局','坪數','現場','不曝光'],
+   tip:'直接答應不拍，並提出替代方案：只寫格局坪數、現場再看。'},
+ rushvisit:{k:['不用您到場','規則','拍照','回報','每一次','約一次','我來'],
+   tip:'把「他要配合」變成「他完全不用到場」，再用每次回報補上他的不安。'},
+ commission2:{k:['不敢保證','進度','每週','報告','回饋','隨時終止','做不到'],
+   tip:'敢說「賣掉我不敢保證」的人才可信。改成保證你做得到的東西——進度與回報。'},
+ g1:{k:['不是要問','不問','東西','代收','信','管委會','住戶自己','怎麼給'],
+   tip:'不要跟他要資料。改問「東西要怎麼給住戶」，他就不必違反規定。'},
+ g2:{k:['我不上去','訪客單','填','留下來','是我不對','沒有預約','不為難'],
+   tip:'先認錯、放棄上樓，再提出一個他可以答應的替代做法。'},
+ g3:{k:['辛苦','不算','放這裡','就走','有住戶問','再給他','不打擾'],
+   tip:'先體諒他每天被打擾，再把自己從「第七個仲介」變成「馬上會走的人」。'},
+ g4:{k:['名片','證號','營業員','證照','拍起來','公司','電話','姓名'],
+   tip:'資料越齊越好。名片、證號、公司電話一次給足，讓他有東西可以登記。'},
+ g5:{k:['等','不出聲','放','退一步','不吵','抬頭','安靜'],
+   tip:'他在測你會不會硬闖。安靜地等，比大聲叫他有用。'},
+ g6:{k:['不為難','名片','請他打','不會說是您','最後','謝謝'],
+   tip:'走之前留一條不會害到他的路：請他轉交，並保證不會說是他給的。'}
+};
+
+/* 各分數帶的通用回話（本機模式） */
+const BAND_REPLY={
+ hi:['屋主停了半秒：「……你這樣講，我倒是第一次聽到。」',
+     '屋主的手從門把上放下來了。',
+     '屋主看了你一眼：「嗯，你講的這個我沒想過。」',
+     '屋主沒有馬上回話，但也沒有要關門的意思。'],
+ mid:['屋主：「嗯。」（他沒有點頭，但也沒有走開。）',
+      '屋主：「你講的我聽到了啦。」',
+      '屋主：「……然後呢？」',
+      '屋主看了一下手錶：「你繼續講。」'],
+ low:['屋主：「你這樣講，跟前面那幾個有什麼不一樣？」',
+      '屋主：「所以呢？你要我怎樣？」',
+      '屋主：「我剛剛講的你有聽懂嗎？」',
+      '屋主皺了一下眉：「講重點。」'],
+ bad:['屋主的臉沉下來：「你這句話講得不太好。」',
+      '屋主往後退半步：「我覺得我們不用談了。」',
+      '屋主：「你們仲介就是這樣我才不想簽。」',
+      '屋主的手又回到門把上了。']
+};
+const GUARD_BAND_REPLY={
+ hi:['管理員的肩膀鬆了一點：「……你倒是講得清楚。」','管理員看了你兩秒：「好啦，這個可以。」'],
+ mid:['管理員：「嗯，然後咧。」','管理員：「你講這個沒有用啦。」'],
+ low:['管理員：「先生，我剛剛講過了。」','管理員：「你是聽不懂嗎？」'],
+ bad:['管理員站起來了。','管理員：「我要通報囉。」']
+};
+
+/* ── 本機評分引擎 ───────────────────────────────────────── */
+function coachScore(mvId,text,prev){
+  const t=String(text||'').trim();
+  const H=MOVE_HINTS[mvId]||{k:[],tip:''};
+  const notes=[], tips=[];
+  let missNote=false;
+  let s=14;
+
+  if(t.length<6) return {score:0,band:'bad',
+    note:'太短了，屋主聽不出你要表達什麼。',tip:H.tip||'',short:true};
+  if(prev&&prev.some(p=>p===t)) return {score:5,band:'bad',
+    note:'同樣的話你已經講過一次了，他不會有第二種反應。',tip:H.tip||''};
+
+  // 地雷
+  let mine=0, mineWhy='';
+  for(const L of LANDMINES){ if(L.re.test(t)){ mine+=L.w; if(!mineWhy) mineWhy=L.why } }
+  if(mine){ s-=Math.min(70,mine); notes.push('踩到地雷——'+mineWhy) }
+
+  // 破綻關鍵字
+  const hits=H.k.filter(k=>t.indexOf(k)>=0);
+  if(hits.length){
+    s+=Math.min(44,hits.length*15);
+    notes.push('有講到這一招的關鍵：「'+hits.slice(0,3).join('」「')+'」');
+  }else if(!mine){
+    missNote=true;
+  }
+
+  // 承接情緒
+  if(EMPATHY.test(t)){ s+=11; notes.push('有先承接他的情緒') }
+  else if(!mine) tips.push('先接住他的話再講你的');
+
+  // 具體下一步
+  if(CONCRETE.test(t)){ s+=13; notes.push('有給出具體、對他零成本的下一步') }
+  else if(!mine) tips.push('缺一個他今天就能答應的具體動作');
+
+  // 不亂保證
+  if(NOCOMMIT.test(t)){ s+=8; notes.push('沒有亂開支票，這是加分的') }
+  // 有禮貌地問
+  if(ASKQ.test(t)) s+=6;
+
+  // 長度
+  if(t.length<14) s-=8;
+  else if(t.length>90) { s-=6; tips.push('話太長了，屋主站在門口聽不完') }
+  else if(t.length>=24&&t.length<=80) s+=4;
+
+  if(missNote) notes.push('但沒有回應到他真正在意的那一點');
+  s=Math.max(0,Math.min(100,Math.round(s)));
+  const band = s>=72?'hi' : s>=48?'mid' : s>=26?'low' : 'bad';
+  return {score:s,band,note:notes.join('；')||'他沒什麼反應。',
+    tip:(tips.length?tips.join('；')+'。':'')+(H.tip||'')};
+}
+
+function coachReply(mv,band,isGuard){
+  const bank=isGuard?GUARD_BAND_REPLY:BAND_REPLY;
+  if(band==='hi'&&mv&&mv.good) return Math.random()<.62?mv.good.r:pickA(bank.hi);
+  if(band==='mid'&&mv&&mv.ok)  return Math.random()<.55?mv.ok.r:pickA(bank.mid);
+  if(band==='bad'&&mv&&mv.bad) return Math.random()<.5?mv.bad[Math.floor(Math.random()*mv.bad.length)].r:pickA(bank.bad);
+  return pickA(bank[band]||bank.mid);
+}
+function pickA(a){ return a[Math.floor(Math.random()*a.length)] }
+
+/* ── 套話：三題自由作答 ──────────────────────────────────── */
+const PROBE_Q=[
+ {q:'「你找誰？」',
+  k:['我是','仲介','名片','不好意思','打擾','附近','房屋','敝姓'],
+  bad:[{re:/(朋友|親戚|同事)/,why:'謊稱關係，被追問就穿幫'},{re:/(他在嗎|地址|住哪)/,why:'一開口就要人，對方會立刻警戒'}],
+  tip:'先報自己是誰、遞名片，比先問人有用。',
+  ok:'對方接過名片，語氣鬆了：「喔你是仲介喔，我還以為是推銷的。」',
+  no:'對方警戒起來：「你問這個要幹嘛？」'},
+ {q:'對方：「你找他到底什麼事？」',
+  k:['房子','掛','在賣','確認','資料','怕','亂刊','門口','牌子','謄本'],
+  bad:[{re:/(委託|簽|生意)/,why:'講到簽約，對方立刻覺得你是來拉生意的'},{re:/(不方便|不能講|隱私)/,why:'你不肯講，對方也不會肯講'}],
+  tip:'把來意講成「確認資料、避免被亂刊」，比講「談委託」安全得多。',
+  ok:'對方點頭：「喔，那間喔，是有掛在賣沒錯。」',
+  no:'對方擺擺手：「那你就是要來拉生意的嘛。」'},
+ {q:'對方：「他現在不住這裡了，你要找他……」（話講一半停住。）',
+  k:['沒關係','不方便','留','資料','行情','謝謝','麻煩您','不打擾','那我'],
+  bad:[{re:/(地址給我|住哪|門牌|等他|在這邊等)/,why:'追問地址會讓對方立刻收回'}],
+  tip:'他停住是在猶豫。這時候退半步、不追問，他反而會自己講出來。',
+  ok:'對方翻了翻你留下的資料：「你們現在做這麼細喔。他搬去{ADDR}那邊了。」',
+  no:'對方搖搖頭：「歹勢啦，我真的不方便講。」'}
+];
+function probeScore(i,text){
+  const Q=PROBE_Q[i], t=String(text||'').trim();
+  if(t.length<5) return {ok:false,score:0,note:'太短了，對方聽不懂你要幹嘛。',tip:Q.tip};
+  for(const b of Q.bad){ if(b.re.test(t)) return {ok:false,score:8,note:'踩到地雷——'+b.why,tip:Q.tip} }
+  const hits=Q.k.filter(k=>t.indexOf(k)>=0);
+  let s=18+hits.length*20+(EMPATHY.test(t)?12:0)+(t.length>=14?6:0);
+  s=Math.min(100,s);
+  return {ok:s>=50,score:s,
+    note:hits.length?('有講到重點：「'+hits.slice(0,2).join('」「')+'」'):'沒有講到對方在意的點',
+    tip:Q.tip};
+}
+
+/* ═══════════════════════════════════════════════════════════
    世界：城市生成、門牌編碼、謄本資料、像素繪圖
    ═══════════════════════════════════════════════════════════ */
 
@@ -1341,13 +1591,13 @@ const P={x:0,y:0,dir:2,frame:0,walkT:0,stepT:0};
 /* ── 遊戲狀態 ── */
 const Game={
   scene:'title', name:'', seed:'', day:1, ap:AP_DAY, signed:0,
-  hstate:{}, letters:[], nav:null, logs:[], duel:null, dayOver:false, lastBoss:-1,
+  hstate:{}, letters:[], nav:null, logs:[], duel:null, dayOver:false, lastBoss:-1, doneDay:0,
   hs(id){ return this.hstate[id]||(this.hstate[id]={seen:false,letter:false,signed:false,
     refused:false,visits:0,knocks:0,tries:0}) },
   reset(seed,name){
     this.seed=seed; this.name=name; this.day=1; this.ap=AP_DAY; this.signed=0;
     this.hstate={}; this.letters=[]; this.nav=null; this.logs=[]; this.duel=null;
-    this.dayOver=false; this.lastBoss=-1;
+    this.dayOver=false; this.lastBoss=-1; this.doneDay=0;
   }
 };
 
@@ -1363,18 +1613,40 @@ const AI={s:null,ready:false,
   },
   async judge(ctx,line){
     const hist=ctx.history.length
-      ? '【剛才的對話】\n'+ctx.history.map(h=>(h.who==='o'?'屋主：':'房仲：')+h.t).join('\n')+'\n' : '';
-    const prompt=`你是一款台灣房仲養成遊戲的裁判兼演員。玩家扮演菜鳥房仲，正在說服屋主簽委託。
-【屋主設定】性格：${ctx.type}（${ctx.note}）；賣屋原因：${ctx.why}；物件：${ctx.addr}，${ctx.ping} 坪；目前戒心 ${ctx.guardPct}%。
-${hist}【屋主這一句】${ctx.line}
-【玩家的回應】${line}
+      ? '【剛才的對話，屋主要記得自己說過什麼】\n'+ctx.history.map(h=>(h.who==='o'?'屋主：':'房仲：')+h.t).join('\n')+'\n' : '';
+    const prompt=`你是一款台灣房仲養成遊戲的裁判兼演員，扮演一位「不想簽委託」的屋主。
+【屋主設定】性格：${ctx.type}（${ctx.note}）；賣屋原因：${ctx.why}；物件：${ctx.addr}，${ctx.ping} 坪；目前戒心 ${ctx.guardPct}%（越高越難搞）。
+【你這一輪已經說出口的理由】${ctx.line}
+${hist}【房仲的回應】${line}
 
-評分請嚴格。台灣屋主本來就難纏，不會因為一句話就妥協：
-- 只有承接了屋主的情緒、又針對他這個理由提出「對他零成本、可執行的下一步」，才給 70 分以上。
-- 空泛的保證、只講自己多努力、只留資料沒有下一步，給 25～45 分。
-- 貶低同業、承諾做不到的事、逼迫、未經同意刊登或找租客、要求屋主違約或做假，給 0～15 分。
-回覆時請延續上面的對話，屋主要記得自己剛才說過什麼，不要換一個人格。
-只輸出 JSON：{"score":0到100的整數,"reply":"屋主的回應（40字內，台灣口語，可以再追問或再刁難）","note":"一句話點評（20字內）"}`;
+你的立場：你「預設就是不簽」。你不會因為對方講一句漂亮話就妥協，也不會主動幫他找台階。
+只有當對方同時做到「接住你的情緒」＋「針對你這個理由，提出一個對你零成本、今天就能執行的具體下一步」，你才會稍微鬆動；
+即使鬆動，你也要再追問或再丟一個新的顧慮，不要直接答應簽約。
+
+評分標準（請嚴格，寧可給低不要給高）：
+- 85～100：非常少見。完全命中你的理由，具體、零風險、你想不出反駁。
+- 65～84：有承接情緒又有具體下一步，但還有可挑剔的地方。
+- 40～64：態度可以，但只是空泛的努力宣示、沒有可執行的下一步。
+- 15～39：答非所問、只講自己、或又重複前面講過的話。
+- 0～14：踩到地雷——貶低同業、保證賣掉、逼迫、未經同意刊登或聯絡租客、要你毀約或做假、當場叫你降價。
+
+只輸出 JSON，不要有其他文字：
+{"score":整數0-100,
+ "reply":"屋主的回應（45字內，台灣口語，語氣要延續前面的對話，可以追問或再刁難）",
+ "note":"對這句話的評語（25字內，直接講好在哪或壞在哪）",
+ "tip":"給房仲的具體建議（30字內，下次可以怎麼講）"}`;
+    return await this.s.json(prompt,{modelTier:'quick'});
+  },
+  async probe(ctx,line){
+    const prompt=`你是一款台灣房仲養成遊戲的演員兼裁判，扮演${ctx.who}。
+房仲來按門鈴要找 ${ctx.sur} 姓的屋主（他名下的 ${ctx.addr} 掛在賣）。你知道他搬去 ${ctx.known}，但你有戒心，不會隨便講。
+【你剛才說】${ctx.q}
+【房仲的回應】${line}
+
+你預設不想透露。只有當對方先報清楚自己是誰、把來意講得讓你安心、而且沒有逼問地址時，你才會鬆一點。
+被追問地址、被謊稱關係、或對方一開口就談生意，你會立刻收回。
+第 ${ctx.round} 題（共 3 題），前兩題不要講出地址，最後一題若對方表現夠好才可以講出「${ctx.known}」。
+只輸出 JSON：{"score":整數0-100,"reply":"你的回應（40字內，台灣口語）","note":"評語（25字內）","tip":"給房仲的建議（30字內）"}`;
     return await this.s.json(prompt,{modelTier:'quick'});
   }
 };
@@ -1507,6 +1779,75 @@ function checkSave(){
   else{ b.disabled=true; sub.textContent='NO DATA' }
 }
 
+
+/* ═══ 排行榜 ═══════════════════════════════════════════════
+   把 FIREBASE 填好就會自動變成跨裝置共享榜；留空則只用本機榜。
+   Firestore 規則請見 README。                                   */
+const FIREBASE={ apiKey:'', projectId:'', collection:'leaderboard' };
+const BOARD_KEY='fangzhong_rpg_board_v1';
+const boardOn=()=>!!(FIREBASE.apiKey&&FIREBASE.projectId);
+
+function boardLocal(){ try{ return JSON.parse(localStorage.getItem(BOARD_KEY)||'[]') }catch(e){ return [] } }
+function boardSaveLocal(list){ try{ localStorage.setItem(BOARD_KEY,JSON.stringify(list.slice(0,100))) }catch(e){} }
+
+async function boardSubmit(entry){
+  const list=boardLocal(); list.push(entry);
+  list.sort((a,b)=>a.days-b.days||b.signed-a.signed||a.ts-b.ts);
+  boardSaveLocal(list);
+  if(!boardOn()) return;
+  try{
+    await fetch(`https://firestore.googleapis.com/v1/projects/${FIREBASE.projectId}/databases/(default)/documents/${FIREBASE.collection}?key=${FIREBASE.apiKey}`,
+      {method:'POST',headers:{'Content-Type':'application/json'},
+       body:JSON.stringify({fields:{
+         name:{stringValue:String(entry.name).slice(0,12)},
+         days:{integerValue:String(entry.days)},
+         signed:{integerValue:String(entry.signed)},
+         ts:{integerValue:String(entry.ts)}}})});
+  }catch(e){}
+}
+async function boardFetch(){
+  const local=boardLocal().map(e=>({...e,mine:true}));
+  if(!boardOn()) return {rows:local,shared:false};
+  try{
+    const r=await fetch(`https://firestore.googleapis.com/v1/projects/${FIREBASE.projectId}/databases/(default)/documents/${FIREBASE.collection}?key=${FIREBASE.apiKey}&pageSize=300`);
+    if(!r.ok) throw 0;
+    const j=await r.json();
+    const rows=(j.documents||[]).map(d=>({
+      name:(d.fields.name||{}).stringValue||'—',
+      days:+((d.fields.days||{}).integerValue||99),
+      signed:+((d.fields.signed||{}).integerValue||0),
+      ts:+((d.fields.ts||{}).integerValue||0)}));
+    return {rows,shared:true};
+  }catch(e){ return {rows:local,shared:false,err:true} }
+}
+function boardCard(){
+  const body=id=>`<div id="bdBody">${id}</div>`;
+  card('排行榜','幾天拿到 6 件',
+    body('<div class="empty">讀取中⋯⋯</div>'),
+    [{key:'✕',label:'關閉',fn:()=>{A.sfx('cancel');closeOvl()}}]);
+  boardFetch().then(({rows,shared,err})=>{
+    const box=el('bdBody'); if(!box) return;
+    rows.sort((a,b)=>a.days-b.days||b.signed-a.signed||a.ts-b.ts);
+    if(!rows.length){
+      box.innerHTML=`<div class="empty">還沒有人通關。<br>30 天內拿到 6 件委託，名字就會出現在這裡。</div>`;
+      return;
+    }
+    const medal=['🥇','🥈','🥉'];
+    box.innerHTML=`<div class="board">
+      <div class="bhd"><span>#</span><span>玩家</span><span>天數</span><span>委託</span></div>
+      ${rows.slice(0,30).map((r,i)=>`<div class="brow${r.mine?' mine':''}">
+        <span class="rk">${i<3?medal[i]:i+1}</span>
+        <span class="nm">${esc(r.name)}</span>
+        <span class="dy">${r.days} 天</span>
+        <span class="sg">${r.signed} 件</span></div>`).join('')}
+    </div>
+    <div class="coach" style="margin-top:9px">${shared
+      ? '<span class="cl">共享</span>所有玩過的人都在同一份榜上。'
+      : (err?'<span class="cl warn">離線</span>連不到共享排行榜，先顯示這台裝置的紀錄。'
+           :'<span class="cl">本機</span>目前只記錄這台裝置玩過的成績。')}</div>`;
+  });
+}
+
 /* ═══ 場景 ═══ */
 function toTitle(){
   Game.scene='title'; Game.duel=null; $title.style.display='flex'; $hud.classList.add('hidden');
@@ -1586,10 +1927,14 @@ function helpCard(){
    <b style="color:var(--amber)">調閱電傳（−20 AP）</b>　站在掛「售」的房子門口，調出二類謄本，看到坪數與屋主戶籍地。<br>
    <b style="color:var(--amber)">留開發信（免費）</b>　之後每天有 2% 機率接到屋主來電約訪。留過信的屋主戒心也會低一點。<br>
    <b style="color:var(--amber)">前往戶籍地（敲門 −40 AP）</b>　戶籍地未隱匿才能導航。到現場有六種狀況。<br>
-   <b style="color:var(--amber)">吃閉門羹</b>　有些屋主一開門就關門。<u>多跑幾趟</u>他才願意跟你講話，而且每跑一趟他的戒心都會降低。<br>
-   <b style="color:var(--amber)">攻防戰</b>　屋主邊講邊想新理由（戒心會自己回升）。答錯不只沒推進，還會扣你的耐心。談輸了隔天可以再來，戒心會比上次低。<br>
-   <b style="color:var(--amber)">謄本紀錄</b>　調閱過的物件都留在這裡，可以隨時重新導航。<br><br>
-   一天 100 AP，用完當天結束、隔天從公司出發。30 天內拿到 6 件委託即通關。</div>`,
+   <b style="color:var(--amber)">吃閉門羹</b>　有些屋主一開門就關門。<u>多跑幾趟</u>他才願意跟你講話，而且每跑一趟他的戒心都會降低。<br><br>
+   <b style="color:var(--amber)">對話全部要自己打字</b>　沒有選項可以選。屋主、管理員、鄰居都會照你講的內容反應，
+   每一句話結束後下面會用小字給你<b style="color:var(--violet)">評語</b>與<b style="color:var(--amber)">建議</b>。<br>
+   <b style="color:var(--amber)">怎麼講才有分</b>　先接住他的情緒 → 針對他這個理由 → 給一個他今天就能答應、而且零成本的具體下一步。<br>
+   <b style="color:var(--red)">地雷</b>　保證賣掉、叫他毀約、貶低同業、當場叫他降價、要鑰匙、未經同意刊登或找租客——講了會直接扣耐心。<br>
+   屋主一邊講一邊想新理由（戒心會自己回升），談輸了隔天可以再來，戒心會比上次低。<br><br>
+   <b style="color:var(--amber)">謄本紀錄</b>　調閱過的物件都留在這裡，可以隨時重新導航。<br>
+   一天 100 AP，用完當天結束、隔天從公司出發。30 天內拿到 6 件委託即通關，天數會登上排行榜。</div>`,
    [{key:'✕',label:'關閉',fn:()=>{A.sfx('cancel');closeOvl()}}]);
 }
 
@@ -1849,46 +2194,127 @@ function offerLetter(src,why){
      {key:'✕',label:'先離開',fn:()=>{A.sfx('cancel');closeOvl();if(Game.scene==='city')A.play('city');setActs()}}]);
 }
 
-/* ═══ 套話 ═══ */
+/* ═══ 套話：自由作答 ═══ */
 function probeGame(src,here){
   const d=World.deed(src);
-  let round=0, hits=0;
+  let round=0, hits=0, said=[];
   const pool=World.houses.filter(o=>o.id!==here.id&&o.id!==src.id);
   const nx=pool[Math.floor(rngFor(Game.seed,'px'+src.id)()*pool.length)];
-  const step=()=>{
-    if(round>=PROBE.length){
-      if(hits>=2){
-        A.sfx('good');
-        Game.nav={id:nx.id,kind:'clue',src:src.id,label:'線索：'+nx.addr.full};
-        addLog('套話成功：屋主人在 '+nx.addr.full,'l-good');
-        card('套出線索了','CLUE',
-          `<div class="say">「他現在住在 <b style="color:var(--amber)">${esc(nx.addr.full)}</b> 那邊啦，你去那裡找他。」</div>
-           <div class="say nar">你把地址記在手機備忘錄裡。導航已經設定好了。</div>`,
-          [{key:'▶',label:'出發',fn:()=>{A.sfx('confirm');closeOvl();A.play('city');setActs()}}]);
-      }else{
-        A.sfx('bad');
-        card('套不出來','FAIL',`<div class="say">「歹勢啦，我真的不方便講。」（門關上了。）</div>`,
-          [{key:'✉',label:'在門口留一封開發信',disabled:Game.hs(src.id).letter,fn:()=>{
-              const st=Game.hs(src.id); st.letter=true; Game.letters.push({house:src.id,day:Game.day,done:false});
-              A.sfx('stamp'); addLog('留下開發信'); closeOvl(); A.play('city'); setActs(); toast('開發信已留下')}},
-           {key:'✕',label:'離開',fn:()=>{A.sfx('cancel');closeOvl();A.play('city');setActs()}}]);
-      }
-      return;
+
+  const finishProbe=()=>{
+    if(hits>=2){
+      A.sfx('good');
+      Game.nav={id:nx.id,kind:'clue',src:src.id,label:'線索：'+nx.addr.full};
+      addLog('套話成功：屋主人在 '+nx.addr.full,'l-good');
+      card('套出線索了','CLUE',
+        `<div class="say">「他現在住在 <b style="color:var(--amber)">${esc(nx.addr.full)}</b> 那邊啦，你去那裡找他。」</div>
+         <div class="say nar">你把地址記在手機備忘錄裡。導航已經設定好了。</div>`,
+        [{key:'▶',label:'出發',fn:()=>{A.sfx('confirm');closeOvl();A.play('city');setActs()}}]);
+    }else{
+      A.sfx('bad');
+      card('套不出來','FAIL',`<div class="say">「歹勢啦，我真的不方便講。」（門關上了。）</div>`,
+        [{key:'✉',label:'在門口留一封開發信',disabled:Game.hs(src.id).letter,fn:()=>{
+            const st=Game.hs(src.id); st.letter=true; Game.letters.push({house:src.id,day:Game.day,done:false});
+            A.sfx('stamp'); addLog('留下開發信'); closeOvl(); A.play('city'); setActs(); toast('開發信已留下')}},
+         {key:'✕',label:'離開',fn:()=>{A.sfx('cancel');closeOvl();A.play('city');setActs()}}]);
     }
-    const q=PROBE[round], qt=q.q.replace('{S}',d.ownerSur);
-    const opts=shuffled(rngFor(Game.seed,'pb'+src.id+round),q.a);
-    card('套話中','ROUND '+(round+1)+' / '+PROBE.length,
-      `<div class="say">${esc(qt)}</div>
-       <div class="gauge" style="margin-top:8px"><b>套出線索　${hits} / 2</b><div class="bar rap"><i style="width:${hits/2*100}%"></i></div></div>`,
-      opts.map((o,i)=>({key:['A','B','C'][i],label:esc(o.t.replace('{S}',d.ownerSur)),fn:()=>{
-        if(o.ok) hits++;
-        A.sfx(o.ok?'good':'guard');
-        card(o.ok?'有進展':'碰壁了','',
-          `<div class="say ${o.ok?'me':''}">${esc(o.r.replace('{ADDR}',nx.addr.full))}</div>`,
-          [{key:'▶',label:'繼續',fn:()=>{round++;step()}}]);
-      }})));
+  };
+
+  const step=()=>{
+    if(round>=PROBE_Q.length) return finishProbe();
+    const Q=PROBE_Q[round];
+    freeformPanel({
+      title:'套話中', tag:'第 '+(round+1)+' / '+PROBE_Q.length+' 題',
+      who:'開門的人', line:Q.q.replace('{S}',d.ownerSur),
+      bars:`<div class="gauge"><b>套出線索　${hits} / 2</b><div class="bar rap"><i style="width:${hits/2*100}%"></i></div></div>`,
+      placeholder:'你要怎麼開口？',
+      onSend:async (text,ui)=>{
+        said.push(text);
+        let r;
+        if(AI.ready){
+          ui.thinking('對方正在想⋯⋯');
+          try{
+            const j=await AI.probe({who:'一位年紀比較大的鄰居／同住者',sur:d.ownerSur,
+              addr:src.addr.full,q:Q.q.replace('{S}',d.ownerSur),known:nx.addr.full,round:round+1},text);
+            const sc=Math.max(0,Math.min(100,Math.round(j.score||0)));
+            r={ok:sc>=55,score:sc,reply:j.reply,note:j.note||'',tip:j.tip||Q.tip};
+          }catch(e){ r=null }
+        }
+        if(!r){
+          const lr=probeScore(round,text);
+          r={ok:lr.ok,score:lr.score,note:lr.note,tip:lr.tip,
+             reply:(lr.ok?Q.ok:Q.no).replace('{ADDR}',nx.addr.full)};
+        }
+        if(r.ok) hits++;
+        A.sfx(r.ok?'good':'guard');
+        resultCard({
+          title:r.ok?'有進展':'碰壁了', tagText:'評分 '+r.score,
+          tagColor:r.ok?'var(--jade)':'var(--red)',
+          me:text, reply:(r.reply||'').replace('{ADDR}',nx.addr.full),
+          note:r.note, tip:r.tip,
+          nextLabel:'繼續', onNext:()=>{ round++; step() }
+        });
+      }
+    });
   };
   step();
+}
+
+/* ═══ 自由對話面板（屋主／管理員／套話共用） ═══════════════ */
+function freeformPanel(o){
+  $ovlIn.innerHTML=`<div class="card"><div class="card-hd"><h3>${o.title}</h3>
+      ${o.tag?`<span class="tag">${o.tag}</span>`:''}</div>
+    <div class="card-bd"><div class="duel">
+      ${o.bars||''}
+      ${o.intro?`<div class="say nar">${esc(o.intro)}</div>`:''}
+      <div class="say"><b>${esc(o.who)}</b>${esc(o.line)}</div>
+      <div class="ffwrap">
+        <textarea id="ffIn" rows="2" maxlength="120" placeholder="${o.placeholder||'輸入你要跟他說的話⋯⋯'}"></textarea>
+        <button class="ffgo" id="ffGo">說出口</button>
+      </div>
+      <div class="coach" id="ffMsg">${AI.ready
+        ? '自己想一句話回他。對方會照你講的內容反應，下面會給你評語與建議。'
+        : '自己想一句話回他。系統會依房仲實務評分，下面會給你評語與建議。'}</div>
+    </div></div></div>`;
+  $ovl.classList.add('show'); $ovl.scrollTop=0;
+  const inp=el('ffIn'), go=el('ffGo'), msg=el('ffMsg');
+  let busy=false;
+  const ui={
+    thinking(t){ msg.className='coach think'; msg.textContent=t;
+      let d=0; ui._tk=setInterval(()=>{d=(d+1)%4; msg.textContent=t+'．'.repeat(d)},380) },
+    stop(){ clearInterval(ui._tk) },
+    error(t){ ui.stop(); msg.className='coach warn'; msg.textContent=t; busy=false; go.disabled=false; inp.disabled=false }
+  };
+  const fire=async()=>{
+    if(busy) return;
+    const v=(inp.value||'').trim();
+    if(v.length<4){ msg.className='coach warn'; msg.textContent='再多說一點，對方聽不出你要表達什麼。'; A.sfx('deny'); return }
+    busy=true; go.disabled=true; inp.disabled=true; A.sfx('click');
+    try{ await o.onSend(v,ui) }catch(e){ ui.error('出了一點狀況，請再說一次。') }
+    finally{ ui.stop() }
+  };
+  go.onclick=fire;
+  // Enter 不送出（換行用 Shift+Enter，一般 Enter 也只是換行）
+  inp.addEventListener('keydown',e=>{ if(e.key==='Enter'&&!e.shiftKey) e.stopPropagation() });
+  setTimeout(()=>{ try{ inp.focus() }catch(e){} },80);
+}
+
+function resultCard(o){
+  $ovlIn.innerHTML=`<div class="card"><div class="card-hd"><h3>${o.title}</h3>
+      <span class="tag" style="background:${o.tagColor};color:#0d1117">${o.tagText}</span></div>
+    <div class="card-bd"><div class="duel">
+      ${o.bars||''}
+      <div class="say me"><b>${esc(Game.name)}</b>${esc(o.me)}</div>
+      <div class="say">${esc(o.reply||'「⋯⋯」')}</div>
+      <div class="coach">${o.note?`<span class="cl">評語</span>${esc(o.note)}`:''}
+        ${o.tip?`<br><span class="cl tipc">建議</span>${esc(o.tip)}`:''}</div>
+      <div class="choices" id="nx"></div>
+    </div></div></div>`;
+  $ovl.scrollTop=0;
+  const b=document.createElement('button'); b.className='ch';
+  b.innerHTML=`<span class="k">▶</span><span>${o.nextLabel}</span>`;
+  b.onclick=()=>{ A.sfx('click'); o.onNext() };
+  el('nx').appendChild(b);
 }
 
 /* ═══ 攻防戰 ═══════════════════════════════════════════════ */
@@ -1898,14 +2324,13 @@ function startDuel(kind,src,here,bonus){
     ? shuffled(rngFor(Game.seed,'gd'+here.id),GUARD_MOVES).slice(0,4)
     : d.moves;
   let maxG;
-  if(kind==='guard') maxG=78;
+  if(kind==='guard') maxG=76;
   else{
-    // 毅力有回報：跑過的趟數、留過的信、談過的次數都會壓低戒心
-    maxG = d.guard - 8*(st.knocks||0) - (st.letter?8:0) - 11*(st.tries||0) + (bonus||0);
+    maxG = d.guard*0.9 - 8*(st.knocks||0) - (st.letter?8:0) - 11*(st.tries||0) + (bonus||0);
     maxG = Math.max(46,Math.round(maxG));
   }
   if(kind==='owner') st.tries=(st.tries||0)+1;
-  Game.duel={kind,src,here,d,moves,i:0,g:maxG,maxG,rap:100,used:0,freeLeft:3,history:[],pending:null};
+  Game.duel={kind,src,here,d,moves,i:0,g:maxG,maxG,rap:100,freeLeft:99,history:[],said:[]};
   A.play('battle'); A.sfx('guard');
   duelTurn(kind==='guard'
     ? '（警衛室的燈很亮。管理員上下打量你。）'
@@ -1926,106 +2351,63 @@ function duelBars(D){
 
 function duelTurn(intro){
   const D=Game.duel; if(!D) return;
-  if(D.i>=D.moves.length) return duelEnd(D.g<=D.maxG*0.28);
-  // 屋主一邊講一邊想新理由：戒心緩慢回升
-  if(D.i>=2){ D.g=Math.min(D.maxG,D.g+3) }
+  if(D.i>=D.moves.length) return duelEnd(D.g<=D.maxG*0.26);
+  if(D.i>=2) D.g=Math.min(D.maxG,D.g+3);          // 他一邊講一邊想新理由
   const mv=D.moves[D.i];
   const line = D.i===0 ? mv.line : (mv.follow||mv.line);
-  D.history.push({who:'o',t:line}); if(D.history.length>6) D.history.shift();
-  const opts=shuffled(rngFor(Game.seed,'op'+D.here.id+D.i+(D.d.no||'')),[
-    {...mv.good,k:'good'},{...mv.ok,k:'ok'},{...mv.bad[0],k:'bad'},{...mv.bad[1],k:'bad'}]);
-  const aiRow = AI.ready ? `<div class="freeform">
-      <input id="aiIn" maxlength="80" placeholder="或者⋯⋯自己想一句話回他" ${D.freeLeft<=0?'disabled':''}>
-      <button id="aiGo" ${D.freeLeft<=0?'disabled':''}>送出</button></div>
-      <div class="thinking" id="aiMsg">${D.freeLeft>0
-        ? 'AI 屋主：自由打字，他會照你講的內容反應（本場還可用 '+D.freeLeft+' 次）'
-        : '自由對話次數用完了，請用上面的選項。'}</div>` : '';
-  $ovlIn.innerHTML=`<div class="card"><div class="card-hd">
-      <h3>${D.kind==='guard'?'管理員關卡':'屋主攻防戰'}</h3>
-      <span class="tag">第 ${D.i+1} / ${D.moves.length} 回合</span></div>
-    <div class="card-bd"><div class="duel">
-      ${duelBars(D)}
-      ${intro?`<div class="say nar">${esc(intro)}</div>`:''}
-      <div class="say"><b>${esc(duelWho(D))}</b>${esc(line)}</div>
-      <div class="choices" id="duelOpts"></div>
-      ${aiRow}
-    </div></div></div>`;
-  $ovl.classList.add('show'); $ovl.scrollTop=0;
-  const box=el('duelOpts');
-  opts.forEach((o,i)=>{
-    const b=document.createElement('button'); b.className='ch';
-    b.innerHTML=`<span class="k">${['A','B','C','D'][i]}</span><span>${esc(o.t)}</span>`;
-    b.onclick=()=>resolveMove(o);
-    box.appendChild(b);
+  if(!D.history.length||D.history[D.history.length-1].t!==line){
+    D.history.push({who:'o',t:line}); if(D.history.length>8) D.history.shift();
+  }
+  freeformPanel({
+    title: D.kind==='guard'?'管理員關卡':'屋主攻防戰',
+    tag:'第 '+(D.i+1)+' / '+D.moves.length+' 回合',
+    who: duelWho(D), line, intro, bars: duelBars(D),
+    placeholder:'你要怎麼回他？',
+    onSend: (text,ui)=>duelAnswer(text,ui)
   });
-  if(AI.ready&&D.freeLeft>0){
-    // 只有按「送出」才會送出，Enter 不送出
-    el('aiGo').onclick=()=>{
-      const v=(el('aiIn').value||'').trim();
-      if(v.length<5){ toast('多說一點，他聽不懂'); return }
-      aiMove(v);
-    };
-    el('aiIn').addEventListener('keydown',e=>{ if(e.key==='Enter') e.preventDefault() });
-  }
 }
 
-function applyDamage(dmg,rapLoss,replyHTML,note){
-  const D=Game.duel;
-  D.g-=dmg; D.rap-=(rapLoss||0);
-  if(dmg>=20) A.sfx('good'); else if(dmg>0) A.sfx('hit'); else A.sfx('bad');
-  const win=D.g<=0, lose=D.rap<=0;
-  $ovlIn.innerHTML=`<div class="card"><div class="card-hd">
-      <h3>${dmg>=20?'說到他心裡了':dmg>0?'有一點推進':'講錯話了'}</h3>
-      <span class="tag" style="background:${dmg>=20?'var(--jade)':dmg>0?'var(--amber)':'var(--red)'};color:#0d1117">
-      ${dmg>=0?'戒心 −'+dmg:'戒心 +'+(-dmg)}${rapLoss?'　耐心 −'+rapLoss:''}</span></div>
-    <div class="card-bd"><div class="duel">${duelBars(D)}${replyHTML}
-      ${note?`<div class="thinking">評語：${esc(note)}</div>`:''}
-      <div class="choices" id="nx"></div></div></div></div>`;
-  $ovl.scrollTop=0;
-  const b=document.createElement('button'); b.className='ch';
-  b.innerHTML=`<span class="k">▶</span><span>${win?'⋯⋯他把筆拿起來了':lose?'⋯⋯門關上了':'繼續'}</span>`;
-  b.onclick=()=>{ A.sfx('click');
-    if(win) return duelEnd(true);
-    if(lose) return duelEnd(false);
-    Game.duel.i++; duelTurn(null) };
-  el('nx').appendChild(b);
-}
-
-function resolveMove(o){
-  const D=Game.duel;
-  D.history.push({who:'p',t:o.t}); if(D.history.length>6) D.history.shift();
-  applyDamage(Math.max(-14,o.d),o.rap||0,
-    `<div class="say me"><b>${esc(Game.name)}</b>${esc(o.t)}</div><div class="say">${esc(o.r)}</div>`);
-}
-
-async function aiMove(text){
+async function duelAnswer(text,ui){
   const D=Game.duel, mv=D.moves[D.i];
-  D.freeLeft--;
-  const msg=el('aiMsg'), go=el('aiGo'), inp=el('aiIn');
-  if(go) go.disabled=true; if(inp) inp.disabled=true;
-  let dots=0; const tk=setInterval(()=>{ dots=(dots+1)%4; if(msg) msg.textContent='屋主正在想⋯⋯'+'．'.repeat(dots) },380);
-  try{
-    const r=await AI.judge({
-      type:D.d.type.n,note:D.d.type.note,why:D.d.why,addr:D.src.addr.full,
-      ping:D.d.ping.toFixed(1),line:D.i===0?mv.line:(mv.follow||mv.line),
-      guardPct:Math.round(D.g/D.maxG*100),history:D.history.slice(0,-1)
-    },text);
-    clearInterval(tk);
-    const score=Math.max(0,Math.min(100,Math.round(r.score||0)));
-    const dmg=Math.round(Math.max(0,score-18)*0.34);      // 難纏：低分幾乎無效
-    const rapLoss= score<35 ? Math.round((35-score)*1.0) : 0;
-    D.history.push({who:'p',t:text});
-    D.history.push({who:'o',t:r.reply||'……'});
-    if(D.history.length>6) D.history=D.history.slice(-6);
-    applyDamage(dmg,rapLoss,
-      `<div class="say me"><b>${esc(Game.name)}</b>${esc(text)}</div>
-       <div class="say">${esc(r.reply||'「……」')}</div>`, r.note||('AI 評分 '+score+' 分'));
-  }catch(e){
-    clearInterval(tk);
-    if(msg) msg.textContent='AI 連線不到，這回合請用上面的選項。';
-    if(go) go.disabled=false; if(inp) inp.disabled=false;
-    D.freeLeft++;
+  const line = D.i===0 ? mv.line : (mv.follow||mv.line);
+  let R=null;
+  if(AI.ready){
+    ui.thinking(D.kind==='guard'?'管理員正在想⋯⋯':'屋主正在想⋯⋯');
+    try{
+      const j=await AI.judge({
+        type:D.kind==='guard'?'大樓管理員（職責是不透露住戶資訊）':D.d.type.n,
+        note:D.kind==='guard'?'照規定辦事、怕被住戶投訴':D.d.type.note,
+        why:D.kind==='guard'?'（無）':D.d.why,
+        addr:D.src.addr.full, ping:D.d.ping.toFixed(1), line,
+        guardPct:Math.round(D.g/D.maxG*100), history:D.history.slice(0,-1)
+      },text);
+      const sc=Math.max(0,Math.min(100,Math.round(j.score||0)));
+      R={score:sc,reply:j.reply,note:j.note||'',tip:j.tip||(MOVE_HINTS[mv.id]||{}).tip||''};
+    }catch(e){ R=null }
   }
+  if(!R){
+    const lr=coachScore(mv.id,text,D.said);
+    R={score:lr.score,note:lr.note,tip:lr.tip,
+       reply:coachReply(mv,lr.band,D.kind==='guard')};
+  }
+  D.said.push(text);
+  D.history.push({who:'p',t:text});
+  D.history.push({who:'o',t:R.reply||'……'});
+  if(D.history.length>8) D.history=D.history.slice(-8);
+
+  const dmg=Math.round(Math.max(0,R.score-20)*0.42);
+  const rap=R.score<35?Math.round((35-R.score)*1.05):0;
+  D.g-=dmg; D.rap-=rap;
+  if(dmg>=18) A.sfx('good'); else if(dmg>0) A.sfx('hit'); else A.sfx('bad');
+  const win=D.g<=0, lose=D.rap<=0;
+  resultCard({
+    title: dmg>=18?'說到他心裡了' : dmg>=8?'有一點推進' : dmg>0?'幾乎沒有作用':'講錯話了',
+    tagText:'評分 '+R.score+'　戒心 −'+dmg+(rap?'　耐心 −'+rap:''),
+    tagColor: dmg>=18?'var(--jade)':dmg>0?'var(--amber)':'var(--red)',
+    bars:duelBars(D), me:text, reply:R.reply, note:R.note, tip:R.tip,
+    nextLabel: win?'⋯⋯他把筆拿起來了' : lose?'⋯⋯門關上了' : '繼續',
+    onNext:()=>{ if(win) return duelEnd(true); if(lose) return duelEnd(false); D.i++; duelTurn(null) }
+  });
 }
 
 function duelEnd(win){
@@ -2063,6 +2445,7 @@ function duelEnd(win){
   }
   if(win){
     st.signed=true; Game.signed++; hudSync(); A.sfx('sign');
+    if(Game.signed===GOAL&&!Game.doneDay) Game.doneDay=Game.day;
     addLog('簽下委託！'+D.src.addr.full,'l-good'); save(true);
     card('委託書簽下來了','＋1 件',
       `<div class="say me"><b>${esc(D.d.ownerName)}</b>「⋯⋯筆給我。」</div>
@@ -2090,10 +2473,10 @@ function duelEnd(win){
 
 function goalReached(){
   card('目標達成','6 / 6',
-    `<div class="say" style="border-left-color:var(--jade)">六件委託到手。店長在電話那頭沉默了三秒，然後說：「回來。」</div>
-     <div class="say nar">你可以現在就回公司結算，也可以繼續跑完這個月——委託可以超過六件。</div>`,
-    [{key:'▶',label:'現在回公司結算',fn:()=>{A.sfx('confirm');closeOvl();finish(true)}},
-     {key:'▷',label:'繼續衝業績',sub:'做到第 30 天再結算',fn:()=>{A.sfx('click');closeOvl();setActs()}}]);
+    `<div class="say" style="border-left-color:var(--jade)">六件委託到手，第 ${Game.doneDay||Game.day} 天。店長在電話那頭沉默了三秒，然後說：「回來。」</div>
+     <div class="say nar">現在回公司結算，成績會登上排行榜（天數越少越前面）。也可以繼續跑完這個月——委託可以超過六件。</div>`,
+    [{key:'▶',label:'現在回公司結算',sub:'以第 '+(Game.doneDay||Game.day)+' 天登記成績',fn:()=>{A.sfx('confirm');closeOvl();finish(true)}},
+     {key:'▷',label:'繼續衝業績',sub:'排行榜天數仍以第 '+(Game.doneDay||Game.day)+' 天計算',fn:()=>{A.sfx('click');closeOvl();setActs()}}]);
 }
 
 /* ═══ 結算 ═══ */
@@ -2102,6 +2485,10 @@ const END_LINES=['房仲這份工作不只是出一張嘴','還要有強大的�
 function finish(win){
   Game.scene='ending'; Game.duel=null; closeOvl(); $talk.classList.remove('show'); $acts.innerHTML='';
   A.play(win?'win':'lose'); A.sfx(win?'sign':'fail');
+  if(win&&Game.signed>=GOAL){
+    boardSubmit({name:Game.name||'菜鳥',days:Math.min(MAXDAY,Game.doneDay||Game.day),
+      signed:Game.signed,ts:Date.now()});
+  }
   const seen=Object.values(Game.hstate).filter(s=>s.seen).length;
   const knocks=Object.values(Game.hstate).reduce((a,s)=>a+(s.knocks||0)+(s.tries||0),0);
   $ovlIn.innerHTML=`<div class="ending">
@@ -2113,12 +2500,14 @@ function finish(win){
       `<p class="${i>=4?(i===6?'tel':'hi'):''}">${esc(l)}</p>`).join('')}</div>
     <div class="choices">
       <button class="ch" id="endAgain" style="justify-content:center;background:var(--amber);color:#22190a;border-color:#ffd889;font-weight:900"><span>再玩一次</span></button>
+      <button class="ch" id="endBoard" style="justify-content:center"><span>看排行榜</span></button>
       <button class="ch" id="endTitle" style="justify-content:center"><span>回主畫面</span></button>
     </div></div>`;
   $ovl.classList.add('show'); $ovl.scrollTop=0;
   $ovlIn.querySelectorAll('#endLines p').forEach((p,i)=>
     setTimeout(()=>{p.classList.add('in');A.sfx(i===6?'confirm':'click')},500+i*620));
   el('endAgain').onclick=()=>{A.sfx('confirm');closeOvl();startNew()};
+  el('endBoard').onclick=()=>{A.sfx('click');boardCard()};
   el('endTitle').onclick=()=>{A.sfx('cancel');closeOvl();toTitle()};
   try{ localStorage.removeItem(SAVE_KEY) }catch(e){}
   checkSave();
@@ -2235,6 +2624,7 @@ function hintPrompt(){
 
 /* ═══ 啟動 ═══ */
 el('mNew').onclick=()=>{A.resume();A.sfx('confirm');startNew()};
+el('mBoard').onclick=()=>{A.resume();A.sfx('click');boardCard()};
 el('mCredits').onclick=()=>{A.resume();A.sfx('click');
   card('製作人員','CREDITS',
    `<div style="font-family:var(--f-body);font-size:15px;line-height:2;text-align:center">
