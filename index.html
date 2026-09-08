@@ -1910,31 +1910,41 @@ const World={
   gen(seed){
     this.seed=seed; const r=rngFor(seed,'city');
     const t=new Uint8Array(MW*MH); this.tiles=t;
-    const isRX=x=>{const m=x%PX;return m<ROADW};
-    const isRY=y=>{const m=y%PY;return m<ROADW};
+    // 街廓大小不一：有的長、有的窄，但道路全部保持正交
+    const colStarts=[], rowStarts=[];
+    for(let x=0;x<MW-5;){ colStarts.push(x); x+=ROADW+ri(r,6,18) }
+    for(let y=0;y<MH-5;){ rowStarts.push(y); y+=ROADW+ri(r,5,14) }
+    // 最後一塊太細就併掉，不要留下畸零地
+    while(colStarts.length>1&&MW-colStarts[colStarts.length-1]-ROADW<6) colStarts.pop();
+    while(rowStarts.length>1&&MH-rowStarts[rowStarts.length-1]-ROADW<5) rowStarts.pop();
+    const colFlag=new Uint8Array(MW), rowFlag=new Uint8Array(MH);
+    const colIdx=new Int16Array(MW), rowIdx=new Int16Array(MH);
+    for(let i=0;i<colStarts.length;i++)
+      for(let k=0;k<ROADW;k++){ const x=colStarts[i]+k; if(x<MW) colFlag[x]=1 }
+    for(let i=0;i<rowStarts.length;i++)
+      for(let k=0;k<ROADW;k++){ const y=rowStarts[i]+k; if(y<MH) rowFlag[y]=1 }
+    for(let x=0,i=0;x<MW;x++){ if(colStarts[i+1]!==undefined&&x>=colStarts[i+1]) i++; colIdx[x]=i }
+    for(let y=0,i=0;y<MH;y++){ if(rowStarts[i+1]!==undefined&&y>=rowStarts[i+1]) i++; rowIdx[y]=i }
+    this.colStarts=colStarts; this.rowStarts=rowStarts;
+    this.colFlag=colFlag; this.rowFlag=rowFlag;
+    this.colIdx=colIdx; this.rowIdx=rowIdx;
+    this.NBX=colStarts.length; this.NBY=rowStarts.length;
     for(let y=0;y<MH;y++)for(let x=0;x<MW;x++){
-      t[y*MW+x]=(isRX(x)||isRY(y))?T_ROAD:T_BLD;
+      t[y*MW+x]=(colFlag[x]||rowFlag[y])?T_ROAD:T_BLD;
     }
-    // 斜向大道：讓街廓不再方方正正
-    this.diag=[];
-    const addDiag=(sign,c)=>{
-      this.diag.push({sign,c});
-      for(let y=0;y<MH;y++)for(let x=0;x<MW;x++){
-        const d=sign>0 ? (y-(x+c)) : (y-(-x+c));
-        if(Math.abs(d)<=1) t[y*MW+x]=T_ROAD;
-      }
-    };
-    addDiag( 1, ri(r,-14,4));
-    addDiag(-1, ri(r,MH-6,MH+16));
-    this.onDiag=(x,y)=>this.diag.some(D=>Math.abs(D.sign>0?(y-(x+D.c)):(y-(-x+D.c)))<=1);
-
     // 街廓內開巷弄
     this.blockTint=[];
-    for(let by=0;by<BY;by++)for(let bx=0;bx<BX;bx++){
-      const x0=bx*PX+ROADW, y0=by*PY+ROADW, bw=PX-ROADW, bh=PY-ROADW;
+    for(let by=0;by<this.NBY;by++)for(let bx=0;bx<this.NBX;bx++){
+      const x0=colStarts[bx]+ROADW, y0=rowStarts[by]+ROADW;
+      const x1=(colStarts[bx+1]!==undefined?colStarts[bx+1]:MW)-1;
+      const y1=(rowStarts[by+1]!==undefined?rowStarts[by+1]:MH)-1;
+      const bw=x1-x0+1, bh=y1-y0+1;
       this.blockTint.push(pick(r,['#8ec24f','#96c95a','#86bb48','#9ecf63','#8bc051','#93c657','#82b644']));
-      if(r()<.72){ const ax=x0+ri(r,2,bw-3); for(let y=y0-ROADW;y<y0+bh+ROADW;y++){ if(y>=0&&y<MH&&t[y*MW+ax]===T_BLD) t[y*MW+ax]=T_ALLEY } }
-      if(r()<.60){ const ay=y0+ri(r,2,bh-3); for(let x=x0-ROADW;x<x0+bw+ROADW;x++){ if(x>=0&&x<MW&&t[ay*MW+x]===T_BLD) t[ay*MW+x]=T_ALLEY } }
+      // 夠寬才開直巷，夠深才開橫巷，窄街廓保持完整
+      if(bw>=9&&r()<.66){ const ax=x0+ri(r,3,bw-4);
+        for(let y=y0;y<=y1;y++) if(t[y*MW+ax]===T_BLD) t[y*MW+ax]=T_ALLEY }
+      if(bh>=8&&r()<.55){ const ay=y0+ri(r,3,bh-4);
+        for(let x=x0;x<=x1;x++) if(t[ay*MW+x]===T_BLD) t[ay*MW+x]=T_ALLEY }
     }
     // 門面候選：建物且四鄰有可走
     const cand=[];
@@ -1969,15 +1979,34 @@ const World={
       h.floors = h.bt==='tower'?ri(hr,9,15) : h.bt==='walkup'?ri(hr,4,5)
                : h.bt==='town'?ri(hr,3,4) : ri(hr,1,2);
       h.tone = hr();
-      const F={tower:[2,3],walkup:[2,2],town:[2,2],shop:[2,1]}[h.bt];
-      h.fw=F[0]; h.fh=F[1];
-      h.fx=h.x-(h.fw-1);            // 門在量體的右下角那一格
-      h.fy=h.y-(h.fh-1);
+      h.want={tower:[2,3],walkup:[2,2],town:[2,2],shop:[3,1]}[h.bt];
     }
-    // 建物佔地，樹木不長在上面
+    // 量體由門口那一格往街廓內部長，碰到馬路或別人就停，絕不壓到路上
     const occ=new Set();
-    for(const h of houses)
-      for(let y=h.fy;y<=h.y;y++) for(let x=h.fx;x<=h.fx+h.fw-1;x++) occ.add(y*MW+x);
+    const blk=(x,y)=>x>=0&&y>=0&&x<MW&&y<MH
+      &&(t[y*MW+x]===T_BLD||t[y*MW+x]===T_DOOR||t[y*MW+x]===T_OFFICE||(x===0&&false))
+      &&!occ.has(y*MW+x);
+    for(const h of houses){
+      const W=h.want||[2,2];
+      let fx=h.x, fy=h.y, fw=1, fh=1;
+      const free=(x0,y0,w,hh)=>{
+        for(let j=0;j<hh;j++)for(let i=0;i<w;i++){
+          const x=x0+i,y=y0+j;
+          if(x===h.x&&y===h.y) continue;
+          if(!blk(x,y)) return false;
+        }
+        return true;
+      };
+      while(fh<W[1] && free(fx,fy-1,fw,1)){ fy--; fh++ }
+      while(fw<W[0]){
+        let grew=false;
+        if(free(fx-1,fy,1,fh)){ fx--; fw++; grew=true }
+        if(fw<W[0] && free(fx+fw,fy,1,fh)){ fw++; grew=true }
+        if(!grew) break;
+      }
+      h.fx=fx; h.fy=fy; h.fw=fw; h.fh=fh; h.doorOff=h.x-fx;
+      for(let j=0;j<fh;j++)for(let i=0;i<fw;i++) occ.add((fy+j)*MW+(fx+i));
+    }
     this.trees=[];
     const tr=rngFor(seed,'trees');
     for(let y=0;y<MH;y++)for(let x=0;x<MW;x++){
@@ -2029,8 +2058,8 @@ const World={
 
     // 路燈與街景雜物
     this.lampPos=[];
-    for(let by=0;by<=BY;by++)for(let bx=0;bx<=BX;bx++){
-      this.lampPos.push({x:bx*PX+1,y:by*PY+1});
+    for(const cy of this.rowStarts) for(const cxs of this.colStarts){
+      this.lampPos.push({x:cxs+1,y:cy+1});
     }
     this.props=[];
     const pr=rngFor(seed,'props');
@@ -2048,7 +2077,10 @@ const World={
   solid(x,y){ const v=this.at(x,y); return !(v===T_ROAD||v===T_ALLEY) },
   house(x,y){ return this.byTile.get(y*MW+x) },
 
-  distIdx(x,y){ const bx=Math.floor(x/PX), by=Math.floor(y/PY); return (bx<2?0:bx<4?1:2)+(by<3?0:3) },
+  distIdx(x,y){
+    const bx=x/MW, by=y/MH;
+    return (bx<0.34?0:bx<0.67?1:2)+(by<0.5?0:3);
+  },
 
   makeAddr(h,used){
     const dist=DISTRICTS[this.distIdx(h.x,h.y)];
@@ -2057,12 +2089,12 @@ const World={
     let street,num,lane=0;
     const corner=!onAlley&&(this.at(h.x-1,h.y)===T_ROAD||this.at(h.x+1,h.y)===T_ROAD);
     if(corner){ // 轉角店面掛在縱向的「路」上
-      street=RD_NAMES[Math.max(0,Math.min(RD_NAMES.length-1,Math.round(h.x/PX)))];
+      street=RD_NAMES[Math.max(0,Math.min(RD_NAMES.length-1,this.colIdx[h.x]))];
       num=(h.y+2)*2-1;
     }else{
-      street=ST_NAMES[Math.max(0,Math.min(ST_NAMES.length-1,Math.round(h.y/PY)))];
+      street=ST_NAMES[Math.max(0,Math.min(ST_NAMES.length-1,this.rowIdx[h.y]))];
       num=(h.x+2)*2-(h.dir===2?1:0);
-      if(onAlley){ lane=(h.x+2)*2-1; num=Math.max(1,(h.y%PY)*2+(h.dir===2?1:2)) }
+      if(onAlley){ lane=(h.x+2)*2-1; num=Math.max(1,(h.y-World.rowStarts[World.rowIdx[h.y]])*2+1) }
     }
     let s;
     for(let bump=0;bump<40;bump++){
@@ -2155,36 +2187,33 @@ function drawCity(t){
         if((hsh&15)===0) rect(sx+4,sy+6,5,2,'#565b63');
         const up=open(World.at(tx,ty-1)), dn=open(World.at(tx,ty+1)),
               lf=open(World.at(tx-1,ty)), rt=open(World.at(tx+1,ty));
-        const dg=World.onDiag?World.onDiag(tx,ty):false;
-        // 人行道（路與街廓的交界）；斜向大道不畫，免得變成鋸齒
-        if(!dg){
-          if(!up) rect(sx,sy,TS,4,'#dcdcd6');
-          if(!dn) rect(sx,sy+TS-4,TS,4,'#dcdcd6');
-          if(!lf) rect(sx,sy,4,TS,'#dcdcd6');
-          if(!rt) rect(sx+TS-4,sy,4,TS,'#dcdcd6');
+        // 人行道（路與街廓的交界）
+        if(!up) rect(sx,sy,TS,4,'#dcdcd6');
+        if(!dn) rect(sx,sy+TS-4,TS,4,'#dcdcd6');
+        if(!lf) rect(sx,sy,4,TS,'#dcdcd6');
+        if(!rt) rect(sx+TS-4,sy,4,TS,'#dcdcd6');
+        const cf=World.colFlag, rf=World.rowFlag;
+        const inV=(tx>=0&&tx<MW)&&!!cf[tx], inH=(ty>=0&&ty<MH)&&!!rf[ty];
+        // 中央虛線：橫向道路走中線，直向道路走中線，路口不畫
+        const cross=inV&&inH;
+        const midV = inV && (World.colStarts[World.colIdx[tx]]+1===tx);
+        const midH = inH && (World.rowStarts[World.rowIdx[ty]]+1===ty);
+        if(!cross){
+          if(midH&&(tx&1)===0) rect(sx+2,sy+7,10,2,'#f2f2ec');
+          if(midV&&(ty&1)===0) rect(sx+7,sy+2,2,10,'#f2f2ec');
         }
-        // 中央虛線
-        const hor=lf&&rt&&!up&&!dn, ver=up&&dn&&!lf&&!rt;
-        if(hor&&(tx&1)===0) rect(sx+2,sy+7,10,2,'#f2f2ec');
-        if(ver&&(ty&1)===0) rect(sx+7,sy+2,2,10,'#f2f2ec');
-        // 斑馬線：只畫在路口的四個出入口
-        if(!dg){
-          const inx=(tx%PX)<ROADW, iny=(ty%PY)<ROADW;
-          if(inx&&!iny&&(ty%PY===ROADW||ty%PY===PY-1))
-            for(let i=0;i<3;i++) rect(sx+2+i*5,sy+4,3,TS-8,'#f2f2ec');
-          if(iny&&!inx&&(tx%PX===ROADW||tx%PX===PX-1))
-            for(let i=0;i<3;i++) rect(sx+4,sy+2+i*5,TS-8,3,'#f2f2ec');
-        }
-        // 斜向大道的中央虛線（只畫在切過街廓的路段）
-        const grid=(tx%PX)<ROADW||(ty%PY)<ROADW;
-        if(dg&&!grid&&((tx+ty)&3)===0){ rect(sx+5,sy+6,7,2,'#e8e8e2'); rect(sx+6,sy+8,7,2,'#e8e8e2') }
+        // 斑馬線：路口四個出入口，整條連續不破碎
+        if(inV&&!inH&&(rf[ty-1]||rf[ty+1]))
+          for(let i=0;i<3;i++) rect(sx+2+i*5,sy,3,TS,'#f2f2ec');
+        if(inH&&!inV&&(cf[tx-1]||cf[tx+1]))
+          for(let i=0;i<3;i++) rect(sx,sy+2+i*5,TS,3,'#f2f2ec');
       }else if(v===T_ALLEY){
         rect(sx,sy,TS,TS,'#6d727a');
         if(!open(World.at(tx,ty-1))) rect(sx,sy,TS,3,'#c8c8c2');
         if(!open(World.at(tx,ty+1))) rect(sx,sy+TS-3,TS,3,'#c8c8c2');
         if((hsh&7)===3) rect(sx+2,sy+3,5,6,'#b08d5e');
       }else{
-        const bi=(Math.floor(ty/PY)*BX+Math.floor(tx/PX))%World.blockTint.length;
+        const bi=(World.rowIdx[Math.max(0,Math.min(MH-1,ty))]*World.NBX+World.colIdx[Math.max(0,Math.min(MW-1,tx))])%World.blockTint.length;
         rect(sx,sy,TS,TS,World.blockTint[(bi+World.blockTint.length)%World.blockTint.length]||'#8ec24f');
         if((hsh&3)===0) rect(sx+3,sy+9,6,2,'rgba(60,120,40,.18)');
         if((hsh&7)===5) rect(sx+8,sy+3,5,2,'rgba(255,255,255,.14)');
@@ -2300,21 +2329,21 @@ function drawFacade(h,sx,sy,t){
     rect(sx+5,sy+5,W-14,6,P.det);
   }
 
-  // 大門（一定在南面正下方那一格）
-  const gx=sx+W-TS;
-  rect(gx+3,sy+H-4,10,6, isOffice?'#f6b23c':'#e8e3d6');
-  rect(gx+4,sy+H-3,8,4, isOffice?'#c4831f':'#b7b2a4');
+  // 大門：畫在量體內，不會壓到馬路
+  const gx=sx+(h.doorOff||0)*TS;
+  rect(gx+3,sy+H-7,10,6, isOffice?'#f6b23c':'#e8e3d6');
+  rect(gx+4,sy+H-6,8,4, isOffice?'#c4831f':'#b7b2a4');
   if(isOffice){
-    rect(sx+2,sy+H-13,W-4,8,'#f6b23c');
+    rect(sx+2,sy+H-16,W-4,8,'#f6b23c');
     cx.fillStyle='#22190a'; cx.font='900 8px "Noto Sans TC",sans-serif';
     cx.textAlign='center'; cx.textBaseline='middle';
-    cx.fillText('日勝',sx+W/2,sy+H-9);
+    cx.fillText('日勝',sx+W/2,sy+H-12);
     cx.textAlign='left'; cx.textBaseline='alphabetic';
   }
   if(h.sale){
     const st=Game.hs(h.id);
     const bob=Math.sin(t/420+h.id)*1.4;
-    const py0=sy+H+3+bob, cxp=gx+8;
+    const py0=sy+H-18+bob, cxp=gx+8;
     const done=st.signed, no=st.refused;
     cx.fillStyle='rgba(28,38,26,.28)'; cx.fillRect(px(cxp-6),px(py0+2),16,14);
     rect(cxp-7,py0,15,13,'#2f343a');
