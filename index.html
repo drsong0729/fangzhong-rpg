@@ -5164,11 +5164,7 @@ $stickZone.addEventListener('pointerdown',e=>{ if(e.pointerType!=='touch') stick
 addEventListener('pointermove',e=>{ if(Stick.on&&e.pointerType!=='touch') stickMove(e) });
 addEventListener('pointerup',e=>{ if(Stick.on&&e.pointerType!=='touch') stickEnd(e) });
 
-$actBtn.addEventListener('pointerdown',e=>{
-  e.preventDefault();
-  if($talk.classList.contains('show')&&!$ovl.classList.contains('show')){ advanceTalk(); return }
-  A.sfx('click'); interact();
-});
+$actBtn.addEventListener('pointerdown',e=>{ e.preventDefault(); A.sfx('click'); interact() });
 
 const IS_TOUCH=matchMedia('(pointer:coarse)').matches;
 $acts.addEventListener('scroll',()=>syncSwipeHint());
@@ -5177,10 +5173,11 @@ function syncPad(){
   if(!IS_TOUCH){ $stickZone.classList.remove('show'); $actBtn.classList.remove('show'); return }
   const ok=(Game.scene==='city'||Game.scene==='office')
     && !Game.duel && !$ovl.classList.contains('show');
+  // 對話中、戰鬥中、看卡片時都收起來，免得擋住對話框；能走路才顯示
   const walk=ok && !$talk.classList.contains('show');
   $stickZone.classList.toggle('show',walk);
   if(!walk) stickEnd(null);
-  $actBtn.classList.toggle('show',ok);      // 對話中也保留互動鍵，可以用來推進對話
+  $actBtn.classList.toggle('show',walk);
   syncSwipeHint();
 }
 /* 底部按鈕列可以左右滑動時給提示 */
