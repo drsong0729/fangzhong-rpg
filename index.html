@@ -74,7 +74,7 @@ button{font-family:inherit;color:inherit}
   align-items:center;justify-content:center;padding:calc(var(--u)*.022) 12px;
   overflow:hidden;
   /* --u：同時受舞台寬與高限制的縮放基準，矮畫面會整體縮小而不是被切掉 */
-  --u:min(var(--sw,480px),calc(var(--sh,320px) * 1.42));
+  --u:min(var(--sw,480px),calc(var(--sh,320px) * 1.20));
   background:linear-gradient(180deg,rgba(6,10,15,.35),rgba(6,10,15,.82))}
 .ttrank{font-family:var(--f-mono);font-size:clamp(7px,calc(var(--u)*.0165),10px);letter-spacing:.09em;
   color:var(--cream);margin:calc(var(--u)*-.008) 0 calc(var(--u)*.024);text-align:center;flex:none;
@@ -96,6 +96,58 @@ button{font-family:inherit;color:inherit}
 .ch .mst{display:block;font-style:normal;font-family:var(--f-mono);font-size:7.5px;letter-spacing:.1em;
   color:var(--jade);margin-top:5px}
 .hint.tut{color:var(--amber)}
+/* ── 天賦診斷 ── */
+.talent{background:var(--panel2);border:2px solid var(--line2);border-left:5px solid var(--violet);
+  border-radius:4px;padding:13px 15px;margin:14px 0;text-align:left}
+.tl-tag{display:inline-block;font-family:var(--f-mono);font-size:7px;letter-spacing:.14em;
+  background:var(--violet);color:#0e0b1c;padding:3px 6px;border-radius:2px;vertical-align:2px}
+.tl-hd{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;margin-bottom:9px}
+.tl-hd b{font-family:var(--f-disp);font-size:23px;font-weight:900;letter-spacing:.1em;color:var(--amber)}
+.tl-hd i{font-style:normal;font-family:var(--f-mono);font-size:7.5px;color:var(--dimmer);letter-spacing:.12em}
+.tl-bar{position:relative;height:10px;background:#0a0f16;border:2px solid var(--line);
+  border-radius:2px;margin-bottom:11px}
+.tl-bar u{display:block;height:100%;background:var(--violet);text-decoration:none}
+.tl-bar span{position:absolute;right:4px;top:-16px;font-family:var(--f-mono);font-size:7px;color:var(--dim)}
+.talent p{font-family:var(--f-body);font-size:13.5px;line-height:1.8;color:var(--cream);margin:0 0 8px}
+.talent p.tl-r{color:var(--jade);font-size:12.5px}
+.tl-num{display:flex;flex-wrap:wrap;gap:6px 14px;font-family:var(--f-mono);font-size:8px;
+  color:var(--dimmer);letter-spacing:.05em;border-top:2px solid var(--line);padding-top:9px;margin-top:4px}
+.tl-num b{color:var(--amber);font-size:11px}
+.tl-best{margin-top:11px;padding-top:10px;border-top:2px solid var(--line)}
+.tl-best em{display:block;font-style:normal;font-family:var(--f-body);font-size:12px;color:var(--dim);margin:7px 0 5px}
+.tl-best q{display:block;font-family:var(--f-body);font-size:14px;line-height:1.75;color:var(--cream);
+  background:#0e1620;border-left:4px solid var(--jade);border-radius:2px;padding:9px 11px;quotes:none}
+.tl-best i{font-style:normal;font-family:var(--f-mono);font-size:8px;color:var(--jade);
+  display:block;text-align:right;margin-top:5px}
+/* ── 成績卡 ── */
+.sharebox{background:var(--panel);border:2px solid var(--line2);border-radius:4px;
+  padding:11px 13px;margin:12px 0;text-align:left}
+.sharebox pre{font-family:var(--f-mono);font-size:11px;line-height:1.6;color:var(--cream);
+  white-space:pre-wrap;word-break:break-word;margin:9px 0 10px;
+  background:#0e1620;border:2px solid var(--line);border-radius:3px;padding:10px 11px;
+  max-height:230px;overflow:auto;user-select:text}
+.shbtn{justify-content:center}
+/* ── 招募 ── */
+.cta-box{background:linear-gradient(180deg,rgba(246,178,60,.13),rgba(246,178,60,.04));
+  border:2px solid var(--amber-d);border-radius:4px;padding:14px 15px;margin:14px 0;text-align:left}
+.cta-hd{font-family:var(--f-disp);font-size:14px;font-weight:900;letter-spacing:.1em;
+  color:var(--amber);margin-bottom:9px}
+.cta-box p{font-family:var(--f-body);font-size:13.5px;line-height:1.85;color:var(--cream);margin:0 0 8px}
+.cta-box p b{color:var(--amber)}
+.cta-box .cta-hook{font-size:14.5px;border-top:2px solid rgba(246,178,60,.3);padding-top:10px;margin-top:10px}
+.ch.cta{text-decoration:none;background:var(--panel);border-color:var(--amber-d)}
+.ch.cta:hover{background:#26364a}
+.ch.cta small{display:block;font-size:10.5px;color:var(--dimmer);font-family:var(--f-mono);
+  letter-spacing:.04em;margin-top:4px}
+/* ── 每日一題 ── */
+.dqband{display:flex;align-items:baseline;gap:11px;flex-wrap:wrap;background:var(--panel2);
+  border:2px solid var(--line);border-radius:3px;padding:10px 12px;margin-bottom:9px}
+.dqband b{font-family:var(--f-disp);font-size:26px;font-weight:900;line-height:1;color:var(--amber)}
+.dqband span{font-family:var(--f-mono);font-size:11px;color:var(--cream)}
+.dqband u{flex:1 0 100%;text-decoration:none;font-family:var(--f-body);font-size:12.5px;
+  line-height:1.7;color:var(--dim)}
+.dqband.dq-S b,.dqband.dq-A b{color:var(--jade)}
+.dqband.dq-C b,.dqband.dq-D b{color:var(--red)}
 .sndhint{position:absolute;top:10px;right:10px;z-index:7;
   font-family:var(--f-mono);font-size:clamp(7px,calc(var(--u)*.017),10px);letter-spacing:.1em;
   color:var(--amber);background:rgba(10,15,22,.85);border:2px solid var(--amber-d);
@@ -113,9 +165,12 @@ button{font-family:inherit;color:inherit}
     0 7px 0 var(--amber-d),0 9px 0 #000,0 16px 26px rgba(0,0,0,.7)}
 .tt em{font-style:normal;color:var(--amber)}
 .tt-rule{width:calc(var(--u)*.72);max-width:460px;height:3px;flex:none;
-  margin:calc(var(--u)*.028) 0 calc(var(--u)*.026);
+  margin:calc(var(--u)*.022) 0 calc(var(--u)*.020);
   background:linear-gradient(90deg,transparent,var(--line2) 18%,var(--amber) 50%,var(--line2) 82%,transparent)}
 .menu{display:flex;flex-direction:column;gap:calc(var(--u)*.018);width:min(78%,calc(var(--u)*.62));max-width:330px}
+.mgrid{display:grid;grid-template-columns:1fr 1fr;gap:calc(var(--u)*.018)}
+.mbtn.sm{font-size:clamp(11px,calc(var(--u)*.033),17px);padding:calc(var(--u)*.017) 6px;letter-spacing:.06em}
+.mbtn.sm small{font-size:clamp(5.5px,calc(var(--u)*.0125),8px);margin-top:3px}
 .mbtn{font-family:var(--f-disp);font-weight:700;letter-spacing:.12em;
   font-size:clamp(13px,calc(var(--u)*.043),21px);
   padding:calc(var(--u)*.021) 12px;background:var(--panel);color:var(--cream);border:2px solid var(--line2);
@@ -390,9 +445,12 @@ button{font-family:inherit;color:inherit}
         <div class="menu">
           <button class="mbtn" id="mNew">新遊戲<small>NEW GAME</small></button>
           <button class="mbtn" id="mLoad" disabled>載入遊戲<small id="mLoadSub">NO DATA</small></button>
-          <button class="mbtn" id="mCards">話術卡<small>0 / 30</small></button>
-          <button class="mbtn" id="mBoard">排行榜<small>LEADERBOARD</small></button>
-          <button class="mbtn" id="mCredits">製作人員<small>CREDITS</small></button>
+          <div class="mgrid">
+            <button class="mbtn sm" id="mDaily">每日一題<small>DAILY</small></button>
+            <button class="mbtn sm" id="mCards">話術卡<small>0 / 30</small></button>
+            <button class="mbtn sm" id="mBoard">排行榜<small>RANK</small></button>
+            <button class="mbtn sm" id="mCredits">製作人員<small>CREDITS</small></button>
+          </div>
         </div>
         <div class="tt-foot">方向鍵／WASD 移動　空白鍵 互動　手機用畫面左下方向鍵</div>
       </div>
@@ -2032,6 +2090,114 @@ const Meta={
 Meta.load();
 
 /* ═══════════════════════════════════════════════════════════
+   房仲天賦診斷 ＋ 每日一題 ＋ 聯絡方式設定
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── 聯絡方式：填了才會出現在結局的按鈕上，留空就自動隱藏 ── */
+const CONTACT={
+  company:'日勝國際不動產',
+  person :'Ryan 吳松儒',
+  tel    :'0755-777-88',      // 結局會做成可直接撥打的按鈕
+  line   :'',                 // LINE 官方帳號網址，例如 https://line.me/R/ti/p/@xxxxx
+  form   :'',                 // 應徵表單網址
+  site   :'https://drsong0729.github.io/fangzhong-rpg/'
+};
+
+/* ── 診斷用的特徵詞（與評分引擎分開，這裡只做分類不做評分） ── */
+const T_EMPATHY =/(了解|我懂|我知道|明白|難怪|辛苦|不好意思|抱歉|是我不對|不打擾|不勉強|不為難|尊重|您說得對|有道理|恭喜|謝謝|理解)/;
+const T_CONCRETE=/(禮拜|星期|下週|下次|三分鐘|三天|一週|每週|三十天|30天|三週|整理|印|報告|回報|備齊|資料|實價|實登|謄本|行情表|名片|不收費|成交才收|留一份|寄給您|拿給您|安排|下一步|幾點|幾號)/;
+const T_ASK     =/(請問|方便|可以嗎|好嗎|您覺得|要不要|大概什麼時候|幾號|多少)/;
+const T_HUMBLE  =/(不敢保證|不騙您|我還在|經驗|做不到|沒辦法保證|您隨時|可以叫停|不用簽|先不簽)/;
+const T_PUSH    =/(一定|保證|絕對|最好|馬上|立刻|趕快|現在就|不然|否則)/;
+
+const TALENTS={
+  data   :{n:'資料型',   en:'THE ANALYST',
+    d:'你的高分回答有一半以上帶著可以被檢查的東西——一份表、一個日期、一組數字。屋主不見得喜歡你，但他會相信你講的話。',
+    r:'這種人在房仲業活得最久。因為市場冷的時候，只有拿得出資料的人還在成交。'},
+  warm   :{n:'陪伴型',   en:'THE LISTENER',
+    d:'你幾乎每一句都先接住對方的情緒才講事情。你不急著成交，但屋主會記得你。',
+    r:'這種人拿到的委託通常是別人跑了五趟拿不到的那一種。老屋主、有感情的房子，只有你談得下來。'},
+  direct :{n:'直球型',   en:'THE CLOSER',
+    d:'你講話短、問題直接，不繞圈子。有人被你嚇到，但更多人鬆了一口氣——終於有人講重點。',
+    r:'這種人成交速度最快。要小心的是，你的直球對某些屋主是壓力。'},
+  humble :{n:'誠實型',   en:'THE STRAIGHT SHOOTER',
+    d:'你不承諾做不到的事，也願意說「這個我不敢保證」。在一個大家都在保證的行業裡，這件事本身就是差異化。',
+    r:'這種人前三個月最辛苦，第二年開始靠轉介就吃不完。'},
+  wolf   :{n:'狼性型',   en:'THE HUNTER',
+    d:'你敢講、敢要、敢逼一把。你的最高分很高，但你也踩過地雷——有幾句話讓屋主直接關門。',
+    r:'這種人業績曲線最陡。加上一點節制，你會是店裡最會賺的那一個。'},
+  steady :{n:'穩健型',   en:'THE ALL-ROUNDER',
+    d:'你沒有特別偏向哪一邊：該接情緒的時候接，該給方案的時候給，也沒有踩過什麼地雷。',
+    r:'這種人是店長最想要的那一種——不用盯，交給你就會做完。'}
+};
+
+/* 依整場的作答特徵判定天賦 */
+function talentOf(S){
+  const n=Math.max(1,S.answers);
+  const emp=S.empathy/n, con=S.concrete/n, ask=S.ask/n, hum=S.humble/n, push=S.push/n;
+  const shortAvg=S.chars/n;
+  const scores={
+    data  : con*2.4 + (S.avg()>=60?0.3:0),
+    warm  : emp*2.6 - push*0.8,
+    direct: (shortAvg<26?1.1:0) + ask*1.5 - emp*0.5,
+    humble: hum*2.8,
+    wolf  : push*1.6 + (S.mines>0?1.0:0) + (S.top>=85?0.5:0),
+    steady: 0.9 + (S.mines===0?0.5:0)
+  };
+  let best='steady', bv=-9;
+  for(const k in scores) if(scores[k]>bv){ bv=scores[k]; best=k }
+  const pct=Math.round(Math.min(96,Math.max(41,bv/(bv+1.1)*100)));
+  return {key:best, t:TALENTS[best], pct};
+}
+
+/* 一場遊戲的作答統計 */
+function newStats(){
+  return {
+    answers:0, sum:0, top:0, chars:0,
+    empathy:0, concrete:0, ask:0, humble:0, push:0, mines:0,
+    typed:0, picked:0,
+    best:null,                       // {score, text, line}
+    avg(){ return this.answers?Math.round(this.sum/this.answers):0 }
+  };
+}
+function statTag(S,text,score,line,typed){
+  S.answers++; S.sum+=score; S.chars+=text.length;
+  if(score>S.top) S.top=score;
+  if(typed) S.typed++; else S.picked++;
+  if(T_EMPATHY.test(text))  S.empathy++;
+  if(T_CONCRETE.test(text)) S.concrete++;
+  if(T_ASK.test(text))      S.ask++;
+  if(T_HUMBLE.test(text))   S.humble++;
+  if(T_PUSH.test(text))     S.push++;
+  if(score<15)              S.mines++;
+  if(!S.best||score>S.best.score) S.best={score,text,line};
+}
+
+/* ── 每日一題：依日期決定，全世界同一題 ── */
+const DAILY_KEY='fangzhong_daily_v1';
+function dailyDate(){
+  const d=new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function dailyMove(){
+  const r=rngFor('daily',dailyDate());
+  const pool=MOVES.concat(GUARD_MOVES);
+  return pool[Math.floor(r()*pool.length)];
+}
+function dailyLoad(){ try{ return JSON.parse(localStorage.getItem(DAILY_KEY)||'{}') }catch(e){ return {} } }
+function dailySave(o){ try{ localStorage.setItem(DAILY_KEY,JSON.stringify(o)) }catch(e){} }
+
+/* 分數落點：不假造百分位，用評分引擎本身的分段講清楚 */
+const DAILY_BAND=[
+  {min:85,n:'S',t:'完全命中他的理由，而且給了他今天就能答應的下一步。這種回答很少見。'},
+  {min:65,n:'A',t:'有承接情緒也有具體方案，只差一點就能讓他鬆口。'},
+  {min:45,n:'B',t:'態度到位，但停在「我會努力」，沒有給出他能檢查的東西。'},
+  {min:20,n:'C',t:'答非所問，或只講了自己想講的。'},
+  {min:0, n:'D',t:'踩到地雷了。這一句在現場會直接被關門。'}
+];
+function dailyBand(s){ for(const b of DAILY_BAND) if(s>=b.min) return b; return DAILY_BAND[DAILY_BAND.length-1] }
+
+/* ═══════════════════════════════════════════════════════════
    世界：城市生成、門牌編碼、謄本資料、像素繪圖
    ═══════════════════════════════════════════════════════════ */
 
@@ -2703,6 +2869,7 @@ const Game={
   scene:'title', name:'', seed:'', day:1, ap:AP_DAY, signed:0,
   hstate:{}, letters:[], nav:null, logs:[], duel:null, dayOver:false, lastBoss:-1, doneDay:0,
   notes:{addrs:[],phones:[]}, seenSeq:0, tut:0, tutId:-1, taken:0, newCards:[],
+  stats:null, dayLog:[],
   hs(id){ return this.hstate[id]||(this.hstate[id]={seen:false,letter:false,signed:false,
     refused:false,visits:0,knocks:0,tries:0,seenOrd:0}) },
   reset(seed,name){
@@ -2711,6 +2878,7 @@ const Game={
     this.dayOver=false; this.lastBoss=-1; this.doneDay=0;
     this.notes={addrs:[],phones:[]}; this.seenSeq=0;
     this.tut=0; this.tutId=-1; this.taken=0; this.newCards=[];
+    this.stats=newStats(); this.dayLog=[];
   }
 };
 
@@ -2873,8 +3041,13 @@ function endDay(reason){
       events.push({house:L.house,meet:pool[Math.floor(Math.random()*pool.length)].id});
     }
   }
+  // 這一天的戰報方塊：簽到／有進展／空手／被搶
+  const d0=Game.day, before=Game.dayLog.length;
+  let mark = Game.dayLog[d0-1] || 'none';
+  Game.dayLog[d0-1]=mark;
   Game.day++;
   const lost=rivalSweep();
+  if(lost.length&&Game.dayLog[d0-1]==='none') Game.dayLog[d0-1]='lost';
   if(Game.day>MAXDAY) return finish(Game.signed>=GOAL);
   Game.ap=dayAP(); Game.dayOver=false;
   // 新的一天：一律回公司出發
@@ -2981,7 +3154,8 @@ function save(silent){
   try{
     localStorage.setItem(SAVE_KEY,JSON.stringify({v:2,seed:Game.seed,name:Game.name,day:Game.day,
       ap:Game.ap,signed:Game.signed,hstate:Game.hstate,letters:Game.letters,nav:Game.nav,
-      notes:Game.notes,seenSeq:Game.seenSeq,tut:Game.tut,tutId:Game.tutId,taken:Game.taken,logs:Game.logs.slice(0,30),scene:Game.scene==='office'?'office':'city',px:P.x,py:P.y}));
+      notes:Game.notes,seenSeq:Game.seenSeq,tut:Game.tut,tutId:Game.tutId,taken:Game.taken,
+      dayLog:Game.dayLog,logs:Game.logs.slice(0,30),scene:Game.scene==='office'?'office':'city',px:P.x,py:P.y}));
     if(!silent){ A.sfx('confirm'); toast('已存檔') }
     checkSave();
   }catch(e){ if(!silent) toast('這個環境無法存檔') }
@@ -3823,6 +3997,8 @@ function duelSettle(text,R){
                         : Math.round(Math.max(0,R.score-20)*0.38);
   if(D.mastered&&R.score>=70) dmg=Math.round(dmg*1.2);        // 已掌握的招式打得更準
   cardEarn((D.mv||{}).id,R.score);                             // 破解就收進圖鑑
+  if(!Game.stats) Game.stats=newStats();
+  statTag(Game.stats,text,R.score,(D.mv||{}).line||'',R.typed!==false);
   if(D.steel){ dmg=Math.round(dmg*0.45); }
   const rap = (R.rap!=null) ? R.rap
             : (R.score<35 ? Math.round((35-R.score)*1.05) : 0);
@@ -3836,6 +4012,7 @@ function duelSettle(text,R){
   D.steel = R.score<45;               // 講差了→他硬起來，下一句先扣半
 
   D.g-=dmg; D.rap-=rap;
+  if(dmg>=14&&Game.dayLog[Game.day-1]!=='sign') Game.dayLog[Game.day-1]='progress';
 
   let win=false, lose=D.rap<=0, bounce=false;
   if(D.kind==='guard'){
@@ -3900,6 +4077,7 @@ function duelPick(o,ui){
   const score = o.k==='good' ? 84 : o.k==='ok' ? 48 : 16;
   const tip = (MOVE_HINTS[mv.id]||{}).tip || '';
   duelSettle(o.t,{
+    typed:false,
     score, d:o.d, rap:o.rap!=null?o.rap:(o.k==='bad'?12:0),
     reply:o.r||'「⋯⋯」',
     note:o.w || (o.k==='good' ? '這一句正好戳到他真正在意的地方——他沒有話回你。' : ''),
@@ -4014,6 +4192,7 @@ function duelEnd(win){
   if(D.kind==='guard'){ guardOutcome(D,st); return }
   if(win){
     st.signed=true; Game.signed++; hudSync(); A.sfx('sign');
+    Game.dayLog[Game.day-1]='sign';
     Meta.addXP(50);
     if(D.src.tut&&Game.tut){ tutStep(6) }
     if(Game.signed===GOAL&&!Game.doneDay) Game.doneDay=Game.day;
@@ -4053,6 +4232,159 @@ function goalReached(){
 /* ═══ 結算 ═══ */
 const END_LINES=['房仲這份工作不只是出一張嘴','還要有強大的毅力與抗壓力','這只是一款遊戲',
   '現實會比這個更辛苦','如果你想挑戰自己、獲取無上限的薪水','歡迎加入日勝國際不動產！','歡迎致電：0755-777-88'];
+/* ═══ 每日一題：全世界同一題，練的就是「開口」 ═══════════ */
+function dailyCard(){
+  const date=dailyDate(), mv=dailyMove(), store=dailyLoad();
+  const rec=store[date];
+  const isGuard=GUARD_MOVES.indexOf(mv)>=0;
+  const who=isGuard?'大樓管理員':'屋主';
+  const done=!!rec;
+
+  const head=`<div class="card-hd"><h3>每日一題</h3><span class="tag">${date}</span></div>`;
+  const intro=`<div class="booknote">每天全世界同一題。沒有選項，只能自己想一句話。
+    ${done?`你今天最高 <b style="color:var(--amber)">${rec.score}</b> 分，可以再挑戰，會取最高分。`
+          :'一天可以挑戰很多次，記錄的是最高分。'}</div>`;
+
+  const panel=()=>{
+    $ovlIn.innerHTML=`<div class="card">${head}<div class="card-bd"><div class="duel">
+      ${intro}
+      <div class="say"><b>${esc(who)}</b>${esc(mv.line)}</div>
+      <div class="ffwrap">
+        <textarea id="dqIn" rows="2" maxlength="120" placeholder="你要怎麼回他？"></textarea>
+        <button class="ffgo" id="dqGo">說出口</button>
+      </div>
+      <div class="coach" id="dqMsg">${AI.ready
+        ? '對方會照你講的內容反應，並給你評語與建議。'
+        : '系統會依房仲實務評分，並給你評語與建議。'}</div>
+      <div class="choices"><button class="ch" id="dqClose"><span class="k">✕</span><span>關閉</span></button></div>
+    </div></div></div>`;
+    $ovl.classList.add('show'); $ovl.scrollTop=0;
+    const inp=el('dqIn'), go=el('dqGo'), msg=el('dqMsg');
+    let busy=false;
+    inp.addEventListener('keydown',e=>{ if(e.key==='Enter'&&!e.shiftKey) e.stopPropagation() });
+    el('dqClose').onclick=()=>{A.sfx('cancel');closeOvl()};
+    go.onclick=async ()=>{
+      if(busy) return;
+      const v=(inp.value||'').trim();
+      if(v.length<4){ msg.className='coach warn'; msg.textContent='再多說一點，對方聽不出你要表達什麼。'; A.sfx('deny'); return }
+      busy=true; go.disabled=true; inp.disabled=true; A.sfx('click');
+      msg.className='coach think'; msg.textContent=who+'正在想⋯⋯';
+      let Rz=null;
+      if(AI.ready){
+        try{
+          const j=await AI.judge({type:isGuard?'大樓管理員（職責是不透露住戶資訊）':'不想簽委託的屋主',
+            note:isGuard?'照規定辦事':'預設就是不簽', why:'（無）', addr:'—', ping:'—',
+            line:mv.line, guardPct:80, history:[]}, v);
+          const sc=Math.max(0,Math.min(100,Math.round(j.score||0)));
+          Rz={score:sc,reply:j.reply,note:j.note||'',tip:j.tip||(MOVE_HINTS[mv.id]||{}).tip||''};
+        }catch(e){ Rz=null }
+      }
+      if(!Rz){
+        const lr=coachScore(mv.id,v,[]);
+        Rz={score:lr.score,note:lr.note,tip:lr.tip,reply:coachReply(mv,lr.band,isGuard)};
+      }
+      const b=dailyBand(Rz.score);
+      const prev=(dailyLoad()[date]||{}).score||0;
+      if(Rz.score>prev){ const st=dailyLoad(); st[date]={score:Rz.score,text:v,ts:Date.now()}; dailySave(st) }
+      A.sfx(Rz.score>=65?'good':Rz.score>=45?'hit':'bad');
+      result(v,Rz,b,prev);
+    };
+    setTimeout(()=>{ try{ inp.focus() }catch(e){} },80);
+  };
+
+  const result=(text,Rz,b,prev)=>{
+    $ovlIn.innerHTML=`<div class="card">${head}<div class="card-bd"><div class="duel">
+      <div class="dqband dq-${b.n}"><b>${b.n}</b><span>${Rz.score} 分</span><u>${esc(b.t)}</u></div>
+      <div class="say"><b>${esc(who)}</b>${esc(mv.line)}</div>
+      <div class="say me"><b>${esc(Game.name||'你')}</b>${esc(text)}</div>
+      <div class="say">${esc(Rz.reply||'「⋯⋯」')}</div>
+      <div class="coach">${Rz.note?`<span class="cl">評語</span>${esc(Rz.note)}`:''}
+        ${Rz.tip?`<br><span class="cl tipc">建議</span>${esc(Rz.tip)}`:''}</div>
+      <div class="booknote">${Rz.score>prev?`今日最高分更新：${prev} → <b style="color:var(--jade)">${Rz.score}</b>`
+        :`今日最高分仍是 ${prev} 分。`}　${CARD_INFO[mv.id]&&Meta.has(mv.id)?'（這一招你已經掌握了）':''}</div>
+      <div class="choices">
+        <button class="ch" id="dqRetry"><span class="k">↻</span><span>再答一次</span></button>
+        <button class="ch" id="dqShare"><span class="k">⧉</span><span>複製今天的成績</span></button>
+        <button class="ch" id="dqClose2"><span class="k">✕</span><span>關閉</span></button>
+      </div>
+    </div></div></div>`;
+    $ovl.scrollTop=0;
+    el('dqRetry').onclick=()=>{A.sfx('click');panel()};
+    el('dqClose2').onclick=()=>{A.sfx('cancel');closeOvl()};
+    el('dqShare').onclick=()=>{
+      const best=(dailyLoad()[date]||{}).score||Rz.score;
+      const t=[`房仲菜鳥大冒險　每日一題 ${date}`,'',
+        `${who}：${mv.line}`,'',
+        `我的分數：${best} 分（${dailyBand(best).n}）`,'',
+        CONTACT.site].join('\n');
+      const ta=document.createElement('textarea'); ta.value=t;
+      ta.style.position='fixed'; ta.style.opacity='0';
+      document.body.appendChild(ta); ta.select();
+      try{ document.execCommand('copy'); A.sfx('confirm'); toast('已複製今天的成績',2000) }
+      catch(e){ A.sfx('deny'); toast('這個環境不能自動複製',2400) }
+      document.body.removeChild(ta);
+    };
+  };
+  panel();
+}
+
+/* ═══ 成績卡：可以直接貼到社群 ═══════════════════════════ */
+const DAY_MARK={sign:'🟩',progress:'🟨',lost:'🟥',none:'⬜'};
+function shareText(win,days){
+  const S=Game.stats||newStats(), T=S.answers>=3?talentOf(S):null;
+  const grid=[];
+  for(let i=0;i<days;i++) grid.push(DAY_MARK[Game.dayLog[i]||'none']||'⬜');
+  const rows=[];
+  for(let i=0;i<grid.length;i+=10) rows.push(grid.slice(i,i+10).join(''));
+  const L=[];
+  L.push(`房仲菜鳥大冒險　${win?`DAY ${days} 通關`:'GAME OVER'}`);
+  L.push(`委託 ${Game.signed}/${GOAL}　${Meta.rank().n}　話術卡 ${Meta.cardCount()}/${Meta.cardTotal()}`);
+  L.push('');
+  rows.forEach(r=>L.push(r));
+  L.push('');
+  if(T) L.push(`天賦：${T.t.n}　平均 ${S.avg()} 分　最高 ${S.top} 分`);
+  if(S.best&&S.best.score>=70) L.push(`最佳一句：「${S.best.text}」`);
+  L.push('');
+  L.push('🟩簽到委託　🟨有推進　🟥被同業搶走　⬜空手');
+  if(CONTACT.site) L.push(CONTACT.site);
+  return L.join('\n');
+}
+function copyShare(){
+  const t=el('shareTxt').textContent;
+  const done=()=>{ A.sfx('confirm'); toast('成績卡已複製，可以直接貼上',2200) };
+  try{
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(t).then(done,()=>fallbackCopy(t,done));
+    }else fallbackCopy(t,done);
+  }catch(e){ fallbackCopy(t,done) }
+}
+function fallbackCopy(t,done){
+  try{
+    const ta=document.createElement('textarea');
+    ta.value=t; ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.select(); document.execCommand('copy');
+    document.body.removeChild(ta); done();
+  }catch(e){ A.sfx('deny'); toast('這個環境不能自動複製，請長按上面的文字自行複製',3000) }
+}
+
+/* ═══ 招募：放在情緒最高點，而且要能一鍵行動 ═══════════════ */
+function ctaHTML(T){
+  const btns=[];
+  if(CONTACT.tel)  btns.push(`<a class="ch cta" href="tel:${esc(CONTACT.tel.replace(/[^0-9+]/g,''))}"><span class="k">☎</span><span>撥打 ${esc(CONTACT.tel)}<small>${esc(CONTACT.company)}　${esc(CONTACT.person)}</small></span></a>`);
+  if(CONTACT.line) btns.push(`<a class="ch cta" href="${esc(CONTACT.line)}" target="_blank" rel="noopener"><span class="k">◉</span><span>加 LINE 聊聊<small>先問問看也可以</small></span></a>`);
+  if(CONTACT.form) btns.push(`<a class="ch cta" href="${esc(CONTACT.form)}" target="_blank" rel="noopener"><span class="k">▤</span><span>填應徵表單<small>三分鐘</small></span></a>`);
+  if(!btns.length) return '';
+  const line = T
+    ? `你在這 30 天裡是<b>${esc(T.t.n)}</b>的房仲。${esc(T.t.r)}`
+    : '這款遊戲把房仲最難的那一段——被拒絕之後還要開口——縮成了三十天。';
+  return `<div class="cta-box">
+    <div class="cta-hd">現實比這個更辛苦，但也真的有人做到了</div>
+    <p>${line}</p>
+    <p class="cta-hook">把你剛剛在遊戲裡寫的那句話截圖帶來，<b>那就是你的面試</b>。</p>
+    <div class="choices">${btns.join('')}</div>
+  </div>`;
+}
+
 function finish(win){
   Meta.finishRun(win, Game.doneDay||Game.day);
   Game.scene='ending'; Game.duel=null; closeOvl(); $talk.classList.remove('show'); $acts.innerHTML='';
@@ -4063,13 +4395,46 @@ function finish(win){
   }
   const seen=Object.values(Game.hstate).filter(s=>s.seen).length;
   const knocks=Object.values(Game.hstate).reduce((a,s)=>a+(s.knocks||0)+(s.tries||0),0);
+  const S=Game.stats||newStats();
+  const T=S.answers>=3 ? talentOf(S) : null;
+  const days=Math.min(Game.day,MAXDAY);
+  const R=Meta.rank();
+
+  const talentHTML = T ? `
+    <div class="talent">
+      <div class="tl-hd"><span class="tl-tag">你的房仲天賦</span>
+        <b>${esc(T.t.n)}</b><i>${T.t.en}</i></div>
+      <div class="tl-bar"><u style="width:${T.pct}%"></u><span>${T.pct}% 傾向</span></div>
+      <p>${esc(T.t.d)}</p>
+      <p class="tl-r">${esc(T.t.r)}</p>
+      <div class="tl-num">
+        <span>回答 <b>${S.answers}</b> 句</span>
+        <span>自己打字 <b>${S.answers?Math.round(S.typed/S.answers*100):0}%</b></span>
+        <span>平均 <b>${S.avg()}</b> 分</span>
+        <span>最高 <b>${S.top}</b> 分</span>
+      </div>
+      ${S.best&&S.best.score>=55?`<div class="tl-best">
+        <span class="tl-tag">你講過最好的一句</span>
+        <em>${esc(S.best.line)}</em>
+        <q>${esc(S.best.text)}</q>
+        <i>${S.best.score} 分</i></div>`:''}
+    </div>` : '';
+
   $ovlIn.innerHTML=`<div class="ending">
     <div class="verdict${win?'':' bad'}">${win?'恭喜通關':'GAME OVER'}</div>
-    <div class="score">經紀營業員　${esc(Game.name)}<br>
-      委託成交　${Game.signed} / ${GOAL} 件　·　天數 ${Math.min(Game.day,MAXDAY)} / ${MAXDAY}<br>
-      調閱謄本 ${seen} 件　·　開發信 ${Game.letters.length} 封　·　敲門 ${knocks} 次</div>
+    <div class="score">${esc(R.n)}　${esc(Game.name)}<br>
+      委託成交　${Game.signed} / ${GOAL} 件　·　天數 ${days} / ${MAXDAY}<br>
+      調閱謄本 ${seen} 件　·　開發信 ${Game.letters.length} 封　·　敲門 ${knocks} 次<br>
+      話術卡 ${Meta.cardCount()} / ${Meta.cardTotal()}${Game.newCards.length?`　（這一場新解鎖 ${Game.newCards.length} 張）`:''}</div>
+    ${talentHTML}
+    <div class="sharebox">
+      <div class="tl-tag">成績卡</div>
+      <pre id="shareTxt">${esc(shareText(win,days))}</pre>
+      <button class="ch shbtn" id="shCopy"><span class="k">⧉</span><span>複製成績卡</span></button>
+    </div>
     <div class="lines" id="endLines">${END_LINES.map((l,i)=>
       `<p class="${i>=4?(i===6?'tel':'hi'):''}">${esc(l)}</p>`).join('')}</div>
+    ${ctaHTML(T)}
     <div class="choices">
       <button class="ch" id="endAgain" style="justify-content:center;background:var(--amber);color:#22190a;border-color:#ffd889;font-weight:900"><span>再玩一次</span></button>
       <button class="ch" id="endBoard" style="justify-content:center"><span>看排行榜</span></button>
@@ -4078,6 +4443,7 @@ function finish(win){
   $ovl.classList.add('show'); $ovl.scrollTop=0;
   $ovlIn.querySelectorAll('#endLines p').forEach((p,i)=>
     setTimeout(()=>{p.classList.add('in');A.sfx(i===6?'confirm':'click')},500+i*620));
+  el('shCopy').onclick=()=>copyShare();
   el('endAgain').onclick=()=>{A.sfx('confirm');closeOvl();startNew()};
   el('endBoard').onclick=()=>{A.sfx('click');boardCard()};
   el('endTitle').onclick=()=>{A.sfx('cancel');closeOvl();toTitle()};
@@ -4121,6 +4487,29 @@ function armAudio(){
     addEventListener(ev,kickAudio,{once:true,capture:true}));
 }
 armAudio();
+
+/* 切到別的 App／別的分頁就把聲音停掉，回來再接上（手機尤其重要） */
+let _bgPaused=false;
+function audioSuspend(){
+  if(!A.ctx||A.ctx.state!=='running') return;
+  _bgPaused=true;
+  try{ A.ctx.suspend() }catch(e){}
+  if(A.timer){ clearInterval(A.timer); A.timer=null }
+}
+function audioResume(){
+  if(!_bgPaused||!A.ctx) return;
+  _bgPaused=false;
+  if(!A.on||!_audioOK) return;
+  try{ A.ctx.resume() }catch(e){}
+  const t=A.track; A.track=null; A.play(t||_wantTrack||'title');
+}
+document.addEventListener('visibilitychange',()=>{
+  if(document.hidden) audioSuspend(); else audioResume();
+});
+addEventListener('pagehide',audioSuspend);
+addEventListener('freeze',audioSuspend);
+addEventListener('blur',()=>{ if(document.hidden) audioSuspend() });
+addEventListener('pageshow',audioResume);
 $stage.addEventListener('pointerdown',()=>{
   A.resume();
   if($talk.classList.contains('show')&&!$ovl.classList.contains('show')) advanceTalk();
@@ -4221,6 +4610,7 @@ function hintPrompt(){
 
 /* ═══ 啟動 ═══ */
 el('mNew').onclick=()=>{A.resume();A.sfx('confirm');startNew()};
+el('mDaily').onclick=()=>{A.resume();A.sfx('click');dailyCard()};
 el('mCards').onclick=()=>{A.resume();A.sfx('click');cardBook()};
 el('mBoard').onclick=()=>{A.resume();A.sfx('click');boardCard()};
 el('mCredits').onclick=()=>{A.resume();A.sfx('click');
@@ -4242,6 +4632,7 @@ el('mLoad').onclick=()=>{
   Game.hstate=s.hstate||{}; Game.letters=s.letters||[]; Game.nav=s.nav||null; Game.logs=s.logs||[];
   Game.notes=s.notes&&s.notes.addrs?s.notes:{addrs:[],phones:[]}; Game.seenSeq=s.seenSeq||0;
   Game.tut=s.tut||0; Game.tutId=(s.tutId===undefined?-1:s.tutId); Game.taken=s.taken||0;
+  Game.dayLog=s.dayLog||[]; Game.stats=newStats();
   if(Game.tutId>=0&&World.houses[Game.tutId]) World.houses[Game.tutId].tut=true;
   $title.style.display='none'; $hud.classList.remove('hidden'); hudSync(); fitStage();
   if(s.scene==='office'){ Game.scene='office'; P.x=9.5*TS; P.y=(OFFICE.h-3)*TS; A.play('office') }
