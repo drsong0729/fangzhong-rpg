@@ -76,6 +76,26 @@ button{font-family:inherit;color:inherit}
   /* --u：同時受舞台寬與高限制的縮放基準，矮畫面會整體縮小而不是被切掉 */
   --u:min(var(--sw,480px),calc(var(--sh,320px) * 1.42));
   background:linear-gradient(180deg,rgba(6,10,15,.35),rgba(6,10,15,.82))}
+.ttrank{font-family:var(--f-mono);font-size:clamp(7px,calc(var(--u)*.0165),10px);letter-spacing:.09em;
+  color:var(--cream);margin:calc(var(--u)*-.008) 0 calc(var(--u)*.024);text-align:center;flex:none;
+  background:rgba(8,12,18,.82);border:2px solid var(--line);border-radius:3px;padding:5px 10px}
+.ttrank b{color:var(--amber);font-size:1.24em;letter-spacing:.14em;margin-right:9px}
+.rankbar{display:flex;gap:11px;align-items:center;background:var(--panel2);border:2px solid var(--line);
+  border-radius:3px;padding:9px 11px;margin-bottom:9px}
+.rankbar .rk{flex:none}
+.rankbar .rk b{display:block;font-family:var(--f-disp);font-size:15px;font-weight:900;
+  letter-spacing:.12em;color:var(--amber)}
+.rankbar .rk i{font-style:normal;font-family:var(--f-mono);font-size:7px;color:var(--dimmer);letter-spacing:.1em}
+.rankbar .rkxp{flex:1;min-width:0}
+.rankbar .rkxp .bar{width:100%;height:9px}
+.rankbar .rkxp .bar i{background:var(--violet)}
+.rankbar .rkxp span{display:block;font-family:var(--f-mono);font-size:7.5px;color:var(--dim);
+  letter-spacing:.05em;margin-top:5px}
+.row.lock{opacity:.5}
+.row.lock .a{color:var(--dimmer);letter-spacing:.2em}
+.ch .mst{display:block;font-style:normal;font-family:var(--f-mono);font-size:7.5px;letter-spacing:.1em;
+  color:var(--jade);margin-top:5px}
+.hint.tut{color:var(--amber)}
 .sndhint{position:absolute;top:10px;right:10px;z-index:7;
   font-family:var(--f-mono);font-size:clamp(7px,calc(var(--u)*.017),10px);letter-spacing:.1em;
   color:var(--amber);background:rgba(10,15,22,.85);border:2px solid var(--amber-d);
@@ -366,9 +386,11 @@ button{font-family:inherit;color:inherit}
         <div class="tt-sub">SUPER SUN REALTY PRESENTS</div>
         <h1 class="tt">房仲<em>菜鳥</em>大冒險</h1>
         <div class="tt-rule"></div>
+        <div class="ttrank" id="ttRank" hidden></div>
         <div class="menu">
           <button class="mbtn" id="mNew">新遊戲<small>NEW GAME</small></button>
           <button class="mbtn" id="mLoad" disabled>載入遊戲<small id="mLoadSub">NO DATA</small></button>
+          <button class="mbtn" id="mCards">話術卡<small>0 / 30</small></button>
           <button class="mbtn" id="mBoard">排行榜<small>LEADERBOARD</small></button>
           <button class="mbtn" id="mCredits">製作人員<small>CREDITS</small></button>
         </div>
@@ -1929,6 +1951,87 @@ const PICS={
 };
 
 /* ═══════════════════════════════════════════════════════════
+   跨場次成長：話術卡圖鑑 ＋ 職級
+   ═══════════════════════════════════════════════════════════ */
+
+const META_KEY='fangzhong_meta_v1';
+
+/* 職級：跨場次累積經驗，給的是「起步優勢」而不是「自動過關」 */
+const RANKS=[
+  {n:'菜鳥',      en:'ROOKIE',    xp:0,    ap:0,  off:0,  note:'剛拿到證照'},
+  {n:'經紀營業員', en:'AGENT',     xp:120,  ap:10, off:3,  note:'開始有人記得你'},
+  {n:'資深經紀',   en:'SENIOR',    xp:360,  ap:20, off:6,  note:'這條街的人會跟你點頭'},
+  {n:'業務主任',   en:'CHIEF',     xp:760,  ap:30, off:9,  note:'手上永遠有案子'},
+  {n:'店長',      en:'MANAGER',   xp:1400, ap:40, off:12, note:'換你在辦公室等人回來'}
+];
+
+/* 每一招破解之後解鎖的「話術卡」：卡面寫的是這一招真正的解法 */
+const CARD_INFO={
+  exclusive  :{n:'到期日',     k:'不勸他毀約，只問到期日並約下一次'},
+  toomany    :{n:'一張表',     k:'不當第七家，只帶一份別人沒有的資料'},
+  buyerfirst :{n:'先後順序',   k:'講清楚沒有委託連門都開不了'},
+  fee        :{n:'成交才收',   k:'把服務費從「支出」講成「條件」'},
+  selfsell   :{n:'兩個風險',   k:'安全與反悔——自售真正踩到的兩件事'},
+  notrush    :{n:'零損失',     k:'不急的人最適合一般委託'},
+  friend     :{n:'不搶案',     k:'尊重同業，只留一組買方條件'},
+  young      :{n:'先認再補',   k:'承認經驗不足，換一個可被驗證的勤'},
+  market     :{n:'分工',       k:'價格他決定，資料你負責'},
+  price      :{n:'讓市場回答', k:'不承諾價格，承諾看屋量'},
+  family     :{n:'兩份資料',   k:'給他跟家人各一份，並約下一次'},
+  distrust   :{n:'寫在紙上',   k:'不辯解，把每一步變成可以叫停的紙本'},
+  tenant     :{n:'租約是賣點', k:'把租客從障礙翻成條件'},
+  neighbor   :{n:'實登',       k:'用成交價打開價，不用嘴巴'},
+  later      :{n:'三分鐘',     k:'不糾纏，留下下一次出現的理由'},
+  nodoc      :{n:'公開資料',   k:'不跟他要資料，先自己準備好'},
+  onlyone    :{n:'這一區',     k:'小店的優勢是密度不是品牌'},
+  taxes      :{n:'真正的數字', k:'不亂算稅，先把成本整理出來'},
+  memory     :{n:'先不簽',     k:'有感情的房子，第一次不談委託'},
+  suspicious :{n:'來源說清楚', k:'誠實說明資料來源，並給他喊停的權利'},
+  sold       :{n:'不擋別人',   k:'祝福對方，同時預約下一個時間點'},
+  photo      :{n:'不曝光',     k:'去掉照片與門牌，照樣賣得掉'},
+  rushvisit  :{n:'不用到場',   k:'把帶看變成不需要他出現的事'},
+  commission2:{n:'保證進度',   k:'不保證成交，保證看得見的過程'},
+  g1:{n:'換個問法',   k:'不問住戶資料，改問流程'},
+  g2:{n:'認錯',       k:'不上樓，留下一張訪客單'},
+  g3:{n:'不算一個',   k:'把自己跟其他仲介切開'},
+  g4:{n:'證號',       k:'主動把身分攤開給他抄'},
+  g5:{n:'等他抬頭',   k:'不搶話，先給一個台階'},
+  g6:{n:'最後一句',   k:'離開前留下一個他做得到的小忙'}
+};
+
+const Meta={
+  cards:{}, xp:0, runs:0, best:0, wins:0,
+  load(){
+    try{
+      const s=JSON.parse(localStorage.getItem(META_KEY)||'null');
+      if(s){ this.cards=s.cards||{}; this.xp=s.xp||0; this.runs=s.runs||0;
+             this.best=s.best||0; this.wins=s.wins||0 }
+    }catch(e){}
+    return this;
+  },
+  save(){ try{ localStorage.setItem(META_KEY,JSON.stringify(
+    {cards:this.cards,xp:this.xp,runs:this.runs,best:this.best,wins:this.wins})) }catch(e){} },
+  rank(){ let r=RANKS[0]; for(const x of RANKS) if(this.xp>=x.xp) r=x; return r },
+  rankIdx(){ let i=0; RANKS.forEach((x,k)=>{ if(this.xp>=x.xp) i=k }); return i },
+  next(){ const i=this.rankIdx(); return RANKS[i+1]||null },
+  cardCount(){ return Object.keys(this.cards).length },
+  cardTotal(){ return Object.keys(CARD_INFO).length },
+  has(id){ return !!this.cards[id] },
+  /* 破解一招 → 永久解鎖，回傳是不是「新的」 */
+  unlock(id){
+    if(!CARD_INFO[id]||this.cards[id]) return false;
+    this.cards[id]=true; this.xp+=10; this.save(); return true;
+  },
+  addXP(n){ this.xp+=n; this.save() },
+  finishRun(win,days){
+    this.runs++;
+    if(win){ this.wins++; this.xp+=150; if(!this.best||days<this.best) this.best=days }
+    this.save();
+  }
+};
+Meta.load();
+
+/* ═══════════════════════════════════════════════════════════
    世界：城市生成、門牌編碼、謄本資料、像素繪圖
    ═══════════════════════════════════════════════════════════ */
 
@@ -2157,9 +2260,11 @@ const World={
     const floor = bt==='town' ? 1 : ri(r,1,Math.min(total,12));
     const year=ri(r,1982,2019);
     const owner=pick(r,SURNAMES);
-    const masked=r()<.32;
+    const masked=h.tut ? false : r()<.32;
     // 戶籍地：城裡另一個門牌
-    const others=this.houses.filter(o=>o.id!==h.id&&!o.office);
+    let others=this.houses.filter(o=>o.id!==h.id&&!o.office);
+    if(h.tut){ const near=others.filter(o=>o.bt!=='tower'&&Math.hypot(o.x-h.x,o.y-h.y)<14);
+               if(near.length) others=near }      // 新手第一件：戶籍地近、不是大樓
     const reg=others[Math.floor(r()*others.length)];
     const type=pick(r,OWNER_TYPES);
     const why=pick(r,SELL_WHY);
@@ -2169,7 +2274,8 @@ const World={
     const first=opens.length?opens[Math.floor(mr()*opens.length)]:MOVES[0];
     const rest=shuffled(mr,MOVES.filter(m=>m.id!==first.id)).slice(0,6);
     const moves=[first].concat(rest);
-    const cold=Math.min(3,type.cold+(r()<0.28?1:0));
+    let cold=Math.min(3,type.cold+(r()<0.28?1:0));
+    if(h.tut) cold=0;                       // 新手第一件不吃閉門羹
     const d={
       m2,ping,floor,total,year,
       bt, btName: BT_NAME[bt],
@@ -2180,8 +2286,9 @@ const World={
       masked, regId:reg.id,
       regFull:reg.addr.full, regMasked:reg.addr.street+'**',
       type,why,moves,cold,
-      stubborn: r()<0.22,   // 軟硬不吃：多跑幾趟也不會降戒心
-      guard:type.guard+ri(r,-10,14),
+      stubborn: h.tut ? false : r()<0.22,   // 軟硬不吃：多跑幾趟也不會降戒心
+      rival: h.tut ? 99 : ri(r,9,29),       // 第幾天會被同業簽走
+      guard: h.tut ? 46 : type.guard+ri(r,-10,14),
       no:'溪虹建字第'+(100000+h.id*137%899999)+'號'
     };
     h._deed=d; return d;
@@ -2383,13 +2490,13 @@ function drawFacade(h,sx,sy,t){
     const st=Game.hs(h.id);
     const bob=Math.sin(t/420+h.id)*1.4;
     const py0=sy+H-18+bob, cxp=gx+8;
-    const done=st.signed, no=st.refused;
+    const done=st.signed, no=st.refused, tk=st.rival;
     cx.fillStyle='rgba(28,38,26,.28)'; cx.fillRect(px(cxp-6),px(py0+2),16,14);
     rect(cxp-7,py0,15,13,'#2f343a');
-    rect(cxp-6,py0+1,13,11, done?'#54b98d':no?'#8d8078':'#f6b23c');
-    cx.fillStyle= done?'#0d2b1f':no?'#2e2620':'#3a2a06';
+    rect(cxp-6,py0+1,13,11, done?'#54b98d':tk?'#c0392b':no?'#8d8078':'#f6b23c');
+    cx.fillStyle= done?'#0d2b1f':tk?'#f4d6d1':no?'#2e2620':'#3a2a06';
     cx.font='900 10px "Noto Sans TC",sans-serif'; cx.textAlign='center'; cx.textBaseline='middle';
-    cx.fillText(done?'簽':no?'拒':'售',cxp,py0+7);
+    cx.fillText(done?'簽':tk?'他':no?'拒':'售',cxp,py0+7);
     cx.textAlign='left'; cx.textBaseline='alphabetic';
     if(st.letter&&!done) rect(cxp+3,py0+8,4,4,'#f3ead9');
   }
@@ -2423,7 +2530,7 @@ function drawMinimap(){
   }
   for(const h of World.houses){
     if(!h.sale) continue; const st=Game.hs(h.id);
-    cx.fillStyle= st.signed?'#1f8b5f':st.refused?'#8a7c72':st.seen?'#c4831f':'#7a6a44';
+    cx.fillStyle= st.signed?'#1f8b5f':st.rival?'#b03a2e':st.refused?'#8a7c72':st.seen?'#c4831f':'#7a6a44';
     cx.fillRect(mx+h.x*sx-.5,my+h.y*sy-.5,2,2);
   }
   const of=World.houses[World.officeId];
@@ -2595,14 +2702,15 @@ const P={x:0,y:0,dir:2,frame:0,walkT:0,stepT:0};
 const Game={
   scene:'title', name:'', seed:'', day:1, ap:AP_DAY, signed:0,
   hstate:{}, letters:[], nav:null, logs:[], duel:null, dayOver:false, lastBoss:-1, doneDay:0,
-  notes:{addrs:[],phones:[]}, seenSeq:0,
+  notes:{addrs:[],phones:[]}, seenSeq:0, tut:0, tutId:-1, taken:0, newCards:[],
   hs(id){ return this.hstate[id]||(this.hstate[id]={seen:false,letter:false,signed:false,
     refused:false,visits:0,knocks:0,tries:0,seenOrd:0}) },
   reset(seed,name){
-    this.seed=seed; this.name=name; this.day=1; this.ap=AP_DAY; this.signed=0;
+    this.seed=seed; this.name=name; this.day=1; this.ap=dayAP(); this.signed=0;
     this.hstate={}; this.letters=[]; this.nav=null; this.logs=[]; this.duel=null;
     this.dayOver=false; this.lastBoss=-1; this.doneDay=0;
     this.notes={addrs:[],phones:[]}; this.seenSeq=0;
+    this.tut=0; this.tutId=-1; this.taken=0; this.newCards=[];
   }
 };
 
@@ -2741,6 +2849,10 @@ function ask(title,text,onYes){
 }
 
 /* ═══ 行動點數 ═══ */
+/* 職級給的起步優勢 */
+function dayAP(){ return AP_DAY+Meta.rank().ap }
+function rankOff(){ return Meta.rank().off }
+
 function spend(n){
   if(Game.ap<n){ A.sfx('deny'); toast('行動點數不足，今天到此為止'); return false }
   Game.ap-=n; A.sfx('ap'); hudSync();
@@ -2762,14 +2874,22 @@ function endDay(reason){
     }
   }
   Game.day++;
+  const lost=rivalSweep();
   if(Game.day>MAXDAY) return finish(Game.signed>=GOAL);
-  Game.ap=AP_DAY; Game.dayOver=false;
+  Game.ap=dayAP(); Game.dayOver=false;
   // 新的一天：一律回公司出發
   Game.scene='office'; P.x=9.5*TS; P.y=(OFFICE.h-3)*TS; P.dir=0;
   A.play('office'); hudSync(); setActs(); save(true);
   const lines=[`（${reason}。你回公司打完日報，關燈，隔天一早——）`,
-    `DAY ${Game.day} ／ ${MAXDAY}　行動點數回滿 100 點。目前委託 ${Game.signed} / ${GOAL} 件。`,
-    '（你在公司的座位上把資料夾收好，準備出門跑街。）'];
+    `DAY ${Game.day} ／ ${MAXDAY}　行動點數回滿 ${dayAP()} 點。目前委託 ${Game.signed} / ${GOAL} 件。`];
+  if(lost.length){
+    lines.push('（早會。店長把一份同業的成交表貼在白板上。）');
+    lines.push(`「${RIVAL.name}昨天又收了一件——${lost[0].addr.full}。」`);
+    if(lost.length>1) lines.push(`「還有 ${lost.length-1} 間也掛上他們的牌子了。」`);
+    lines.push('「跑慢的人，永遠只能看別人的成交表。」');
+  }else{
+    lines.push('（你在公司的座位上把資料夾收好，準備出門跑街。）');
+  }
   if(events.length){
     const ev=events[0];
     const src=World.houses[ev.house], mt=World.houses[ev.meet], d=World.deed(src);
@@ -2783,12 +2903,85 @@ function endDay(reason){
   say('　',lines,()=>setActs(),`DAY ${Game.day}`);
 }
 
+/* ═══ 同業：跑太慢就被別人簽走 ═══════════════════════════ */
+const RIVAL={name:'宏昌房屋 林俊傑'};
+function rivalSweep(){
+  const cap=Math.floor(World.houses.filter(h=>h.sale).length*0.42);   // 最多吃四成，保證還過得了關
+  const lost=[];
+  for(const h of World.houses){
+    if(!h.sale||h.tut) continue;
+    const st=Game.hs(h.id), d=World.deed(h);
+    if(st.signed||st.rival) continue;
+    if(Game.taken>=cap) break;
+    if(Game.day>=d.rival){
+      st.rival=true; Game.taken++; lost.push(h);
+      addLog(`${h.addr.full} 被 ${RIVAL.name} 簽走了`,'l-bad');
+      if(Game.nav&&Game.nav.id===h.id) Game.nav=null;
+    }
+  }
+  return lost;
+}
+function rivalLeft(h){ return World.deed(h).rival-Game.day }
+
+/* ═══ 話術卡：破解一招就永久收進圖鑑 ═══════════════════════ */
+function cardEarn(id,score){
+  if(score<70||!CARD_INFO[id]) return;
+  if(Meta.unlock(id)){
+    Game.newCards.push(id);
+    addLog('解鎖話術卡「'+CARD_INFO[id].n+'」','l-good');
+    setTimeout(()=>toast('★ 解鎖話術卡「'+CARD_INFO[id].n+'」',2400),700);
+  }
+}
+function cardBook(){
+  const ids=Object.keys(CARD_INFO), got=Meta.cardCount();
+  const R=Meta.rank(), NX=Meta.next();
+  const rows=ids.map(id=>{
+    const has=Meta.has(id), c=CARD_INFO[id];
+    const mv=MOVES.concat(GUARD_MOVES).find(m=>m.id===id);
+    return `<div class="row${has?'':' lock'}">
+      <div class="meta"><div class="a">${has?esc(c.n):'？？？'}</div>
+        <div class="b">${has?esc(mv?mv.line:''):'還沒破解過這一招'}</div>
+        ${has?`<div class="c">${esc(c.k)}</div>`:''}</div>
+      <span class="st${has?' ok':''}">${has?'已掌握':'未解鎖'}</span></div>`;
+  }).join('');
+  const pct = NX ? Math.min(100,Math.round((Meta.xp-R.xp)/(NX.xp-R.xp)*100)) : 100;
+  $ovlIn.innerHTML=`<div class="card"><div class="card-hd"><h3>話術卡圖鑑</h3>
+      <span class="tag">${got} / ${ids.length}</span></div>
+    <div class="card-bd">
+      <div class="rankbar">
+        <div class="rk"><b>${esc(R.n)}</b><i>${R.en}</i></div>
+        <div class="rkxp"><div class="bar"><i style="width:${pct}%"></i></div>
+          <span>${Meta.xp} XP　${NX?`距離「${NX.n}」還差 ${NX.xp-Meta.xp}`:'已是最高職級'}</span></div>
+      </div>
+      <div class="booknote">職級加成：每天行動點數 +${R.ap}、所有對象起始戒心 −${R.off}。
+        破解一招 +10 XP、簽下一件 +50 XP、通關 +150 XP。已掌握的招式在戰鬥中會標示，傷害 +20%。</div>
+      <div class="rows">${rows}</div>
+      <div class="choices"><button class="ch" id="closeCard"><span class="k">✕</span><span>關閉</span></button></div>
+    </div></div>`;
+  $ovl.classList.add('show'); $ovl.scrollTop=0;
+  el('closeCard').onclick=()=>{A.sfx('cancel');closeOvl()};
+}
+
+/* ═══ 新手引導：店長帶你跑第一件 ═══════════════════════════ */
+const TUT_HINT=['',
+  '走出公司，跟著紅色箭頭走到那間房子。',
+  '站到門口，按空白鍵（手機按右下的 ●）調閱電傳。',
+  '謄本最下面有屋主的戶籍地，按「前往戶籍地」。',
+  '跟著箭頭走到戶籍地，按空白鍵敲門。',
+  '四句只有一句真的解得開他。也可以不選，自己打一句。'];
+function tutStep(n){
+  if(!Game.tut) return;
+  Game.tut=n; setActs();
+  if(n>=6){ Game.tut=0; setActs(); return }
+  if(TUT_HINT[n]) toast('新手引導　'+TUT_HINT[n],3200);
+}
+
 /* ═══ 存讀檔 ═══ */
 function save(silent){
   try{
     localStorage.setItem(SAVE_KEY,JSON.stringify({v:2,seed:Game.seed,name:Game.name,day:Game.day,
       ap:Game.ap,signed:Game.signed,hstate:Game.hstate,letters:Game.letters,nav:Game.nav,
-      notes:Game.notes,seenSeq:Game.seenSeq,logs:Game.logs.slice(0,30),scene:Game.scene==='office'?'office':'city',px:P.x,py:P.y}));
+      notes:Game.notes,seenSeq:Game.seenSeq,tut:Game.tut,tutId:Game.tutId,taken:Game.taken,logs:Game.logs.slice(0,30),scene:Game.scene==='office'?'office':'city',px:P.x,py:P.y}));
     if(!silent){ A.sfx('confirm'); toast('已存檔') }
     checkSave();
   }catch(e){ if(!silent) toast('這個環境無法存檔') }
@@ -2798,6 +2991,16 @@ function checkSave(){
   const s=loadSave(), b=el('mLoad'), sub=el('mLoadSub');
   if(s){ b.disabled=false; sub.textContent=`DAY ${s.day} · ${s.signed}件 · ${s.name}` }
   else{ b.disabled=true; sub.textContent='NO DATA' }
+  const r=el('ttRank');
+  if(r){
+    const R=Meta.rank();
+    r.innerHTML = Meta.runs
+      ? `<b>${esc(R.n)}</b><span>話術卡 ${Meta.cardCount()} / ${Meta.cardTotal()}　${Meta.xp} XP`
+        +`${Meta.best?`　最佳 ${Meta.best} 天`:''}</span>`
+      : '';
+    r.hidden = !Meta.runs;
+  }
+  const c=el('mCards'); if(c) c.querySelector('small').textContent=Meta.cardCount()+' / '+Meta.cardTotal();
 }
 
 
@@ -2893,19 +3096,42 @@ function startNew(){
 function beginStory(){
   $title.style.display='none'; $hud.classList.remove('hidden'); hudSync(); fitStage();
   Game.scene='office'; P.x=9.5*TS; P.y=9*TS; P.dir=0;
-  A.play('office'); setActs();
-  say('店長',[
-    `「${Game.name}，過來一下。」`,
-    '「你的證照下來了，從今天開始你就是正式的經紀營業員。恭喜。」',
-    '「不過恭喜歸恭喜，這個月的目標我先跟你講清楚——」',
-    '「委託。六件。這個月三十天，你要幫我帶回六張委託書。」',
-    '（店長把一張街道圖推到你面前。）',
-    '「掛售的房子就去調電傳、看謄本、找屋主。找到人，就跟他談。」',
-    '「他第一次不理你是正常的。第二次、第三次還去的人，才拿得到委託。」',
-    `「去吧，${Game.name}。門在下面。」`
-  ],()=>{ addLog('店長交付目標：本月 6 件委託'); toast('目標：30 天內取得 6 件委託',2600) });
+  A.play('office');
+  // 店長指定第一件：挑離公司最近的掛售物件，屋主刻意好談
+  const of=World.houses[World.officeId];
+  const cands=World.houses.filter(h=>h.sale&&!h.office);
+  cands.sort((a,b)=>Math.hypot(a.x-of.x,a.y-of.y)-Math.hypot(b.x-of.x,b.y-of.y));
+  const first=cands[0];
+  if(first){
+    first.tut=true; Game.tutId=first.id; Game.tut=1;
+    Game.nav={id:first.id,kind:'tut',src:first.id,label:'店長指定：'+first.addr.full};
+  }
+  setActs();
+  const R=Meta.rank(), veteran=Meta.runs>0;
+  const head = veteran
+    ? [`「${Game.name}，回來啦。」`,
+       `「你現在是${R.n}了，${R.note}。」`,
+       `「規矩一樣：三十天，六件委託。走吧。」`]
+    : [`「${Game.name}，過來一下。」`,
+       '「你的證照下來了，從今天開始你就是正式的經紀營業員。恭喜。」',
+       '「不過恭喜歸恭喜，這個月的目標我先跟你講清楚——」',
+       '「委託。六件。這個月三十天，你要幫我帶回六張委託書。」'];
+  const tail = first
+    ? ['（店長把一張街道圖推到你面前，用紅筆圈了一間。）',
+       `「第一件我幫你挑好了——<b>${first.addr.full}</b>，走路三分鐘。」`,
+       '「屋主我認識，人不難講話，你去練手。」',
+       '「流程記好：調電傳 → 看謄本 → 找戶籍地 → 敲門 → 談。」',
+       `「去吧，${Game.name}。跟著箭頭走就對了。」`]
+    : ['「掛售的房子就去調電傳、看謄本、找屋主。找到人，就跟他談。」',
+       `「去吧，${Game.name}。門在下面。」`];
+  say('店長',head.concat(tail),()=>{
+    addLog('店長交付目標：本月 6 件委託');
+    if(first){ addLog('店長指定第一件：'+first.addr.full,'l-good'); tutStep(1) }
+    else toast('目標：30 天內取得 6 件委託',2600);
+  });
 }
 function toCity(){
+  if(Game.tut===1) tutStep(2);
   Game.scene='city';
   const w=frontTile(World.houses[World.officeId]);
   P.x=w.x*TS+2; P.y=w.y*TS+2; P.dir=2;
@@ -2927,12 +3153,14 @@ function setActs(){
     L.push({t:'手機記事本',s:notesCount()?'線索 '+notesCount()+' 筆':'尚無線索',f:noteBook});
     L.push({t:'結束今天',s:'回公司休息',f:()=>ask('結束今天？','回公司打日報，明天一早重新出發。',()=>endDay('你走回公司'))});
     if(Game.nav) L.push({t:'取消導航',s:'清除目標',f:()=>{A.sfx('cancel');Game.nav=null;setActs()}});
+    L.push({t:'話術卡',s:Meta.cardCount()+' / '+Meta.cardTotal(),f:cardBook});
     L.push({t:'說明',s:'HOW TO PLAY',f:helpCard});
   }else if(Game.scene==='office'){
     L.push({t:'走出公司',s:'進入城市',f:()=>{A.sfx('door');toCity()}});
     L.push({t:'謄本紀錄',s:'調閱過的物件',f:deedBook});
     L.push({t:'手機記事本',s:notesCount()?'線索 '+notesCount()+' 筆':'尚無線索',f:noteBook});
     L.push({t:'跟店長聊聊',s:'FREE',f:bossTalk});
+    L.push({t:'話術卡',s:Meta.cardCount()+' / '+Meta.cardTotal(),f:cardBook});
     L.push({t:'說明',s:'HOW TO PLAY',f:helpCard});
   }
   $acts.innerHTML='';
@@ -2942,7 +3170,8 @@ function setActs(){
     b.onclick=()=>{A.sfx('click');a.f()}; $acts.appendChild(b);
   });
   const h=document.createElement('span'); h.className='hint';
-  h.textContent= Game.nav? ('導航中 → '+Game.nav.label) : '找街上掛「售」的房子，走到門口按空白鍵';
+  if(Game.tut) { h.className='hint tut'; h.textContent='新手引導　'+(TUT_HINT[Game.tut]||'') }
+  else h.textContent= Game.nav? ('導航中 → '+Game.nav.label) : '找街上掛「售」的房子，走到門口按空白鍵';
   $acts.appendChild(h);
 }
 function helpCard(){
@@ -2957,6 +3186,12 @@ function helpCard(){
    <b style="color:var(--amber)">怎麼講才有分</b>　先接住他的情緒 → 針對他這個理由 → 給一個他今天就能答應、而且零成本的具體下一步。<br>
    <b style="color:var(--red)">地雷</b>　保證賣掉、叫他毀約、貶低同業、當場叫他降價、要鑰匙、未經同意刊登或找租客——講了會直接扣耐心。<br>
    屋主一邊講一邊想新理由（戒心會自己回升），談輸了隔天可以再來，戒心會比上次低。<br><br>
+   <b style="color:var(--red)">同業也在跑</b>　每一間掛售物件都有別家在追。拖太久會被 <b>宏昌房屋 林俊傑</b> 簽走，
+   招牌變成「他」就談不成了。謄本紀錄剩三天以內會跳紅字提醒。<br>
+   <b style="color:var(--jade)">話術卡</b>　某一招你答到 70 分以上就永久解鎖，之後遇到同一招，正解會標
+   <b style="color:var(--jade)">★ 已掌握</b>、傷害 +20%。卡片跨場次保留。<br>
+   <b style="color:var(--violet)">職級</b>　破解一招 +10 XP、簽一件 +50 XP、通關 +150 XP。升級後每天行動點數變多、
+   所有對象的起始戒心變低——這是唯一會跨場次變強的東西。<br>
    <b style="color:var(--amber)">謄本紀錄</b>　調閱過的物件都留在這裡（最新的排最上面），可以隨時重新導航。<br>
    <b style="color:var(--amber)">手機記事本</b>　鄰居、管理員、開門的人給你的<u>地址</u>與<u>電話</u>會自動記在這裡，
    每一筆都註明是從哪一件謄本、哪一個人問到的。地址可以直接導航，電話可以直接撥（−40 AP）。<br>
@@ -3086,7 +3321,10 @@ function deedBook(){
   const box=el('rows');
   seen.forEach(h=>{
     const d=World.deed(h), st=Game.hs(h.id);
-    const state= st.signed?['已簽委託','ok'] : st.refused?['被拒絕過','no'] : st.letter?['已留開發信','']:['待拜訪',''];
+    const left=rivalLeft(h);
+    const state= st.signed?['已簽委託','ok'] : st.rival?['被同業簽走','no']
+      : (left<=3&&left>0)?['剩 '+left+' 天','no']
+      : st.refused?['被拒絕過','no'] : st.letter?['已留開發信','']:['待拜訪',''];
     const r=document.createElement('div'); r.className='row';
     r.innerHTML=`<div class="meta"><div class="a">${esc(h.addr.full)}</div>
       <div class="b">${d.ping.toFixed(1)} 坪 · ${esc(d.ownerName)} · 戶籍 ${d.masked?'已隱匿':esc(d.regFull)}${st.knocks?' · 已跑 '+st.knocks+' 趟':''}</div></div>
@@ -3094,11 +3332,12 @@ function deedBook(){
     const b1=document.createElement('button'); b1.className='go'; b1.textContent='看謄本';
     b1.onclick=()=>{A.sfx('paper');showDeed(h)};
     const b2=document.createElement('button'); b2.className='go'; b2.textContent='導航';
-    b2.disabled=d.masked||st.signed;
-    b2.title=d.masked?'戶籍地已隱匿':'';
+    b2.disabled=d.masked||st.signed||st.rival;
+    b2.title=st.rival?'已被同業簽走':d.masked?'戶籍地已隱匿':'';
     b2.onclick=()=>{
       A.sfx('confirm');
       Game.nav={id:d.regId,kind:'reg',src:h.id,label:'戶籍地：'+d.regFull};
+      if(Game.tut===3&&h.tut) tutStep(4);
       closeOvl(); if(Game.scene==='office') toCity(); else { A.play('city'); setActs() }
       toast('已設定導航，跟著紅色箭頭走');
     };
@@ -3128,6 +3367,14 @@ function interact(){
 
 function saleHouse(h){
   const st=Game.hs(h.id);
+  if(st.rival){
+    A.sfx('bad');
+    card('慢了一步','SOLD OUT',
+      `<div class="say nar"><b style="color:var(--amber)">${esc(h.addr.full)}</b><br>
+        原本的「售」被換成另一塊牌子了——<b style="color:var(--red)">${RIVAL.name}</b>。<br><br>
+        你站在門口看了兩秒，轉身走人。</div>`,
+      [{key:'✕',label:'離開',fn:()=>{A.sfx('cancel');closeOvl()}}]); return;
+  }
   if(st.signed){
     card('已簽委託','DONE',`<div class="say nar">${esc(h.addr.full)}<br>這間的委託書已經在你手上了。</div>`,
       [{key:'✕',label:'關閉',fn:()=>{A.sfx('cancel');closeOvl()}}]); return;
@@ -3139,6 +3386,7 @@ function saleHouse(h){
           if(!spend(AP_INVESTIGATE)) return;
           st.seen=true; st.seenOrd=++Game.seenSeq; A.sfx('paper'); A.play('doc');
           addLog('調閱 '+h.addr.full+' 的二類謄本');
+          if(Game.tut===2&&h.tut) tutStep(3);
           setTimeout(()=>showDeed(h),260);
         }},
        {key:'✕',label:'離開',fn:()=>{A.sfx('cancel');closeOvl()}}]);
@@ -3178,6 +3426,7 @@ function showDeed(h){
       fn:()=>{
         Game.nav={id:d.regId,kind:'reg',src:h.id,label:'戶籍地：'+d.regFull};
         addLog('導航前往 '+d.ownerSur+'姓屋主的戶籍地');
+        if(Game.tut===3&&h.tut) tutStep(4);
         closeOvl(); if(Game.scene==='office') toCity(); else { A.play('city'); setActs() }
         toast('已設定導航，跟著紅色箭頭走');
       }},
@@ -3225,6 +3474,15 @@ function arriveTarget(h){
   Game.nav=null; setActs();
   const r=rngFor(Game.seed,'enc'+src.id+'#'+st.visits+'#'+Game.day);
   const addr=h.addr.full;
+  if(src.tut&&Game.tut){                // 店長指定的第一件：屋主一定在家
+    if(Game.tut<5) tutStep(5);
+    A.sfx('door');
+    say('　',[`（你按了 ${addr} 的門鈴。）`,
+      `（腳步聲。門開了一條縫，一位${d.ownerSur}姓的屋主探出頭。）`,
+      '（就是他。店長說的那位。）'],
+      ()=>knockOwner(src,h),'','owner');
+    return;
+  }
   if(h.bt==='tower'){          // 電梯大樓一定有管理員，來幾次都一樣
     A.sfx('guard');
     const gw=Game.hs(h.id).guardWins||0;
@@ -3397,7 +3655,8 @@ function freeformPanel(o){
   const opts=o.opts||null;
   const optHtml = opts
     ? `<div class="choices tight" id="ffOpts">`+opts.map((op,k)=>
-        `<button class="ch" data-i="${k}"><span class="k">${'ABCD'[k]}</span><span>${esc(op.t)}</span></button>`).join('')
+        `<button class="ch" data-i="${k}"><span class="k">${'ABCD'[k]}</span><span>${esc(op.t)}${
+          op.mark?`<em class="mst">★ ${esc(op.mark)}</em>`:''}</span></button>`).join('')
       +`</div><div class="orline"><span>或者，自己想一句</span></div>`
     : '';
   $ovlIn.innerHTML=`<div class="card"><div class="card-hd"><h3>${o.title}</h3>
@@ -3474,7 +3733,7 @@ function startDuel(kind,src,here,bonus){
   let maxG;
   if(kind==='guard'){
     const gw=Game.hs(here.id).guardWins||0;
-    maxG=Math.max(44,84-16*gw);
+    maxG=Math.max(40,84-16*gw-rankOff());
   }
   else{
     if(d.stubborn){
@@ -3483,7 +3742,7 @@ function startDuel(kind,src,here,bonus){
     }else{
       maxG = d.guard*0.9 - 8*(st.knocks||0) - (st.letter?8:0) - 11*(st.tries||0) + (bonus||0);
     }
-    maxG = Math.max(52,Math.round(maxG*1.12));
+    maxG = Math.max(52,Math.round(maxG*1.12)-rankOff());
   }
   if(kind==='owner') st.tries=(st.tries||0)+1;
   Game.duel={kind,src,here,d,moves,i:0,g:maxG,maxG,rap:100,history:[],said:[],
@@ -3539,6 +3798,7 @@ function duelTurn(intro){
   }
   const opts=duelOptions(D,mv);
   D.opts=opts; D.mv=mv;
+  D.mastered = Meta.has(mv.id);
   const steelNote = D.steel
     ? '他剛剛被你惹到了，這一句要先把場子拉回來，講什麼都比平常難進去。'
     : (D.final?'這是他最後一道題。答得漂亮他就簽，答壞了前面全部要重來。':null);
@@ -3550,7 +3810,7 @@ function duelTurn(intro){
     who: duelWho(D), line, intro, bars: duelBars(D),
     placeholder:'你要怎麼回他？',
     hint: steelNote,
-    opts: opts.map(o=>({t:o.t})),
+    opts: opts.map(o=>({t:o.t, mark:(D.mastered&&o.k==='good')?'已掌握':''})),
     onPick: (k,ui)=>duelPick(opts[k],ui),
     onSend: (text,ui)=>duelAnswer(text,ui)
   });
@@ -3561,6 +3821,8 @@ function duelSettle(text,R){
   const D=Game.duel;
   let dmg = (R.d!=null) ? Math.max(0,Math.round(R.d*0.75))
                         : Math.round(Math.max(0,R.score-20)*0.38);
+  if(D.mastered&&R.score>=70) dmg=Math.round(dmg*1.2);        // 已掌握的招式打得更準
+  cardEarn((D.mv||{}).id,R.score);                             // 破解就收進圖鑑
   if(D.steel){ dmg=Math.round(dmg*0.45); }
   const rap = (R.rap!=null) ? R.rap
             : (R.score<35 ? Math.round((35-R.score)*1.05) : 0);
@@ -3752,6 +4014,8 @@ function duelEnd(win){
   if(D.kind==='guard'){ guardOutcome(D,st); return }
   if(win){
     st.signed=true; Game.signed++; hudSync(); A.sfx('sign');
+    Meta.addXP(50);
+    if(D.src.tut&&Game.tut){ tutStep(6) }
     if(Game.signed===GOAL&&!Game.doneDay) Game.doneDay=Game.day;
     addLog('簽下委託！'+D.src.addr.full,'l-good'); save(true);
     card('委託書簽下來了','＋1 件',
@@ -3790,6 +4054,7 @@ function goalReached(){
 const END_LINES=['房仲這份工作不只是出一張嘴','還要有強大的毅力與抗壓力','這只是一款遊戲',
   '現實會比這個更辛苦','如果你想挑戰自己、獲取無上限的薪水','歡迎加入日勝國際不動產！','歡迎致電：0755-777-88'];
 function finish(win){
+  Meta.finishRun(win, Game.doneDay||Game.day);
   Game.scene='ending'; Game.duel=null; closeOvl(); $talk.classList.remove('show'); $acts.innerHTML='';
   A.play(win?'win':'lose'); A.sfx(win?'sign':'fail');
   if(win&&Game.signed>=GOAL){
@@ -3956,6 +4221,7 @@ function hintPrompt(){
 
 /* ═══ 啟動 ═══ */
 el('mNew').onclick=()=>{A.resume();A.sfx('confirm');startNew()};
+el('mCards').onclick=()=>{A.resume();A.sfx('click');cardBook()};
 el('mBoard').onclick=()=>{A.resume();A.sfx('click');boardCard()};
 el('mCredits').onclick=()=>{A.resume();A.sfx('click');
   card('製作人員','CREDITS',
@@ -3975,6 +4241,8 @@ el('mLoad').onclick=()=>{
   Game.day=s.day; Game.ap=s.ap; Game.signed=s.signed;
   Game.hstate=s.hstate||{}; Game.letters=s.letters||[]; Game.nav=s.nav||null; Game.logs=s.logs||[];
   Game.notes=s.notes&&s.notes.addrs?s.notes:{addrs:[],phones:[]}; Game.seenSeq=s.seenSeq||0;
+  Game.tut=s.tut||0; Game.tutId=(s.tutId===undefined?-1:s.tutId); Game.taken=s.taken||0;
+  if(Game.tutId>=0&&World.houses[Game.tutId]) World.houses[Game.tutId].tut=true;
   $title.style.display='none'; $hud.classList.remove('hidden'); hudSync(); fitStage();
   if(s.scene==='office'){ Game.scene='office'; P.x=9.5*TS; P.y=(OFFICE.h-3)*TS; A.play('office') }
   else { Game.scene='city'; P.x=s.px; P.y=s.py; A.play('city') }
