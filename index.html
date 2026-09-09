@@ -205,6 +205,9 @@ button{font-family:inherit;color:inherit}
 .ovl{position:fixed;inset:0;z-index:50;display:none;flex-direction:column;
   background:rgba(5,8,12,.92);backdrop-filter:blur(3px);padding:12px;overflow:auto;overscroll-behavior:contain}
 .ovl.show{display:flex}
+/* 卡片剛出現的一瞬間不接受點擊，避免手機上點掉對話的那一下誤觸選項 */
+.ovl.lock #ovlInner{pointer-events:none}
+.ovl.lock .ch,.ovl.lock .ffgo,.ovl.lock .go,.ovl.lock textarea{opacity:.55;transition:opacity .18s}
 #ovlInner{width:100%;display:flex;flex-direction:column;margin:auto}
 .card{width:100%;max-width:620px;margin:0 auto;background:var(--panel);border:2px solid var(--line2);
   border-radius:4px;box-shadow:0 8px 0 -4px #060a0f,0 22px 46px -20px #000}
@@ -3521,18 +3524,28 @@ function card(title,tag,bodyHTML,acts,pic){
   const picHTML = (pic&&PICS[pic]) ? `<div class="card-pic"><img src="${PICS[pic]}" alt=""></div>` : '';
   $ovlIn.innerHTML=`<div class="card"><div class="card-hd"><h3>${title}</h3>${tag?`<span class="tag">${tag}</span>`:''}</div>
     <div class="card-bd">${picHTML}${bodyHTML}<div class="choices" id="cardActs"></div></div></div>`;
-  $ovl.classList.add('show');
+  $ovl.classList.add('show'); ovlGuard(420);
   const box=el('cardActs');
   (acts||[]).forEach((a,i)=>{
     const b=document.createElement('button');
     b.className='ch'+(a.cls?' '+a.cls:'');
     b.innerHTML=`<span class="k">${a.key||(i+1)}</span><span>${a.label}${a.sub?`<small>${a.sub}</small>`:''}</span>`;
     b.disabled=!!a.disabled;
-    b.onclick=()=>{ if(a.disabled) return; A.sfx(a.sfx||'click'); a.fn() };
+    b.onclick=()=>{ if(a.disabled||ovlLocked()) return; A.sfx(a.sfx||'click'); a.fn() };
     box.appendChild(b);
   });
 }
-function closeOvl(){ $ovl.classList.remove('show'); $ovlIn.innerHTML='' }
+function closeOvl(){ $ovl.classList.remove('show'); $ovlIn.innerHTML=''; clearTimeout(_ovlLockT) }
+
+/* 防誤觸：卡片剛長出來的那一瞬間不接受點擊。
+   手機上點掉最後一句對話的那一下，會順勢落在剛出現的選項上。 */
+let _ovlLockT=null;
+function ovlGuard(ms){
+  $ovl.classList.add('lock');
+  clearTimeout(_ovlLockT);
+  _ovlLockT=setTimeout(()=>$ovl.classList.remove('lock'), ms||420);
+}
+function ovlLocked(){ return $ovl.classList.contains('lock') }
 function ask(title,text,onYes){
   card(title,'',`<div class="say nar">${esc(text)}</div>`,
     [{key:'▶',label:'確定',fn:()=>{closeOvl();onYes()}},
@@ -3668,7 +3681,7 @@ function cardBook(){
       <div class="rows">${rows}</div>
       <div class="choices"><button class="ch" id="closeCard"><span class="k">✕</span><span>關閉</span></button></div>
     </div></div>`;
-  $ovl.classList.add('show'); $ovl.scrollTop=0;
+  $ovl.classList.add('show'); $ovl.scrollTop=0; ovlGuard(420);
   el('closeCard').onclick=()=>{A.sfx('cancel');closeOvl()};
 }
 
@@ -3983,7 +3996,7 @@ function noteBook(){
       <div class="rows" id="nPhone"></div>
       <div class="choices"><button class="ch" id="closeNote"><span class="k">✕</span><span>關閉</span></button></div>
     </div></div>`;
-  $ovl.classList.add('show'); $ovl.scrollTop=0;
+  $ovl.classList.add('show'); $ovl.scrollTop=0; ovlGuard(420);
 
   const ab=el('nAddr');
   if(!A_.length) ab.innerHTML='<div class="empty sm">還沒問到任何地址。</div>';
@@ -4039,7 +4052,7 @@ function deedBook(){
     <div class="card-bd"><div class="booknote">由上而下：最近調閱的排在最前面。</div>
     <div class="rows" id="rows"></div>
     <div class="choices"><button class="ch" id="closeBook"><span class="k">✕</span><span>關閉</span></button></div></div></div>`;
-  $ovl.classList.add('show');
+  $ovl.classList.add('show'); ovlGuard(420);
   const box=el('rows');
   seen.forEach(h=>{
     const d=World.deed(h), st=Game.hs(h.id);
@@ -4408,7 +4421,7 @@ function freeformPanel(o){
           ? '自己想一句話回他。對方會照你講的內容反應，下面會給你評語與建議。'
           : '自己想一句話回他。系統會依房仲實務評分，下面會給你評語與建議。'))}</div>
     </div></div></div>`;
-  $ovl.classList.add('show'); $ovl.scrollTop=0;
+  $ovl.classList.add('show'); $ovl.scrollTop=0; ovlGuard(520);
   const inp=el('ffIn'), go=el('ffGo'), msg=el('ffMsg');
   let busy=false;
   const lock=()=>{ go.disabled=true; inp.disabled=true;
@@ -4422,7 +4435,7 @@ function freeformPanel(o){
       if(opts) el('ffOpts').querySelectorAll('.ch').forEach(b=>b.disabled=false) }
   };
   const fire=async()=>{
-    if(busy) return;
+    if(busy||ovlLocked()) return;
     const v=(inp.value||'').trim();
     if(v.length<4){ msg.className='coach warn'; msg.textContent='再多說一點，對方聽不出你要表達什麼。'; A.sfx('deny'); return }
     busy=true; lock(); A.sfx('click');
@@ -4431,7 +4444,7 @@ function freeformPanel(o){
   };
   go.onclick=fire;
   if(opts) el('ffOpts').querySelectorAll('.ch').forEach(b=>{
-    b.onclick=()=>{ if(busy) return; busy=true; lock(); A.sfx('click'); o.onPick(+b.dataset.i,ui) };
+    b.onclick=()=>{ if(busy||ovlLocked()) return; busy=true; lock(); A.sfx('click'); o.onPick(+b.dataset.i,ui) };
   });
   // Enter 不送出（換行用 Shift+Enter，一般 Enter 也只是換行）
   inp.addEventListener('keydown',e=>{ if(e.key==='Enter'&&!e.shiftKey) e.stopPropagation() });
@@ -4449,10 +4462,10 @@ function resultCard(o){
         ${o.tip?`<br><span class="cl tipc">建議</span>${esc(o.tip)}`:''}</div>
       <div class="choices" id="nx"></div>
     </div></div></div>`;
-  $ovl.scrollTop=0;
+  $ovl.scrollTop=0; ovlGuard(420);
   const b=document.createElement('button'); b.className='ch';
   b.innerHTML=`<span class="k">▶</span><span>${o.nextLabel}</span>`;
-  b.onclick=()=>{ A.sfx('click'); o.onNext() };
+  b.onclick=()=>{ if(ovlLocked()) return; A.sfx('click'); o.onNext() };
   el('nx').appendChild(b);
 }
 
@@ -4847,7 +4860,7 @@ function dailyCard(){
         : '系統會依房仲實務評分，並給你評語與建議。'}</div>
       <div class="choices"><button class="ch" id="dqClose"><span class="k">✕</span><span>關閉</span></button></div>
     </div></div></div>`;
-    $ovl.classList.add('show'); $ovl.scrollTop=0;
+    $ovl.classList.add('show'); $ovl.scrollTop=0; ovlGuard(420);
     const inp=el('dqIn'), go=el('dqGo'), msg=el('dqMsg');
     let busy=false;
     inp.addEventListener('keydown',e=>{ if(e.key==='Enter'&&!e.shiftKey) e.stopPropagation() });
@@ -4897,7 +4910,7 @@ function dailyCard(){
         <button class="ch" id="dqClose2"><span class="k">✕</span><span>關閉</span></button>
       </div>
     </div></div></div>`;
-    $ovl.scrollTop=0;
+    $ovl.scrollTop=0; ovlGuard(420);
     el('dqRetry').onclick=()=>{A.sfx('click');panel()};
     el('dqClose2').onclick=()=>{A.sfx('cancel');closeOvl()};
     el('dqShare').onclick=()=>{
@@ -5038,7 +5051,7 @@ function renderEnding(win){
       <button class="ch" id="endBoard" style="justify-content:center"><span>看排行榜</span></button>
       <button class="ch" id="endTitle" style="justify-content:center"><span>回主畫面</span></button>
     </div></div>`;
-  $ovl.classList.add('show'); $ovl.scrollTop=0;
+  $ovl.classList.add('show'); $ovl.scrollTop=0; ovlGuard(600);
   const anim=!Game._endShown; Game._endShown=true;
   $ovlIn.querySelectorAll('#endLines p').forEach((p,i)=>{
     if(anim) setTimeout(()=>{p.classList.add('in');A.sfx(i===6?'confirm':'click')},500+i*620);
