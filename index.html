@@ -76,6 +76,13 @@ button{font-family:inherit;color:inherit}
   /* --u：同時受舞台寬與高限制的縮放基準，矮畫面會整體縮小而不是被切掉 */
   --u:min(var(--sw,480px),calc(var(--sh,320px) * 1.42));
   background:linear-gradient(180deg,rgba(6,10,15,.35),rgba(6,10,15,.82))}
+.sndhint{position:absolute;top:10px;right:10px;z-index:7;
+  font-family:var(--f-mono);font-size:clamp(7px,calc(var(--u)*.017),10px);letter-spacing:.1em;
+  color:var(--amber);background:rgba(10,15,22,.85);border:2px solid var(--amber-d);
+  border-radius:3px;padding:6px 9px;cursor:pointer;
+  animation:sndpulse 1.6s steps(2,jump-none) infinite}
+.sndhint:hover{background:var(--panel2)}
+@keyframes sndpulse{0%,60%{opacity:1}61%,100%{opacity:.45}}
 .tt-sub{font-family:var(--f-mono);font-size:clamp(7px,calc(var(--u)*.0165),11px);
   letter-spacing:.24em;color:var(--amber);margin-bottom:calc(var(--u)*.024);text-shadow:0 2px 0 #000}
 .tt{font-family:var(--f-disp);font-weight:900;letter-spacing:.05em;
@@ -355,6 +362,7 @@ button{font-family:inherit;color:inherit}
       </div>
 
       <div class="title-lyr" id="titleLyr">
+        <button class="sndhint" id="sndHint" hidden>♪ 點一下畫面開啟音樂</button>
         <div class="tt-sub">SUPER SUN REALTY PRESENTS</div>
         <h1 class="tt">房仲<em>菜鳥</em>大冒險</h1>
         <div class="tt-rule"></div>
@@ -2863,7 +2871,8 @@ function boardCard(){
 
 /* ═══ 場景 ═══ */
 function toTitle(){
-  Game.scene='title'; Game.duel=null; $title.style.display='flex'; $hud.classList.add('hidden');
+  Game.scene='title'; _wantTrack='title';
+  if(typeof showSndHint==='function') showSndHint(!_audioOK); Game.duel=null; $title.style.display='flex'; $hud.classList.add('hidden');
   closeOvl(); $talk.classList.remove('show'); $acts.innerHTML='';
   checkSave(); A.play('title'); fitStage();
 }
@@ -3822,15 +3831,31 @@ addEventListener('keydown',e=>{
   if(k===' '||k==='enter') interact();
 });
 addEventListener('keyup',e=>{ keys[e.key.toLowerCase()]=false });
-/* 瀏覽器要有互動才准出聲：第一次點擊／按鍵時把音軌重新開一次 */
-let _audioKick=false;
-function kickAudio(){
-  if(_audioKick) return; _audioKick=true;
-  A.resume();
-  if(A.on){ const t=A.track||'title'; A.track=null; A.play(t) }
+/* ── 瀏覽器要有使用者互動才准出聲 ──
+   載入時先試著直接播（常訪站台的瀏覽器會放行）；沒放行就掛上提示，
+   之後每一次互動都再試一次，直到 AudioContext 真的 running 才收手。 */
+let _audioOK=false, _wantTrack='title';
+const $sndHint=el('sndHint');
+function showSndHint(on){
+  if(!$sndHint) return;
+  $sndHint.hidden = !on || !A.on || Game.scene!=='title';
 }
-['pointerdown','keydown','touchstart'].forEach(ev=>
-  addEventListener(ev,kickAudio,{once:true,capture:true}));
+function kickAudio(){
+  if(_audioOK) return;
+  A.resume();
+  if(A.on){ const t=A.track||_wantTrack||'title'; A.track=null; A.play(t) }
+  const settle=()=>{
+    if(A.ctx&&A.ctx.state==='running'){ _audioOK=true; showSndHint(false) }
+    else armAudio();
+  };
+  if(A.ctx&&A.ctx.state!=='running'&&A.ctx.resume) A.ctx.resume().then(settle,()=>armAudio());
+  else setTimeout(settle,120);
+}
+function armAudio(){
+  ['pointerdown','keydown','touchstart','click'].forEach(ev=>
+    addEventListener(ev,kickAudio,{once:true,capture:true}));
+}
+armAudio();
 $stage.addEventListener('pointerdown',()=>{
   A.resume();
   if($talk.classList.contains('show')&&!$ovl.classList.contains('show')) advanceTalk();
@@ -3972,6 +3997,12 @@ el('bAudio').onclick=function(){
 fitStage(); setTimeout(fitStage,80); setTimeout(fitStage,400);
 checkSave();
 AI.init();
+/* 主畫面音樂：先試著直接播，被瀏覽器擋下就顯示「點一下開啟音樂」 */
+A.play('title');
+setTimeout(()=>{
+  if(A.ctx&&A.ctx.state==='running'){ _audioOK=true; showSndHint(false) }
+  else showSndHint(true);
+},350);
 requestAnimationFrame(loop);
 </script>
 
