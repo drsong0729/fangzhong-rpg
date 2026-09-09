@@ -99,6 +99,16 @@ button{font-family:inherit;color:inherit}
 .ch .mst{display:block;font-style:normal;font-family:var(--f-mono);font-size:7.5px;letter-spacing:.1em;
   color:var(--jade);margin-top:5px}
 .hint.tut{color:var(--amber)}
+/* 人生第一件委託 */
+.firstdeal{text-align:center}
+.fd-big{font-family:var(--f-disp);font-size:clamp(17px,4.2vmin,24px);font-weight:900;letter-spacing:.06em;
+  color:var(--amber);line-height:1.5;margin:2px 0 12px;text-shadow:0 2px 0 #000}
+.firstdeal p{font-family:var(--f-body);font-size:14px;line-height:1.9;color:var(--cream);margin:0 0 12px}
+.fd-tip{display:flex;flex-direction:column;gap:6px;text-align:left;margin:0 0 12px}
+.fd-tip span{font-family:var(--f-body);font-size:12.5px;line-height:1.6;color:var(--dim);
+  background:var(--panel2);border:2px solid var(--line);border-left:4px solid var(--jade);
+  border-radius:3px;padding:7px 10px}
+.fd-tip span::before{content:'▸ ';color:var(--jade);font-family:var(--f-mono)}
 /* ── 天賦診斷 ── */
 .talent{background:var(--panel2);border:2px solid var(--line2);border-left:5px solid var(--violet);
   border-radius:4px;padding:13px 15px;margin:14px 0;text-align:left}
@@ -4727,6 +4737,31 @@ function phoneCall(src,here,ph,charge){
     }}]);
 }
 
+/* 店長指定的那一件簽下來之後：正式放你出去跑 */
+function firstDealCard(){
+  A.play('win'); A.sfx('confirm');
+  card('人生第一件委託','FIRST DEAL',
+    `<div class="firstdeal">
+       <p class="fd-big">恭喜你簽到人生第一件委託！</p>
+       <p>接下來到城市各個角落去募集掛售的物件吧！<br>
+          把委託都簽回來、達成目標！！</p>
+       <div class="fd-tip">
+         <span>街上掛「售」的房子都可以調電傳</span>
+         <span>謄本上的戶籍地就是屋主可能在的地方</span>
+         <span>被拒絕沒關係，同一個人跑越多趟越好談</span>
+         <span>動作要快——同業也在跑同一批物件</span>
+       </div>
+       <div class="say" style="border-left-color:var(--jade)">
+         本月委託數：<b style="color:var(--jade)">${Game.signed} / ${GOAL}</b>　剩 ${Math.max(0,MAXDAY-Game.day+1)} 天</div>
+     </div>`,
+    [{key:'▶',label:'出發',sub:'去街上找下一間',fn:()=>{
+      A.sfx('confirm'); closeOvl();
+      if(Game.scene==='city') A.play('city'); else A.play('office');
+      setActs();
+      if(Game.signed===GOAL) setTimeout(goalReached,400);
+    }}]);
+}
+
 function duelEnd(win){
   const D=Game.duel, st=Game.hs(D.src.id);
   Game.duel=null; A.play('city');
@@ -4735,7 +4770,8 @@ function duelEnd(win){
     st.signed=true; Game.signed++; hudSync(); A.sfx('sign');
     Game.dayLog[Game.day-1]='sign';
     Meta.addXP(50);
-    if(D.src.tut&&Game.tut){ tutStep(6) }
+    const firstEver = !!(D.src.tut&&Game.tut);      // 店長指定的那一件
+    if(firstEver){ tutStep(6) }
     if(Game.signed===GOAL&&!Game.doneDay) Game.doneDay=Game.day;
     addLog('簽下委託！'+D.src.addr.full,'l-good'); save(true);
     card('委託書簽下來了','＋1 件',
@@ -4746,6 +4782,7 @@ function duelEnd(win){
        <div class="say" style="border-left-color:var(--jade)">本月委託數：<b style="color:var(--jade)">${Game.signed} / ${GOAL}</b></div>`,
       [{key:'▶',label:'收好委託書',fn:()=>{
         A.sfx('confirm'); closeOvl(); setActs();
+        if(firstEver) return setTimeout(firstDealCard,320);
         if(Game.signed===GOAL) setTimeout(goalReached,400);
       }}],'sign');
   }else{
