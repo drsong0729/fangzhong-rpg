@@ -135,8 +135,10 @@ button{font-family:inherit;color:inherit}
 .cta-box p{font-family:var(--f-body);font-size:13.5px;line-height:1.85;color:var(--cream);margin:0 0 8px}
 .cta-box p b{color:var(--amber)}
 .cta-box .cta-hook{font-size:14.5px;border-top:2px solid rgba(246,178,60,.3);padding-top:10px;margin-top:10px}
-.ch.cta{text-decoration:none;background:var(--panel);border-color:var(--amber-d)}
-.ch.cta:hover{background:#26364a}
+.ch.cta,.ch.cta:link,.ch.cta:visited{text-decoration:none;background:var(--panel);
+  border-color:var(--amber-d);color:var(--cream)}
+.ch.cta:hover{background:#26364a;color:var(--amber)}
+.ch.cta .k{color:var(--amber)}
 .ch.cta small{display:block;font-size:10.5px;color:var(--dimmer);font-family:var(--f-mono);
   letter-spacing:.04em;margin-top:4px}
 /* ── 每日一題 ── */
@@ -2098,8 +2100,8 @@ const CONTACT={
   company:'日勝國際不動產',
   person :'Ryan 吳松儒',
   tel    :'0755-777-88',      // 結局會做成可直接撥打的按鈕
-  line   :'',                 // LINE 官方帳號網址，例如 https://line.me/R/ti/p/@xxxxx
-  form   :'',                 // 應徵表單網址
+  line   :'https://page.line.me/supersun.realty',
+  form   :'https://www.104.com.tw/company/1a2x6bngpb?jobsource=google',
   site   :'https://drsong0729.github.io/fangzhong-rpg/'
 };
 
@@ -4372,7 +4374,7 @@ function ctaHTML(T){
   const btns=[];
   if(CONTACT.tel)  btns.push(`<a class="ch cta" href="tel:${esc(CONTACT.tel.replace(/[^0-9+]/g,''))}"><span class="k">☎</span><span>撥打 ${esc(CONTACT.tel)}<small>${esc(CONTACT.company)}　${esc(CONTACT.person)}</small></span></a>`);
   if(CONTACT.line) btns.push(`<a class="ch cta" href="${esc(CONTACT.line)}" target="_blank" rel="noopener"><span class="k">◉</span><span>加 LINE 聊聊<small>先問問看也可以</small></span></a>`);
-  if(CONTACT.form) btns.push(`<a class="ch cta" href="${esc(CONTACT.form)}" target="_blank" rel="noopener"><span class="k">▤</span><span>填應徵表單<small>三分鐘</small></span></a>`);
+  if(CONTACT.form) btns.push(`<a class="ch cta" href="${esc(CONTACT.form)}" target="_blank" rel="noopener"><span class="k">▤</span><span>看 104 職缺並投履歷<small>${esc(CONTACT.company)}　左營直營店</small></span></a>`);
   if(!btns.length) return '';
   const line = T
     ? `你在這 30 天裡是<b>${esc(T.t.n)}</b>的房仲。${esc(T.t.r)}`
