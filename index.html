@@ -6165,7 +6165,7 @@ function ctaHTML(T){
   const btns=[];
   if(CONTACT.tel)  btns.push(`<a class="ch cta" href="tel:${esc(CONTACT.tel.replace(/[^0-9+]/g,''))}"><span class="k">☎</span><span>撥打 ${esc(CONTACT.tel)}<small>${esc(CONTACT.company)}　${esc(CONTACT.person)}</small></span></a>`);
   if(CONTACT.line) btns.push(`<a class="ch cta" href="${esc(CONTACT.line)}" target="_blank" rel="noopener"><span class="k">◉</span><span>加 LINE 聊聊<small>先問問看也可以</small></span></a>`);
-  if(CONTACT.form) btns.push(`<a class="ch cta" href="${esc(CONTACT.form)}" target="_blank" rel="noopener"><span class="k">▤</span><span>看 104 職缺並投履歷<small>${esc(CONTACT.company)}　左營直營店</small></span></a>`);
+  if(CONTACT.form) btns.push(`<a class="ch cta" href="${esc(CONTACT.form)}" target="_blank" rel="noopener"><span class="k">▤</span><span>看 104 職缺並投履歷<small>${esc(CONTACT.company)}　高雄第一店</small></span></a>`);
   if(!btns.length) return '';
   const line = T
     ? `你在這 30 天裡是<b>${esc(T.t.n)}</b>的房仲。${esc(T.t.r)}`
