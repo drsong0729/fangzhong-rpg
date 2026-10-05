@@ -444,6 +444,54 @@ body.touch #mini{right:max(186px,calc(env(safe-area-inset-right) + 178px))!impor
   .mapHead h3{font-size:17px}
 }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}#endLines p,.endBtns{opacity:1}}
+
+/* ---- 業務生涯：熟悉度、情報卡、議價、拍照 ---- */
+#liTag{font-size:10.5px;font-weight:700;color:#cfe0ff;letter-spacing:.04em;margin-top:1px;white-space:nowrap}
+.icards{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px;font-family:var(--f-ui)}
+.icard{border:1px dashed rgba(255,255,255,.28);padding:5px 8px;background:rgba(255,255,255,.03);min-width:0}
+.icard small{display:block;font-size:11px;color:var(--muted)}
+.icard b{font-size:14px;display:block;overflow-wrap:anywhere}
+.icard.on{border-style:solid;border-color:var(--neon);background:rgba(255,207,58,.1)}
+.mbox.paper .icard{border-color:#0003;background:#0000000a}
+.mbox.paper .icard small{color:#6a6458}
+.mbox.paper .icard.on{border-color:#c88a00;background:#fff4d6}
+.itm.hob{border-color:rgba(47,191,113,.7);color:#bff5d6}
+.neg{display:flex;flex-direction:column;gap:8px}
+.negRow{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.negRow > div{background:rgba(255,255,255,.05);padding:6px 10px;display:flex;flex-direction:column}
+.negRow small{font-size:11.5px;color:var(--muted)}
+.negRow b{font-family:var(--f-num);font-size:22px}
+.negRow .nb b{color:var(--cyan)} .negRow .no b{color:var(--neon)}
+.negRow.sm{grid-template-columns:1fr 1fr}.negRow.sm > div{flex-direction:row;justify-content:space-between;align-items:center;font-size:13px}
+.pip{font-size:14px;letter-spacing:2px;color:var(--red)}
+.negBar{position:relative;height:12px;background:linear-gradient(90deg,rgba(63,214,255,.25),rgba(255,207,58,.25));margin:4px 6px}
+.negBar i{position:absolute;top:-4px;width:4px;height:20px;transform:translateX(-2px)}
+.negBar i.b{background:var(--cyan)} .negBar i.o{background:var(--neon)} .negBar i.o.unk{background:repeating-linear-gradient(0deg,var(--neon) 0 3px,transparent 3px 6px)}
+.negLog{margin:0;font-size:14.5px;border-left:3px solid var(--violet);padding-left:10px}
+.photoRes{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:12px;align-items:start}
+.photoRes img{width:100%;border:4px solid #fff;box-shadow:0 4px 14px rgba(0,0,0,.5)}
+.photoRes .stars{color:var(--neon);font-size:24px;letter-spacing:2px}
+.photoRes .pscore{font-family:var(--f-num);font-size:30px;margin-right:6px}
+.photoRes ul{margin:8px 0;padding-left:18px;font-size:13.5px;display:flex;flex-direction:column;gap:4px}
+body.photo #hud > :not(#toasts){display:none!important}
+body.photo #iWrap{display:none!important}
+#photoUI{position:fixed;inset:0;z-index:25;pointer-events:none}
+#photoUI .vf{position:absolute;inset:7% 9%;border:2px solid rgba(255,255,255,.9);box-shadow:0 0 0 100vmax rgba(0,0,0,.3);
+  background:linear-gradient(90deg,transparent calc(33.33% - 1px),rgba(255,255,255,.35) calc(33.33% - 1px) calc(33.33% + 1px),transparent calc(33.33% + 1px) calc(66.66% - 1px),rgba(255,255,255,.35) calc(66.66% - 1px) calc(66.66% + 1px),transparent calc(66.66% + 1px)),
+  linear-gradient(180deg,transparent calc(33.33% - 1px),rgba(255,255,255,.35) calc(33.33% - 1px) calc(33.33% + 1px),transparent calc(33.33% + 1px) calc(66.66% - 1px),rgba(255,255,255,.35) calc(66.66% - 1px) calc(66.66% + 1px),transparent calc(66.66% + 1px))}
+#phHint{position:absolute;top:10px;left:50%;transform:translateX(-50%);background:rgba(12,15,22,.8);color:#fff;font-size:13px;padding:6px 12px;white-space:nowrap;max-width:94vw;overflow:hidden;text-overflow:ellipsis}
+#phLevel{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:120px;height:2px;background:rgba(255,255,255,.7)}
+#phLevel.ok{background:var(--green);box-shadow:0 0 8px var(--green)}
+#phTilt{position:absolute;left:50%;top:calc(50% + 10px);transform:translateX(-50%);font-size:12px;color:#fff;text-shadow:0 1px 3px #000;font-weight:700}
+#phBar{position:absolute;left:50%;bottom:max(12px,env(safe-area-inset-bottom));transform:translateX(-50%);display:flex;gap:10px;align-items:center;pointer-events:auto}
+#phBar .pb{background:rgba(12,15,22,.85);color:#fff;border:1px solid rgba(255,255,255,.4);padding:9px 12px;font-weight:700;font-size:14px;min-width:44px;min-height:44px}
+#phShot{width:68px;height:68px;border-radius:50%;background:#fff;border:6px solid rgba(12,15,22,.6);box-shadow:0 0 0 3px #fff}
+#phShot:active{transform:scale(.94)}
+#phFov{color:#fff;font-size:12px;font-weight:700;text-shadow:0 1px 3px #000;min-width:72px;text-align:center}
+#phFlash{position:absolute;inset:0;background:#fff;opacity:0}
+#phFlash.on{animation:phFlash .35s ease-out}
+@keyframes phFlash{0%{opacity:.9}100%{opacity:0}}
+@media (max-width:640px){.icards{grid-template-columns:repeat(2,1fr)}.photoRes{grid-template-columns:1fr}.negRow b{font-size:18px}}
 </style>
 
 </head>
@@ -454,6 +502,8 @@ body.touch #mini{right:max(186px,calc(env(safe-area-inset-right) + 178px))!impor
   <div id="stickZone" aria-hidden="true"></div>
   <div id="joy" hidden><div id="joyK"></div></div>
   <div id="iWrap"><div id="iLbl"></div><button id="iBtn" aria-label="互動">互動</button></div>
+  <div id="photoUI" hidden><div class="vf"></div><div id="phFlash"></div><div id="phHint">拖曳取景 · WASD 走動 · 滾輪／Z X 調焦距 · 空白鍵拍照 · Esc 結束</div><div id="phLevel"></div><div id="phTilt"></div>
+    <div id="phBar"><button class="pb" id="phExit">結束</button><button class="pb" id="phOut">廣</button><span id="phFov"></span><button class="pb" id="phIn">望遠</button><button id="phShot" aria-label="拍照"></button></div></div>
   <div id="hud" hidden>
     <div id="hudTR">
       <div class="clock"><span id="wx" class="wx cloud" aria-hidden="true"></span><span id="clk">09:00</span><span id="tmp">29°</span></div>
@@ -468,7 +518,7 @@ body.touch #mini{right:max(186px,calc(env(safe-area-inset-right) + 178px))!impor
       <div id="qBox" class="open"><button id="qHead"><span>今日任務</span><span id="qCount">0/3</span></button><ul id="qList"></ul></div>
     </div>
     <canvas id="mini" width="360" height="360"></canvas>
-    <div id="hudBR"><button id="rideBtn">上車</button><div id="streetPlate"><b id="stName">—</b><small id="stEn"></small></div><canvas id="speedo" width="220" height="200"></canvas><div id="spdTxt">0 km/h</div><div id="modeLbl">機車</div></div>
+    <div id="hudBR"><button id="rideBtn">上車</button><div id="streetPlate"><b id="stName">—</b><small id="stEn"></small><small id="liTag"></small></div><canvas id="speedo" width="220" height="200"></canvas><div id="spdTxt">0 km/h</div><div id="modeLbl">機車</div></div>
     <div id="tutBar" hidden><i>新手引導</i><b></b></div>
     <div id="act" hidden><button id="actBtn"><span id="actTxt"></span><kbd>E</kbd></button><div id="actSub"></div></div>
     <div id="bubbles" aria-hidden="true"></div>
@@ -532,7 +582,7 @@ body.touch #mini{right:max(186px,calc(env(safe-area-inset-right) + 178px))!impor
 
   <div id="mapScr" hidden>
     <div class="mapHead"><h3>溪虹市地圖</h3>
-      <div class="legend"><span><i style="background:#e3242b"></i>未調閱</span><span><i style="background:#ff9a2e"></i>已調閱</span><span><i style="background:#2fbf71"></i>已委託</span><span><i style="background:#8b5cf6"></i>導航目標</span><span><i style="background:#3fd6ff"></i>路線</span><span><i style="background:#1f9a4a;border-radius:2px"></i>便利商店</span><span><i style="background:#c8161d;box-shadow:0 0 0 2px #ffcf3a"></i>阿豪</span><span><i style="background:#e3242b;box-shadow:0 0 0 2px #ff7a00"></i>阿豪鎖定</span><span><i style="background:#5a5f6a"></i>被搶走</span><span><i style="background:#ff3b6b"></i>圖釘</span><span><i style="background:#e0782a"></i>高架捷運</span><span><i style="background:#1f6fd0"></i>地下捷運</span></div>
+      <div class="legend"><span><i style="background:#e3242b"></i>未調閱</span><span><i style="background:#ff9a2e"></i>已調閱</span><span><i style="background:#2fbf71"></i>已委託</span><span><i style="background:#8b5cf6"></i>導航目標</span><span><i style="background:#3fd6ff"></i>路線</span><span><i style="background:#1f9a4a;border-radius:2px"></i>便利商店</span><span><i style="background:#c8161d;box-shadow:0 0 0 2px #ffcf3a"></i>阿豪</span><span><i style="background:#e3242b;box-shadow:0 0 0 2px #ff7a00"></i>阿豪鎖定</span><span><i style="background:#5a5f6a"></i>被搶走</span><span><i style="background:#ff3b6b"></i>圖釘</span><span><i style="background:#e0782a"></i>高架捷運</span><span><i style="background:#1f6fd0"></i>地下捷運</span><span><i style="background:#3f8cf0;border-radius:2px"></i>派報住戶</span><span><i style="background:transparent;box-shadow:0 0 0 2px #2fd07a"></i>今日帶看</span><span><i style="background:transparent;box-shadow:0 0 0 2px #ffcf3a"></i>急件</span></div>
       <div class="mapHint">點一下地圖任意位置放圖釘導航・再點圖釘可取消・拖曳移動地圖</div>
       <div class="mapTools"><button class="btn ghost sm" id="mapIn" aria-label="放大">＋</button><button class="btn ghost sm" id="mapOut" aria-label="縮小">－</button><button class="btn ghost sm" id="mapMe">回到我</button><button class="btn ghost sm" id="mapAll">全圖</button><button class="btn ghost sm" id="mapPinClr" hidden>清除圖釘</button><button class="btn sm" id="mapClose">關閉 <kbd>M</kbd></button></div></div>
     <canvas id="bigMap"></canvas>
@@ -624,7 +674,7 @@ const OFFICE_NPC = {
     open: ['喔，{P}！', '兄弟，怎麼了？', '（拔下耳機）蛤？你說什麼？', '我剛被屋主掛電話，你來得正好。', '嘿，要不要一起去跑？', '你也在找委託喔？'],
     body: ['我昨天在鳳翔路被一個阿伯念了二十分鐘，最後他說：「年輕人不錯，留個名片。」', '跟你說，管理員最吃的是禮貌，不是飲料。我送過飲料，被退回來。', '我發現傍晚去拜訪成功率比較高，大家剛下班心情比較好。', '我上個月業績掛零，被 Simon 叫去喝茶，結果他只跟我聊他以前怎麼被拒絕。', '機車要記得加油，上次我騎到一半沒油，牽了兩公里。', '我最近在練一句話：「我不敢保證，但我能做到的是……」屋主聽了比較放心。', '有個屋主跟我說他兒子也在做房仲，結果他兒子是我國中同學。', '我現在都會先看謄本的登記日期，持有很久的屋主比較不急。', '你有沒有被狗追過？我上禮拜被追了一條街。', '開發信我都寫三個版本，給阿公阿嬤、給上班族、給投資客，用字都不一樣。', '我覺得做這行最重要的是臉皮厚，還有腿要夠力。', '欸，聽說垃圾車來的時候最好找人，大家都會出來倒垃圾。', '我手上有一組買方在找三房，你有看到適合的跟我說，我們配案。'],
     close: ['衝了！', '一起加油啦！', '晚點見。', '別被屋主嚇到喔。', '我先去跑了，掰。'] },
-  amy: { name: 'Amy（行政秘書）',
+  amy: { name: '家蓁（行政秘書）',
     open: ['您好，{P}。', '有什麼需要幫忙的嗎？', '（從電腦後面探出頭）嗨！', '早安～', '要印東西嗎？'],
     body: ['委託書我都放在左邊第二個抽屜，記得帶幾份出門。', '提醒一下，名片快用完了要跟我說，印刷要三天。', '今天有幾通客人打來問物件，我都先記下來了，放在你桌上。', '公司的 LINE 群組記得看，Simon 常常在裡面發市場資料。', '要申請謄本的話直接跟我說，我幫你調閱比較快。', '出門前記得簽外出單，不然 Simon 會找不到人。', '有屋主打電話來找你的話，我會馬上轉給你。', '我們公司電話是 0755-777-88，名片上那個。', '影印機卡紙的話，打開側邊那個綠色的蓋子就好。', '昨天有位阿姨來店裡，說想了解一下房子行情，我請她留了電話。', '茶水間的咖啡豆快沒了，誰最後一個用的要記得補喔。', '這個月的業績表我做好了，白板上那個是最新的。'],
     close: ['路上小心。', '有需要再叫我。', '加油！', '祝你今天順利。', '慢走～'] },
@@ -1119,6 +1169,72 @@ const CHAT_HILL = ["這段坡好陡，走得好喘。","上坡騎機車都要催
 const CHAT_PLAYER = ["那個穿西裝的是房仲嗎？","日勝房屋的耶，好認真。","房仲又來發傳單了。","年輕人，你們在找房子賣嗎？","我家也想賣，改天問問看。","穿西裝騎機車，不熱嗎？","房仲先生，這附近行情怎樣？","萬國旗領帶好特別喔。","欸，那不是日勝的嗎？","我鄰居好像要賣房子耶。"];
 const BUMP_LINES = ["喂！看路啦！","騎慢一點好不好！","嚇死我了！","你差點撞到我！","年輕人小心一點！","欸欸欸！","有沒有在看前面啊！"];
 
+// ===================== 帶看：買方的疑慮（格式同 moves.js 的 M） =====================
+const BUYER_MOVES = [
+  M(["這間開這個價錢，比旁邊實價登錄高很多耶。", "我查過實登，這條路的成交單價沒這麼高吧？", "老實說，這個總價有點超出我的預算。"],
+    ["您功課做得很仔細。我把這條路近半年的三筆成交整理給您，屋況、樓層差在哪，我們一筆一筆對。", "開價是屋主的期待，成交價是市場決定的。您先確認喜不喜歡這間，價格交給我去跟屋主談。"],
+    "價格還有空間，您先看屋況，喜歡我們再來談。",
+    ["這已經很便宜了，再等就被別人買走了。", "實價登錄都不準啦，您不用看那個。", "預算不夠的話，您要不要改看小一點的？"],
+    "……好，你把那幾筆整理給我。如果真的有道理，我可以考慮。", "嗯，先看看再說。"),
+  M(["這房子屋齡不小了，會不會有漏水、壁癌？", "我看牆角有水痕，是不是會漏水？", "老房子我最怕管線，換一次很貴吧？"],
+    ["我們有屋況說明書，漏水、管線都寫清楚，成交後也有漏水保固，您不用自己承擔風險。", "這處水痕是之前樓上漏水，已經修好了，修繕紀錄可以給您看；簽約前也可以請專業屋況檢測。"],
+    "屋主說最近沒有漏水的問題，您可以放心。",
+    ["老房子哪間不漏水，買了再修就好。", "這個看不出來啦，應該沒問題。", "漏水您可以自己找師傅看，這部分我們不負責。"],
+    "有保固就安心多了。修繕紀錄等一下傳給我。", "希望是真的。"),
+  M(["客廳採光有點暗耶，下午會不會更暗？", "這個格局有點怪，房間是不是太小了？", "廚房好小，我家那位一定不喜歡。"],
+    ["這間早上的光線最好。您可以挑一天早上再來看一次，我陪您。", "這面牆不是結構牆，打掉可以變開放式。我請配合的設計師幫您估個價。"],
+    "開燈就很亮了，其實還好。",
+    ["每間房子都有缺點啦，不要想太多。", "房間小比較好整理啊。", "廚房小就少煮飯，外食比較方便。"],
+    "可以改的話，感覺就不一樣了。你幫我問問設計師。", "嗯……我再想想。"),
+  M(["這附近停車好難，有沒有車位？", "沒車位的話，我每天下班要找好久。", "機車要停哪？騎樓可以停嗎？"],
+    ["兩百公尺外有一個月租停車場，我已經問過了，現在還有位子，一個月兩千出頭。", "這區晚上路邊車位其實不少。建議您晚上八點再來繞一圈，親自感受一下。"],
+    "附近有停車場，可以月租。",
+    ["停車問題買了再說啦。", "違停也不太會被開單啦。", "大家都這樣停，習慣就好。"],
+    "你連停車場都問好了喔？好，這個加分。", "嗯，再看看。"),
+  M(["這裡的學區怎麼樣？小孩明年要上小學。", "學校離這裡會很遠嗎？", "我聽說這附近的國中不太好？"],
+    ["學校走路大概八分鐘，我等一下帶您實際走一次上學的路線，看看安不安全。", "學區的部分，我幫您查設籍規定和學校招生資訊，確認清楚再決定。"],
+    "學校就在附近，應該沒問題。",
+    ["學區不重要啦，現在都可以跨區讀。", "國中好不好要看小孩自己啦。", "這個您要自己去問學校。"],
+    "走一次路線好，我也想知道路上安不安全。", "好，我會再查查。"),
+  M(["我剛剛看到巷口有間宮廟，會不會很吵？", "附近是不是有高壓電塔？", "晚上這邊會不會有人聚集喝酒？"],
+    ["您觀察得很細。廟會一年大概兩三次，我把日期查給您，您可以挑那天晚上來感受一下。", "附近的設施我都會寫在說明書裡，不會讓您買了才知道。您擔心的話，我們晚上再來一次。"],
+    "其實還好，平常很安靜。",
+    ["宮廟很好啊，有神明保佑。", "那個沒什麼影響啦，大家都住得好好的。", "您想太多了，不會怎樣的。"],
+    "你這樣講我比較放心，晚上我再來看一次。", "嗯……我再觀察看看。"),
+  M(["我自備款大概只有兩成，貸得下來嗎？", "銀行會貸幾成？利率大概多少？", "我是自己開店的，貸款會不會很難？"],
+    ["我先幫您跟配合的銀行做初步試算，看您的條件可以貸幾成、月付多少，您心裡比較有底。", "自營業者可以用報稅資料或存摺往來證明收入。我介紹熟悉的放款專員給您，先評估再出價。"],
+    "應該可以貸到八成，不用太擔心。",
+    ["貸不下來可以找民間貸款。", "先簽約再說，貸款之後再想辦法。", "自備款不夠可以先跟親戚借借看。"],
+    "先試算好，我才知道自己能出多少。", "希望可以啦。"),
+  M(["管理費一個月多少？會不會太貴？", "公設比多少？我不想買一堆用不到的公設。", "這棟有沒有管委會？管理得好嗎？"],
+    ["我把近一年的管委會會議紀錄調給您，公基金和修繕狀況一看就知道這棟管得好不好。", "公設比大概三成，這個年份的大樓算正常，而且有管理員和垃圾代收，生活很方便。"],
+    "管理費不算貴啦，這區都差不多。",
+    ["公設比高才有面子啊。", "管理費不想繳也可以先欠著。", "管委會的事您住進來再參加就好。"],
+    "會議紀錄可以看喔？好，我想看。", "嗯，差不多吧。"),
+  M(["我還要再看看其他間，比較一下。", "我昨天在別家也看到一間不錯的。", "不急啦，我想多看幾間再決定。"],
+    ["多比較是對的。您跟我說另一間的條件，我幫您把兩間的優缺點列成表，客觀比一比。", "沒問題。只提醒您，這個價位在這區不多，您比完如果還是喜歡，記得第一個打給我。"],
+    "好，那您比較完再跟我說。",
+    ["別家的物件都有問題啦，我們這間最好。", "現在不決定，明天就沒了喔！", "您再比下去永遠買不到房子。"],
+    "列成表好，我自己也比較看得清楚。", "好，我再跟你聯絡。"),
+  M(["我另一半還沒來看，我一個人不能決定。", "我要帶爸媽來看一次，頭期款他們要幫忙。", "家裡意見不一樣，有人比較想買大樓。"],
+    ["當然，買房是全家的事。您約家人方便的時間，我再帶一次，也把重點整理成一頁給他們看。", "大樓和透天各有好處，我把管理、車位和總價做成比較表，讓您跟家人討論比較有依據。"],
+    "好啊，您再約家人一起來。",
+    ["您自己喜歡就好，家人的意見不重要。", "先付個訂金卡位，家人再來看就好。", "家人不來看沒關係，簽約那天再來就好。"],
+    "你願意再帶一次，我回去比較好講。", "嗯，我回去問問。"),
+  M(["屋主為什麼要賣？房子是不是有什麼問題？", "這間以前有沒有發生過什麼事？", "賣這麼急，是不是有問題？"],
+    ["賣屋原因我跟屋主確認過，也寫在說明書裡；像非自然身故這類事情，我們會查證並書面告知您。", "您問得很好。任何會影響居住的事情，依法都要揭露，我不會瞞您，有疑慮我們白紙黑字寫清楚。"],
+    "屋主說是想換屋，房子本身沒問題。",
+    ["這是屋主的隱私，我不方便講。", "沒事啦，有事我們也不會賣給您。", "您問這麼多，到底有沒有要買？"],
+    "有書面寫清楚，我就放心了。", "好吧。"),
+  M(["如果我有興趣，要怎麼出價？", "我想出個價，但我怕出太高。", "可不可以先談價錢，談不成就算了？"],
+    ["您可以簽斡旋金或要約書表達誠意，我拿著去跟屋主談，談不成斡旋金全額退還。", "我建議依近期實登和屋況抓一個合理的價格，我們一起擬，我再幫您跟屋主爭取。"],
+    "您給我一個數字，我去跟屋主說說看。",
+    ["您直接出開價就好，比較快成交。", "先出很低的價錢嚇嚇屋主。", "出價之前要先付服務費喔。"],
+    "好，那我們來討論看看出多少。", "我想想要出多少。"),
+];
+const BUYER_PERSONA = ["（環顧客廳）", "（摸了摸牆壁）", "（打開窗戶往外看）", "（拿手機拍照）", "（敲了敲牆）", "（抬頭看天花板）", "（皺著眉頭）", "（翻看你給的資料）", "（打開廚房櫥櫃）", "（走到陽台）", "（跟家人交換眼神）", "（看了看手錶）"];
+const BUYER_BAD_REPLY = ["……你這樣說我反而不敢買了。", "這個回答我不太能接受。", "你是不是只想快點成交？", "算了，我再去看別家。", "聽起來不太專業耶。", "我覺得你沒在聽我說。"];
+
 // ===================== 音訊：WebAudio 合成 BGM 與音效 =====================
 const AU = { ctx: null, track: null, trackName: null, step: 0, nextT: 0, spb: 0.1, engine: null, want: null, vol: { master: 0.9, music: 0.5, sfx: 0.8, amb: 0.7 }, duck: 1 };
 const mtof = m => 440 * Math.pow(2, (m - 69) / 12);
@@ -1496,8 +1612,15 @@ function buildSignAtlas() {
   return { tex: t, cellsH, cellsV };
 }
 
-function makeSaleSign(phone, signed, lost) {
+function makeSaleSign(phone, signed, lost, opt = {}) {
   const c = cvs(256, 320), x = c.getContext('2d');
+  if (opt.sold) {
+    x.fillStyle = '#114f9c'; x.fillRect(0, 0, 256, 320); x.strokeStyle = '#ffcf3a'; x.lineWidth = 8; x.strokeRect(10, 10, 236, 300);
+    x.fillStyle = '#fff'; x.textAlign = 'center'; x.font = `900 36px ${FONT_SANS}`; x.fillText('日勝國際', 128, 62);
+    x.fillStyle = '#ffcf3a'; x.font = `900 108px ${FONT_SERIF}`; x.fillText('成交', 128, 200);
+    x.fillStyle = '#fff'; x.font = `700 26px ${FONT_SANS}`; x.fillText('感謝委託', 128, 278);
+    return texFrom(c, false);
+  }
   if (lost) {
     x.fillStyle = '#fdf6e8'; x.fillRect(0, 0, 256, 320); x.fillStyle = '#c8161d'; x.fillRect(0, 0, 256, 70);
     x.fillStyle = '#fff'; x.textAlign = 'center'; x.font = `900 40px ${FONT_SANS}`; x.fillText('大鴻房屋', 128, 50);
@@ -1513,6 +1636,7 @@ function makeSaleSign(phone, signed, lost) {
     x.strokeStyle = '#fff'; x.lineWidth = 6; x.strokeRect(10, 10, 236, 300);
     x.fillStyle = '#fff'; x.textAlign = 'center'; x.font = `900 190px ${FONT_SERIF}`; x.fillText('售', 128, 205);
     x.font = `700 30px ${FONT_SANS}`; x.fillText(phone, 128, 282);
+    if (opt.urgent) { x.save(); x.translate(196, 52); x.rotate(Math.PI / 4); x.fillStyle = '#ffcf3a'; x.fillRect(-90, -22, 180, 44); x.fillStyle = '#c8161d'; x.font = `900 32px ${FONT_SANS}`; x.textBaseline = 'middle'; x.fillText('急售', 0, 2); x.restore(); }
   }
   return texFrom(c, false);
 }
@@ -3516,6 +3640,7 @@ const POOLS = {
   neighbor: buildPool('n', NEIGHBOR_MOVES, NEIGHBOR_PERSONA, 33),
   clue: buildPool('c', CLUE_MOVES, CLUE_PERSONA, 44),
   stranger: buildPool('s', STRANGER_MOVES, STRANGER_PERSONA, 55),
+  buyer: buildPool('b', BUYER_MOVES, BUYER_PERSONA, 66),
 };
 
 // ===================== 基本場景 =====================
@@ -3795,7 +3920,7 @@ function saveGame(silent) {
 }
 function loadGame() {
   try { const d = JSON.parse(localStorage.getItem(SAVE_KEY)); if (!d) return false; G = d; const ost = d.ost; delete G.ost; const hadAU = d.apUsed != null; ensureState(); if (!hadAU) G.apUsed = Math.max(0, apMax() - G.ap); OWN = genOwners(G.seed, G.genV || 1); OWN.forEach((o, i) => { if (ost[i]) o.st = ost[i]; }); decorateOwners(); G.tut = -1;   // 新手教學關卡已移除
-    tutSetupOwner(); G.today = G.today || { inv: 0, talk: 0, sign: 0 }; setupSaleSigns(); return true; }
+    tutSetupOwner(); G.today = G.today || { inv: 0, talk: 0, sign: 0 }; G.race = null; setupSaleSigns(); return true; }
   catch (e) { return false; }
 }
 function saveInfo() { try { const d = JSON.parse(localStorage.getItem(SAVE_KEY)); return d ? `${d.name} · Lv.${d.lv || 1} · 第 ${d.day} 天 · 委託 ${d.comm}/6` : ''; } catch (e) { return ''; } }
@@ -3805,14 +3930,14 @@ function setupSaleSigns() {
   SALE_MESH = {}; SALE_MATS = [];
   OWN.forEach(o => {
     const b = BLD[o.bid];
-    const mat = new THREE.MeshStandardMaterial({ map: makeSaleSign(o.phone, o.st.signed, o.st.lost), emissive: 0xffffff, emissiveIntensity: 0.3, roughness: 0.6 });
+    const mat = new THREE.MeshStandardMaterial({ map: makeSaleSign(o.phone, o.st.signed, o.st.lost, { urgent: !!o.st.urgent, sold: !!o.st.sold }), emissive: 0xffffff, emissiveIntensity: 0.3, roughness: 0.6 });
     mat.emissiveMap = mat.map; SALE_MATS.push(mat);
     const m = new THREE.Mesh(new THREE.PlaneGeometry(1.5, 1.85), mat);
     const so = -(b.vside || 1) * b.w * 0.24; m.position.set(b.fx + b.n.x * 0.12 + b.t.x * so, b.y + 6.6, b.fz + b.n.z * 0.12 + b.t.z * so); m.rotation.y = b.ry;
     m.visible = o.appear <= (G ? G.day : 1); SALE_MESH[o.id] = m; scene.add(m);
   });
 }
-function refreshSign(o) { const m = SALE_MESH[o.id]; if (!m) return; m.material.map.dispose(); m.material.map = makeSaleSign(o.phone, o.st.signed, o.st.lost); m.material.emissiveMap = m.material.map; m.material.needsUpdate = true; }
+function refreshSign(o) { const m = SALE_MESH[o.id]; if (!m) return; m.material.map.dispose(); m.material.map = makeSaleSign(o.phone, o.st.signed, o.st.lost, { urgent: !!o.st.urgent, sold: !!o.st.sold }); m.material.emissiveMap = m.material.map; m.material.needsUpdate = true; }
 const activeOwners = () => OWN.filter(o => o.appear <= G.day);
 
 // ===================== UI 工具 =====================
@@ -3877,7 +4002,7 @@ function enterOffice(first) {
   OFF.win.material.color.set('#9cc6e8');
   updateHUD();
   const newDay = G.qDay !== G.day;
-  if (newDay) { rivalDayStart(); genQuests(); }
+  if (newDay) { rivalDayStart(); genQuests(); careerDayStart(); }
   const lines = first ? BOSS_INTRO.map(t => ({ name: 'Simon 店長', text: t })) : morningLines();
   const to = first && tutOwner();
   if (to) { const lb = BLD[to.bid]; lines.splice(4, 0,
@@ -3885,7 +4010,7 @@ function enterOffice(first) {
     { name: 'Simon 店長', text: '那間的屋主好說話，戶籍地也在附近。調完電傳就直接去敲門，紅色箭頭會一路帶你過去。' },
     { name: 'Simon 店長', text: '畫面下方會一步一步提示你。第一件簽到了，後面就簡單了！' }); }
   if (newDay) lines.push({ name: 'Simon 店長', text: '今天的任務我寫在左上角了：' + G.quests.map(q => QUESTS.find(x => x.id === q.id).text(q.n)).join('、') + '。做完有獎勵。' });
-  if (first) lines.push({ name: 'Simon 店長', text: '跑業務會累積經驗，升級可以學技能。簽到委託有獎金，可以去便利商店或找 Amy 買道具。' });
+  if (first) lines.push({ name: 'Simon 店長', text: '跑業務會累積經驗，升級可以學技能。簽到委託有獎金，可以去便利商店或找家蓁 買道具。' });
   setTimeout(() => dialog(lines, () => { toast('可以找同事聊聊，走到出口（藍色光圈）就能出門'); }), 500);
 }
 function morningLines() {
@@ -3897,6 +4022,7 @@ function morningLines() {
   if (G.rivalIntro) { G.rivalIntro = false; L.push({ name: 'Simon 店長', text: '注意，對面大鴻房屋來了個叫阿豪的業務，專門搶別人在跑的物件。地圖上紅色的機車就是他。' }, { name: 'Simon 店長', text: '他鎖定的物件會標成橘色。搶在他前面簽下來，公司另外發獎金！' }); }
   if (G.rivalNews) { L.push({ name: 'Simon 店長', text: `昨天阿豪簽走了${G.rivalNews}。動作要快啊。` }); G.rivalNews = null; }
   if (G.weather.w === 'rain') L.push({ name: 'Simon 店長', text: '今天下雨，騎車慢一點。不過下雨天屋主比較常待在家，是拜訪的好機會。' });
+  careerMorning(L);
   if (G.day === 30) L.push({ name: 'Simon 店長', text: '今天是最後一天了。不管結果如何，我都看到你的努力。' });
   return L;
 }
@@ -3929,7 +4055,7 @@ function enterCity(fromLoad) {
   if (G.call != null) setTimeout(phoneCall, 2500);
   if (G.target) setTarget(G.target, true);
   if (G.weather.w === 'rain') setTimeout(rainBanner, 1500);
-  tutEnterCity(); applyCarCheat();
+  tutEnterCity(); applyCarCheat(); careerEnterCity();
   const bikeTip = () => toast('你的機車就停在店門口（頭上有標示），走過去按「上車」就能騎走，也可以直接走路');
   if (G.cityIntro === false) {   // 新遊戲第一次走出店門：新手提示
     G.cityIntro = true; saveGame(true);
@@ -4010,7 +4136,7 @@ function showTranscript(o) {
   <dt>住址</dt><dd class="em">${hhAddr}${o.hidden ? '<span class="tag">隱匿</span>' : ''}</dd>
   <dt>權利範圍</dt><dd>全部 ＊＊＊＊1分之1＊＊＊＊</dd>
   <dt>權狀字號</dt><dd>${o.regY}${dist.slice(0, 1)}建字第${o.buildNo}號</dd></dl>
-  <div class="docFoot">（本謄本僅供參考，地址與人名皆為遊戲虛構）</div></div>${intelLine(o) ? `<p class="docIntel">${intelLine(o)}</p>` : ''}${G.rival && G.rival.oid === o.id ? '<p class="docIntel warn">阿豪正在打這間的主意！</p>' : ''}`;
+  <div class="docFoot">（本謄本僅供參考，地址與人名皆為遊戲虛構）</div></div>${intelLine(o) ? `<p class="docIntel">${intelLine(o)}</p>` : ''}${G.rival && G.rival.oid === o.id ? '<p class="docIntel warn">阿豪正在打這間的主意！</p>' : ''}${o.st.urgent && !o.st.signed ? `<p class="docIntel warn">急件：屋主${o.st.urgent.why}，今明兩天在物件現場！</p>` : ''}${cardHtml(o)}`;
   const btns = [];
   btns.push({ label: o.st.letter ? '已留過開發信' : '在現址留開發信', sub: '不耗體力 · 屋主可能回電', dis: o.st.letter || o.st.signed, fn: () => { leaveLetter(o); closeModal(); } });
   btns.push({ label: o.hidden ? '前往戶籍地（地址隱匿）' : '前往戶籍地', sub: o.hidden ? '無法導航' : '設定導航', dis: o.hidden || o.st.signed, fn: () => { setTarget({ kind: 'hh', oid: o.id, bid: o.hh }); closeModal(); } });
@@ -4024,7 +4150,7 @@ function leaveLetter(o, via) { if (o.st.letter) { toast('已經給這位屋主�
 // 導航
 function setTarget(t, silent) {
   G.target = t; const b = BLD[t.bid], o = OWN[t.oid];
-  const label = t.kind === 'hh' ? `${o.sn}＊＊ 的戶籍地` : t.kind === 'loc' ? `${ownerName(o)} 所在地` : `與${ownerName(o)}見面`;
+  const label = t.kind === 'hh' ? `${o.sn}＊＊ 的戶籍地` : t.kind === 'loc' ? `${ownerName(o)} 所在地` : t.kind === 'race' ? `搶件賽：${ownerName(o)}在物件現場` : o.st.urgent ? `急件：與${ownerName(o)}見面` : `與${ownerName(o)}見面`;
   $('navLbl').textContent = label; $('navAddr').textContent = addrOf(b, t.kind === 'hh' ? o.hhUnit : 0); show('nav', true);
   if (!silent) { sfx('notify'); toast('已設定導航：' + addrOf(b)); if (G.pin) { G.pin = null; updatePinUI(); } }
   ROUTE.t = 0;
@@ -4071,6 +4197,7 @@ function visitTarget() {
   if (o.st.lost) { choice('來晚一步', `<p>${ownerName(o)}：「不好意思，我已經簽專任給大鴻房屋的阿豪了。」</p>`, [{ label: '下次要更快', fn: afterAction }]); G.target = null; show('nav', false); return; }
   // 到達目的地就結束導航（之後要再去，可以從謄本紀錄重新導航）
   VISIT_B = t.bid; G.target = null; show('nav', false); ROUTE.pts = [];
+  if (t.kind === 'race') { const won = G.race && G.race.oid === o.id && G.race.st === 'on'; if (won) { G.race.st = 'won'; toast('搶先阿豪一步抵達！', 'star'); } return ownerBattle(o, { meet: true, race: won }); }
   if (t.kind === 'loc' || t.kind === 'meet') return ownerBattle(o, { meet: t.kind === 'meet' });
   const name = ownerName(o), b = BLD[t.bid];
   o.st.hhSeen = true;
@@ -4078,7 +4205,7 @@ function visitTarget() {
     case 1: return ownerBattle(o, {});
     case 2: {
       if (G.weather.w === 'rain' && !o.st.rainHome) { o.st.rainHome = true; if (Math.random() < 0.5) { toast('下雨天，屋主剛好在家！'); return ownerBattle(o, {}); } }
-      const obs = !o.st.perKnown && Math.random() < 0.6; if (obs) setTimeout(() => gainIntel(o, true), 400);
+      const obs = !o.st.perKnown && Math.random() < 0.6; if (obs) setTimeout(() => gainIntel(o, 'per'), 400);
       return choice('屋主不在', `<p>${pk(ABSENT_LINES, Math.random)}</p>${obs ? `<p class="quote">你注意到：${PERS[o.per].obs}</p>` : ''}<p class="dim">${name}似乎不住在這裡，或是剛好出門了。</p>`, [
       { label: '留下開發信', sub: o.st.letter ? '已留過' : '投進信箱', dis: o.st.letter, fn: () => { leaveLetter(o); afterAction(); } },
       { label: '離開', cls: 'ghost', fn: afterAction }]); }
@@ -4120,17 +4247,19 @@ const ROLE = {
   neighbor: { res: 62, good: [26, 32], ok: [8, 12], bad: 30, okHit: 10, maxR: 6, resL: '鄰居戒心', roleL: '隔壁鄰居' },
   clue: { res: 66, good: [26, 32], ok: [8, 12], bad: 30, okHit: 10, maxR: 6, resL: '對方戒心', roleL: '應門的人' },
   stranger: { res: 30, good: [40, 40], ok: [10, 10], bad: 20, okHit: 5, maxR: 1, resL: '對方戒心', roleL: '應門的住戶' },
+  buyer: { res: 80, good: [24, 30], ok: [7, 11], bad: 26, okHit: 9, maxR: 6, resL: '買方疑慮', roleL: '看屋買方' },
 };
 let BT = null, VISIT_B = null, TALKED = null;
 function talk(role, o, cb = {}) {
   if (!spendAP(TALK_COST)) { afterAction(); return; }
   G.stats.talks++; G.today.talk++;
   // 同一個地點的人物固定（外觀、稱呼都一樣），不會每次換人
-  const RND = Math.random; Math.random = mulberry32(o.id * 7919 + ({ owner: 1, guard: 2, neighbor: 3, clue: 4, stranger: 5 }[role]) * 104729);
-  const R_ = ROLE[role], style = NPC_STYLES[role === 'owner' ? 'owner' : role]();
+  const RND = Math.random; Math.random = mulberry32(o.id * 7919 + ({ owner: 1, guard: 2, neighbor: 3, clue: 4, stranger: 5, buyer: 6 }[role]) * 104729);
+  const R_ = ROLE[role], style = role === 'buyer' ? cb.buyer.style : NPC_STYLES[role === 'owner' ? 'owner' : role]();
   let res = R_.res;
+  if (role === 'buyer') res = R_.res - photoStars(o.st.photo) * 4;
   if (role === 'owner') { res = o.tut ? Math.max(30, 46 - o.st.tries * 6) : Math.max(52, 100 - o.st.tries * 12 - (cb.meet ? 25 : 0) - (o.st.letter ? 5 : 0)); o.st.lastDay = G.day; }
-  const name = role === 'owner' ? ownerName(o) : role === 'guard' ? '管理員' + pk(['王伯', '李大哥', '陳伯', '林姐', '張伯', '黃大哥'], Math.random) : role === 'neighbor' ? pk(['隔壁阿姨', '隔壁阿伯', '鄰居太太', '鄰居先生'], Math.random) : role === 'clue' ? pk(['應門的年輕人', '應門的太太', '應門的阿姨', '房客'], Math.random) : '住戶';
+  const name = role === 'owner' ? ownerName(o) : role === 'guard' ? '管理員' + pk(['王伯', '李大哥', '陳伯', '林姐', '張伯', '黃大哥'], Math.random) : role === 'neighbor' ? pk(['隔壁阿姨', '隔壁阿伯', '鄰居太太', '鄰居先生'], Math.random) : role === 'clue' ? pk(['應門的年輕人', '應門的太太', '應門的阿姨', '房客'], Math.random) : role === 'buyer' ? cb.buyer.name : '住戶';
   Math.random = RND;
   const rainy = G.weather.w === 'rain' && role !== 'stranger';
   if (rainy) res = Math.round(res * (role === 'owner' ? 0.85 : 0.88));
@@ -4179,11 +4308,12 @@ const TALK_PLAN = {
     late: [12, 13], warmOnly: [], notFirst: [], early: [3, 5, 7], nonFamily: [0, 2, 6, 8, 10],
   },
   stranger: { open: null, groups: [], late: [], warmOnly: [], notFirst: [] },
+  buyer: { open: [0, 1, 2, 3, 4, 5, 7, 10], groups: [], late: [11, 8, 9, 6], warmOnly: [11], notFirst: [8, 9, 11] },
 };
 function allowedMoves(role) {
   const P = TALK_PLAN[role], used = BT.usedM || (BT.usedM = []), first = BT.round <= 1;
   const ratio = BT.res / BT.res0, lastRounds = BT.round >= ROLE[role].maxR - 1;
-  const n = { owner: OWNER_MOVES, guard: GUARD_MOVES, neighbor: NEIGHBOR_MOVES, clue: CLUE_MOVES, stranger: STRANGER_MOVES }[role].length;
+  const n = { owner: OWNER_MOVES, guard: GUARD_MOVES, neighbor: NEIGHBOR_MOVES, clue: CLUE_MOVES, stranger: STRANGER_MOVES, buyer: BUYER_MOVES }[role].length;
   const blocked = new Set(used);
   for (const g of P.groups) if (g.some(m => used.includes(m))) g.forEach(m => blocked.add(m));
   let all = [...Array(n).keys()].filter(m => !blocked.has(m));
@@ -4237,6 +4367,7 @@ function scenarioLine(s) {
 const fillVars = t => {
   t = t.replace(/\{P\}/g, G.name).replace(/\{S\}/g, BT && BT.o ? addrOf(BLD[BT.o.bid]) : '');
   if (!BT || !BT.o) return t;
+  if (BT.role === 'buyer') return t;
   if (BT.role === 'owner') { if (BT.o.g && BT.s && (BT.s.m === 8 || BT.s.m === 16)) t = t.replace(/我太太，她/g, '我先生，他').replace(/太太/g, '先生').replace(/老婆/g, '老公'); return t; }
   t = genderize(t, BT.o.g);
   if (BT.role === 'clue' && BT.usedM && TALK_PLAN.clue.nonFamily.includes(BT.usedM[0])) t = t.replace(/您的家人/g, '屋主').replace(/府上/g, '屋主');
@@ -4248,7 +4379,7 @@ function nextRound() {
   $('bRound').textContent = BT.role === 'stranger' ? '' : `第 ${BT.round} 回合`;
   $('bFb').hidden = true; $('bOpts').hidden = false;
   typeInto($('bLine'), fillVars(BT.sLine));
-  const opts = shuffle([{ t: s.good, q: 2 }, { t: s.ok, q: 1 }, { t: s.bads[0], q: 0 }, { t: s.bads[1], q: 0 }]);
+  const opts = shuffle([{ t: s.good, q: 2 }, { t: s.ok, q: 1 }, { t: s.bads[0], q: 0 }, { t: s.bads[1], q: 0 }]); careerOpts(opts);
   $('bOpts').innerHTML = opts.map((op, i) => `<button class="opt" data-i="${i}"><kbd>${i + 1}</kbd><span>${fillVars(op.t)}</span></button>`).join('');
   $('bOpts').querySelectorAll('.opt').forEach(el => el.onclick = () => answer(opts[+el.dataset.i]));
   battleRoundShown(opts);
@@ -4261,7 +4392,7 @@ function answer(op) {
   const R_ = ROLE[BT.role]; let react;
   if (op.q === 2) { BT.res -= Math.round(ri(R_.good[0], R_.good[1], Math.random) * battleMult(2)); react = BT.s.rg; sfx('good'); setTimeout(() => sfx('hit'), 180); shake('enemy'); }
   else if (op.q === 1) { BT.res -= ri(R_.ok[0], R_.ok[1], Math.random); BT.conf -= R_.okHit; react = BT.s.ro; sfx('ok'); }
-  else { BT.conf -= Math.round(R_.bad * battleMult(0)); BT.res = Math.min(BT.res0, BT.res + 5); react = pk(BT.role === 'owner' ? OWNER_BAD_REPLY : BT.role === 'guard' ? GUARD_BAD_REPLY : PROBE_BAD_REPLY, Math.random); sfx('bad'); shake('me'); }
+  else { BT.conf -= Math.round(R_.bad * battleMult(0)); BT.res = Math.min(BT.res0, BT.res + 5); react = op.taboo ? careerTabooHit() : pk(BT.role === 'owner' ? OWNER_BAD_REPLY : BT.role === 'guard' ? GUARD_BAD_REPLY : BT.role === 'buyer' ? BUYER_BAD_REPLY : PROBE_BAD_REPLY, Math.random); sfx('bad'); shake('me'); }
   BT.res = Math.max(0, BT.res); BT.conf = Math.max(0, BT.conf); setBars();
   BT.last = op.q;
   $('bOpts').hidden = true; $('bFb').hidden = false;
@@ -4320,8 +4451,8 @@ function endDayPrompt(auto) {
 function endDay() {
   // 開發信回電判定
   if (G.call == null) {
-    const cands = OWN.filter(o => o.st.letter && !o.st.signed && o.appear <= G.day);
-    for (const o of shuffle(cands)) { const p = (o.st.guardLetter ? 0.04 : 0.02) + G.contacts * 0.002 + G.skills.network * 0.01 + G.perm.card * 0.01; if (Math.random() < p) { G.call = o.id; break; } }
+    const cands = OWN.filter(o => (o.st.letter || o.st.dm) && !o.st.signed && !o.st.lost && o.appear <= G.day);
+    for (const o of shuffle(cands)) { const p = (o.st.letter ? (o.st.guardLetter ? 0.04 : 0.02) + G.contacts * 0.002 + G.skills.network * 0.01 + G.perm.card * 0.01 : 0.012) + famOwner(o) * 0.0004; if (Math.random() < p) { G.call = o.id; break; } }
   }
   sfx('chime');
   const safeQ = G.quests.find(q => q.id === 'safe' && !q.done && !q.fail);
@@ -4354,7 +4485,7 @@ function ending() {
   const pass = G.comm >= 6; show('ending', true);
   $('endTitle').textContent = pass ? '恭喜通關' : 'GAME OVER'; $('ending').className = pass ? 'pass' : 'fail';
   $('endSub').textContent = pass ? `${G.name}，你在第 ${G.day} 天時共簽下 ${G.comm} 件委託。` : `${G.name}，三十天過去，你簽下了 ${G.comm} 件委託，離目標還差 ${6 - G.comm} 件。`;
-  $('endStats').innerHTML = `<li><span>調閱謄本</span><b>${G.stats.inv}</b></li><li><span>開發信</span><b>${G.stats.letters}</b></li><li><span>交談</span><b>${G.stats.talks}</b></li><li><span>委託</span><b>${G.comm}</b></li><li><span>等級</span><b>Lv.${G.lv}</b></li><li><span>存款</span><b>NT$${fmt(G.money)}</b></li><li><span>成就</span><b>${Object.keys(G.ach).length}/${ACH.length}</b></li><li><span>被搶走</span><b>${G.lost}</b></li>`;
+  $('endStats').innerHTML = `<li><span>調閱謄本</span><b>${G.stats.inv}</b></li><li><span>開發信</span><b>${G.stats.letters}</b></li><li><span>交談</span><b>${G.stats.talks}</b></li><li><span>委託</span><b>${G.comm}</b></li><li><span>等級</span><b>Lv.${G.lv}</b></li><li><span>存款</span><b>NT$${fmt(G.money)}</b></li><li><span>成就</span><b>${Object.keys(G.ach).length}/${ACH.length}</b></li><li><span>被搶走</span><b>${G.lost}</b></li><li><span>成交</span><b>${G.deals || 0} 件</b></li><li><span>成交總額</span><b>${fmt(G.dealAmt || 0)} 萬</b></li>`;
   const L = ['房仲這份工作不只是出一張嘴', '還要有強大的毅力與抗壓力', '這只是一款遊戲', '現實會比這個更辛苦', '如果你想挑戰自己、獲取無上限的薪水', '歡迎加入日勝國際不動產！', '歡迎致電：0755-777-88'];
   $('endLines').innerHTML = L.map((l, i) => `<p style="animation-delay:${1.2 + i * 1.1}s" class="${i >= 5 ? 'hl' : ''}">${l}</p>`).join('');
   playMusic(pass ? 'ending' : 'sad'); sfx(pass ? 'win' : 'lose');
@@ -4481,7 +4612,7 @@ function openRecords() {
   if (MODE !== 'city') return; sfx('click');
   const list = OWN.filter(o => o.st.inv);
   const rows = list.length ? list.map(o => {
-    const b = BLD[o.bid], chips = [o.st.signed ? '<i class="c ok">已委託</i>' : '', o.st.letter ? '<i class="c">已留信</i>' : '', o.hidden ? '<i class="c warn">戶籍隱匿</i>' : '', o.st.clue ? '<i class="c clue">有線索</i>' : '', o.st.tries ? `<i class="c">拒絕 ${o.st.tries} 次</i>` : '', o.st.lost ? '<i class="c warn">被阿豪搶走</i>' : '', o.st.perKnown ? `<i class="c clue">${PERS[o.per].name}</i>` : '', o.st.intel ? `<i class="c">情報 ${o.st.intel}</i>` : '', G.rival && G.rival.oid === o.id ? '<i class="c warn">阿豪鎖定中</i>' : ''].join('');
+    const b = BLD[o.bid], chips = [o.st.signed ? '<i class="c ok">已委託</i>' : '', o.st.letter ? '<i class="c">已留信</i>' : '', o.hidden ? '<i class="c warn">戶籍隱匿</i>' : '', o.st.clue ? '<i class="c clue">有線索</i>' : '', o.st.tries ? `<i class="c">拒絕 ${o.st.tries} 次</i>` : '', o.st.lost ? '<i class="c warn">被阿豪搶走</i>' : '', o.st.perKnown ? `<i class="c clue">${PERS[o.per].name}</i>` : '', o.st.intel ? `<i class="c">情報 ${o.st.intel}</i>` : '', G.rival && G.rival.oid === o.id ? '<i class="c warn">阿豪鎖定中</i>' : '', o.st.urgent && !o.st.signed && !o.st.lost ? '<i class="c warn">急件</i>' : '', o.st.signed ? `<i class="c">開價 ${fmtWan(o.price)}</i>` : '', o.st.sold ? '<i class="c ok">已成交</i>' : '', buyerAt(o) ? '<i class="c ok">今日帶看</i>' : '', o.st.signed && !o.st.sold ? `<i class="c">照片 ${o.st.photo ? starStr(photoStars(o.st.photo)) : '未拍'}</i>` : ''].join('');
     return `<li><div class="rT"><b>${o.sn}＊＊</b><span>${addrOf(b, o.unit)}</span><div>${chips}</div></div><div class="rB">
       <button class="btn sm" data-a="doc" data-o="${o.id}">謄本</button>
       <button class="btn sm" data-a="sale" data-o="${o.id}">物件</button>
@@ -4589,6 +4720,7 @@ function drawMap(x, W, H, cx, cz, sc, big) {
   for (const L of [MRT_E, MRT_U]) for (const st of L.stations) { const mx = X(st.x), mz = Z(st.z); if (!inV(mx, mz)) continue; const r = big ? Math.max(7, Math.min(11, 3 * sc)) : 6; x.fillStyle = L === MRT_E ? '#e0782a' : '#1f6fd0'; x.strokeStyle = '#fff'; x.lineWidth = 2; x.beginPath(); x.arc(mx, mz, r, 0, 7); x.fill(); x.stroke(); x.fillStyle = '#fff'; x.font = `900 ${r * 1.1}px ${FONT_SANS}`; if (big) { x.fillText('M', mx, mz + 0.5); if (sc > BM.fit * 1.6) { x.font = `800 ${Math.round(11 * Math.min(devicePixelRatio, 2))}px ${FONT_SANS}`; x.fillStyle = '#fff'; x.fillText(st.name + '站', mx, mz + r + 10 * Math.min(devicePixelRatio, 2)); } } else miniUpright(x, mx, mz, () => x.fillText('M', 0, 0.5)); }
   for (const b of STORES) { const mx = X(b.fx), mz = Z(b.fz); if (!inV(mx, mz)) continue; const r = big ? Math.max(5, Math.min(8, 2.2 * sc)) : 4.5; x.fillStyle = '#1f9a4a'; x.fillRect(mx - r, mz - r, r * 2, r * 2); x.strokeStyle = '#fff'; x.lineWidth = 1.5; x.strokeRect(mx - r, mz - r, r * 2, r * 2); }
   if (G.rival && RIVAL_MESH) { let rx = X(G.rival.x), rz = Z(G.rival.z); if (!big) [rx, rz] = miniEdge(W, rx, rz, 10); x.fillStyle = '#c8161d'; x.beginPath(); x.arc(rx, rz, big ? 8 : 6, 0, 7); x.fill(); x.strokeStyle = '#ffcf3a'; x.lineWidth = 2; x.stroke(); x.fillStyle = '#fff'; x.font = `900 ${big ? 10 : 8}px ${FONT_SANS}`; if (big) x.fillText('豪', rx, rz + 0.5); else miniUpright(x, rx, rz, () => x.fillText('豪', 0, 0.5)); }
+  careerMap(x, X, Z, inV, big);
   if (ROUTE.pts.length > 1) { x.strokeStyle = '#3fd6ff'; x.lineWidth = Math.max(3, Math.min(8, 1.6 * sc)); x.setLineDash([Math.max(6, 3 * sc), Math.max(4, 2 * sc)]); x.beginPath(); ROUTE.pts.forEach((p, i) => i ? x.lineTo(X(p.x), Z(p.z)) : x.moveTo(X(p.x), Z(p.z))); x.stroke(); x.setLineDash([]); }
   const tgt = G.target ? BLD[G.target.bid] : MAPNAV ? BLD[MAPNAV.bid] : null;
   if (tgt) { let tx = X(tgt.front.x), tz = Z(tgt.front.z); if (!big) [tx, tz] = miniEdge(W, tx, tz, 14); x.fillStyle = '#8b5cf6'; x.beginPath(); x.arc(tx, tz, big ? Math.max(9, 4 * sc) : 10, 0, 7); x.fill(); x.fillStyle = '#fff'; x.font = `900 ${big ? Math.max(11, 5 * sc) : 12}px ${FONT_SANS}`; if (big) x.fillText('★', tx, tz + 1); else miniUpright(x, tx, tz, () => x.fillText('★', 0, 1)); }
@@ -4658,6 +4790,7 @@ addEventListener('keydown', e => {
   if (MODE === 'talk' && BT) { if ($('bFb').hidden && ['1', '2', '3', '4'].includes(k)) { const b = $('bOpts').querySelectorAll('.opt')[+k - 1]; b && b.click(); } else if (!$('bFb').hidden && (k === 'enter' || k === ' ' || k === 'e')) { e.preventDefault(); $('bNext').click(); } return; }
   if (!$('mapScr').hidden) { if (k === 'm' || k === 'escape') closeMap(); return; }
   if (ui.modalOpen) { if (k === 'escape' && $('mbox').querySelector('#mResume, #rClose, #sBack')) { const sb = $('sBack'); sb ? sb.click() : closeModal(); } return; }
+  if (PHOTO && MODE === 'city') { if (k === ' ' || k === 'enter') { e.preventDefault(); photoShutter(); } else if (k === 'escape') endPhoto(); else if (k === 'z' || k === '-' || k === 'q') photoZoom(6); else if (k === 'x' || k === '=' || k === '+') photoZoom(-6); if (['arrowup', 'arrowdown', 'arrowleft', 'arrowright', ' '].includes(k)) e.preventDefault(); return; }
   if ((MODE === 'city' || MODE === 'office') && k === 't') { e.preventDefault(); openCheat(); return; }
   if (MODE === 'city') {
     if (k === 'm') openMap(); else if (k === 'r') openRecords(); else if (k === 'b') openBag(); else if (k === 'k') openSkills(); else if (k === 'escape') openMenu();
@@ -4721,14 +4854,15 @@ function updateTouchUI() {
 // ===================== 互動判定 =====================
 let ACT = null;
 function findAction() {
-  if (MODE === 'office' && !PAUSE) { let best = null, bd = 2.0; for (const n of OFF.npcs) { if (Math.sign(OP.x) !== Math.sign(n.x) && (OP.z > 7.5 || OP.z < 2.5 || n.z > 7.5 || n.z < 2.5)) continue; const d = Math.hypot(OP.x - n.x, OP.z - n.z); if (d < bd) { bd = d; best = n; } } return best ? { kind: 'chat', npc: best, label: best.key === 'amy' ? '找 Amy（聊天／福利社）' : '和' + OFFICE_NPC[best.key].name.replace(/（.*）/, '') + '聊聊', sub: '不耗體力' } : null; }
-  if (MODE !== 'city' || PAUSE) return null;
+  if (MODE === 'office' && !PAUSE) { let best = null, bd = 2.0; for (const n of OFF.npcs) { if (Math.sign(OP.x) !== Math.sign(n.x) && (OP.z > 7.5 || OP.z < 2.5 || n.z > 7.5 || n.z < 2.5)) continue; const d = Math.hypot(OP.x - n.x, OP.z - n.z); if (d < bd) { bd = d; best = n; } } return best ? { kind: 'chat', npc: best, label: best.key === 'amy' ? '找家蓁（聊天／福利社）' : '和' + OFFICE_NPC[best.key].name.replace(/（.*）/, '') + '聊聊', sub: '不耗體力' } : null; }
+  if (MODE !== 'city' || PAUSE || PHOTO) return null;
   if (COP && !COP.done) return { kind: 'none', label: '交通警察在後面追你', sub: '逃不掉的，乖乖停車吧' };
   const d = (b) => Math.hypot(PLAYER.x - b.front.x, PLAYER.z - b.front.z);
-  if (G.target) { const b = BLD[G.target.bid]; if (d(b) < 8) { const o = OWN[G.target.oid]; return { kind: 'visit', label: G.target.kind === 'meet' ? '赴約見面' : '拜訪', sub: addrOf(b) + (G.target.kind === 'hh' && o.kase !== 2 && o.kase !== 6 ? ` · 交談體力 -${TALK_COST}` : '') }; } }
+  if (G.target) { const b = BLD[G.target.bid]; if (d(b) < 8) { const o = OWN[G.target.oid]; return { kind: 'visit', label: G.target.kind === 'meet' ? '赴約見面' : G.target.kind === 'race' ? '搶先拜訪屋主' : '拜訪', sub: addrOf(b) + (G.target.kind === 'hh' && o.kase !== 2 && o.kase !== 6 ? ` · 交談體力 -${TALK_COST}` : '') }; } }
   const ni = nearInfra(); if (ni) return ni.kind === 'mrt' ? { kind: 'mrt', e: ni.e, label: '搭乘捷運', sub: `${ni.e.name}站 · ${ni.e.line.name}（${ni.e.line.kind}）` } : { kind: 'under', u: ni.u, label: '走地下道', sub: '到馬路對面' };
   let best = null, bd = 7.5;
   for (const o of OWN) { if (o.appear > G.day) continue; const b = BLD[o.bid], dd = d(b); if (dd < bd) { bd = dd; best = o; } }
+  if (best && best.st.signed) { const by = buyerAt(best); return by ? { kind: 'show', o: best, by, label: '開始帶看', sub: `${by.name}（${by.kind}）· 體力 -${TALK_COST}` } : best.st.sold ? { kind: 'none', label: '日勝成交物件', sub: addrOf(BLD[best.bid]) + ` · 成交 ${fmtWan(best.st.dealPrice || best.price)}` } : { kind: 'photo', o: best, label: '拍攝屋況照片', sub: PLAYER.ride ? '先下車（F）才能拍照' : best.st.photo ? `目前最佳 ${starStr(photoStars(best.st.photo))}` : '好照片會帶來更多買方' }; }
   if (best) return best.st.signed ? { kind: 'none', label: '日勝專任物件', sub: addrOf(BLD[best.bid]) + ' · 已委託' } : best.st.lost ? { kind: 'none', label: '大鴻房屋專任', sub: '被阿豪搶走了' } : best.st.inv ? { kind: 'doc', o: best, label: '查看謄本', sub: '已調閱 · ' + addrOf(BLD[best.bid], best.unit) } : { kind: 'inv', o: best, label: '調閱電傳', sub: `體力 -${invCost()} · 查看二類謄本` };
   for (const b of STORES) if (d(b) < 6.5) return { kind: 'shop', label: '進入便利商店', sub: '買道具・補體力' };
   if (d(OFFICE) < 7.5) return { kind: 'office', label: '回公司下班', sub: '提早結束今天' };
@@ -4742,8 +4876,10 @@ function doAction() {
   else if (ACT.kind === 'mrt') openMRT(ACT.e);
   else if (ACT.kind === 'under') walkUnderpass(ACT.u);
   else if (ACT.kind === 'office') endDayPrompt(false);
-  else if (ACT.kind === 'chat') { if (ACT.npc.key === 'amy') { const n = ACT.npc; choice('Amy（行政秘書）', '<p class="quote">「要聊聊，還是去公司福利社買點東西？」</p>', [{ label: '聊聊', fn: () => officeChat(n) }, { label: '公司福利社', sub: `錢包 NT$${fmt(G.money)}`, fn: () => openShop('公司福利社') }, { label: '不用了', cls: 'ghost', fn: () => { } }]); } else officeChat(ACT.npc); }
+  else if (ACT.kind === 'chat') { if (ACT.npc.key === 'amy') { const n = ACT.npc; choice('家蓁（行政秘書）', '<p class="quote">「要聊聊，還是去公司福利社買點東西？」</p>', [{ label: '聊聊', fn: () => officeChat(n) }, { label: '領取派報 DM', sub: G.dm && G.dm.day === G.day ? '今天已經領過了' : '每天一疊，去社區發', fn: offerDM }, { label: '公司福利社', sub: `錢包 NT$${fmt(G.money)}`, fn: () => openShop('公司福利社') }, { label: '不用了', cls: 'ghost', fn: () => { } }]); } else officeChat(ACT.npc); }
   else if (ACT.kind === 'shop') openShop();
+  else if (ACT.kind === 'show') startShowing(ACT.o, ACT.by);
+  else if (ACT.kind === 'photo') startPhoto(ACT.o);
 }
 const CHAT_DECK = {};
 function officeChat(n) {
@@ -4771,10 +4907,10 @@ function fpLayers(on) { CAM.fp = on; CAM.fpMesh = PLAYER.mesh; [typeof SCOOTER_M
 {
   const g = $('gl'); g.addEventListener('contextmenu', e => e.preventDefault());
   g.addEventListener('pointerdown', e => { if (!(MODE === 'city' || MODE === 'office') || PAUSE) return; CAM.drag = { id: e.pointerId, x: e.clientX, y: e.clientY }; try { g.setPointerCapture(e.pointerId); } catch (_) { } g.classList.add('grabbing'); });
-  g.addEventListener('pointermove', e => { const d = CAM.drag; if (!d || d.id !== e.pointerId) return; CAM.yaw -= (e.clientX - d.x) * 0.006; CAM.pitch = clamp(CAM.pitch + (e.clientY - d.y) * 0.004, -0.05, 1.1); d.x = e.clientX; d.y = e.clientY; CAM.last = performance.now() / 1000; });
+  g.addEventListener('pointermove', e => { const d = CAM.drag; if (!d || d.id !== e.pointerId) return; CAM.yaw -= (e.clientX - d.x) * 0.006; CAM.pitch = clamp(CAM.pitch + (e.clientY - d.y) * 0.004, PHOTO ? -0.75 : -0.05, 1.1); d.x = e.clientX; d.y = e.clientY; CAM.last = performance.now() / 1000; });
   const up = e => { if (CAM.drag && CAM.drag.id === e.pointerId) { CAM.drag = null; g.classList.remove('grabbing'); } };
   g.addEventListener('pointerup', up); g.addEventListener('pointercancel', up);
-  g.addEventListener('wheel', e => { if (MODE !== 'city' && MODE !== 'office') return; e.preventDefault(); CAM.dist = clamp(CAM.dist + e.deltaY * 0.008, 4, 16); }, { passive: false });
+  g.addEventListener('wheel', e => { if (MODE !== 'city' && MODE !== 'office') return; e.preventDefault(); if (PHOTO) { photoZoom(e.deltaY > 0 ? 3 : -3); return; } CAM.dist = clamp(CAM.dist + e.deltaY * 0.008, 4, 16); }, { passive: false });
 }
 const WALK_BASIS = { yaw: 0, key: '' };
 function updateWalk(dt) {
@@ -4856,7 +4992,7 @@ function updateCityView(dt, rode) {
   updateLampLights(dt);
   if (!rode) updateWalk(dt);
   // 相機：拖曳轉視角，騎車時慢慢回正
-  { const fpNow = !!(VIEWS[CAM.view] || {}).fp && MODE === 'city'; if (fpNow !== CAM.fp || (fpNow && CAM.fpMesh !== PLAYER.mesh)) fpLayers(fpNow); }
+  { const fpNow = (!!(VIEWS[CAM.view] || {}).fp || !!PHOTO) && MODE === 'city'; if (fpNow !== CAM.fp || (fpNow && CAM.fpMesh !== PLAYER.mesh)) fpLayers(fpNow); }
   if (MODE === 'talk' && BT && BT.cam) talkCam(BT.cam.b, 1 - Math.pow(0.02, dt));
   else {
     CAM.yaw = Math.atan2(Math.sin(CAM.yaw), Math.cos(CAM.yaw));   // 保持在 ±180° 內，回正時才不會繞一大圈
@@ -4867,7 +5003,7 @@ function updateCityView(dt, rode) {
     if (CAM.turnBack && (CAM.drag || Math.abs(p.v) < 0.3 || Math.abs(CAM.yaw) < 0.08)) CAM.turnBack = false;
     if (CAM.turnBack) CAM.yaw *= Math.pow(0.25, dt);
     else if (p.ride && !CAM.drag && performance.now() / 1000 - CAM.last > 1.8 && Math.abs(p.v) > 1.5) CAM.yaw *= Math.pow(document.body.classList.contains('touch') && JOY.on ? 0.55 : 0.2, dt);
-    const V = VIEWS[CAM.view] || VIEWS[0], lookBack = MODE === 'city' && !PAUSE && !!KEY['c'], fp = !!V.fp && MODE === 'city';
+    const V = VIEWS[CAM.view] || VIEWS[0], lookBack = MODE === 'city' && !PAUSE && !PHOTO && !!KEY['c'], fp = (!!V.fp || !!PHOTO) && MODE === 'city';
     if (lookBack !== CAM.back) { CAM.back = lookBack; CAM.snap = true; }
     const yaw = p.h + CAM.yaw + (lookBack ? Math.PI : 0);
     if (fp) {
@@ -4876,7 +5012,8 @@ function updateCityView(dt, rode) {
       const ex = p.x + fz * seat + fx * (p.ride ? (p.car ? -0.25 : -0.05) : 0.15), ez = p.z - fx * seat + fz * (p.ride ? (p.car ? -0.25 : -0.05) : 0.15);
       const ey = gy0 + (p.ride ? (p.car ? 1.55 : 1.62) : 1.7) + (!p.ride && Math.abs(p.v) > 0.3 ? Math.abs(Math.sin(performance.now() / 160)) * 0.04 : 0);
       camera.position.set(ex, ey, ez); CAM.snap = false;
-      const tilt = Math.tan(clamp(CAM.pitch - 0.2, -0.45, 0.9)) * 10;
+      const tilt = Math.tan(clamp(CAM.pitch - 0.2, PHOTO ? -0.95 : -0.45, 0.9)) * 10;
+      if (PHOTO && camera.fov !== PHOTO.fov) { camera.fov = PHOTO.fov; camera.updateProjectionMatrix(); }
       camera.lookAt(ex + Math.sin(yaw) * 10, ey - tilt, ez + Math.cos(yaw) * 10);
     } else {
     const back = ((p.ride ? CAM.dist + (p.car ? 2.5 : 0) : CAM.dist * 0.72) + Math.abs(p.v) * (p.car ? 0.05 : 0.08)) * (V.k || 1);
@@ -4905,7 +5042,7 @@ function updateCityView(dt, rode) {
   } else { BEACON.visible = false; ROUTE.pts = []; }
   ACT = findAction();
   if (ACT && !PAUSE) { show('act', true); $('actTxt').textContent = ACT.label; $('actSub').textContent = ACT.sub; $('actBtn').disabled = ACT.kind === 'none'; } else show('act', false);
-  hudT -= dt; if (hudT <= 0) { hudT = 0.25; const name = streetNameAt(p.x, p.z); $('stName').textContent = name; $('stEn').textContent = STREET_EN[name] || ''; $('streetPlate').classList.toggle('lane', name.endsWith('巷')); updateHUD(); }
+  hudT -= dt; if (hudT <= 0) { hudT = 0.25; const name = streetNameAt(p.x, p.z); $('stName').textContent = name; $('stEn').textContent = STREET_EN[name] || ''; $('streetPlate').classList.toggle('lane', name.endsWith('巷')); updateHUD(); careerHud(); }
   miniT -= dt; if (miniT <= 0) { miniT = 1 / 20; drawMini(); drawSpeedo(p.ride ? Math.abs(p.v) * 3.6 : 0); $('spdTxt').textContent = !p.ride ? '步行' : (p.v < -0.2 ? '倒車 ' : '') + Math.round(Math.abs(p.v) * 3.6) + ' km/h';
     const nearBike = !p.ride && Math.hypot(p.x - PARK.x, p.z - PARK.z) < 2.6; $('rideBtn').disabled = !p.ride && !nearBike; $('rideBtn').classList.toggle('ready', nearBike); PARK_TAG.material.opacity = p.ride ? 0 : (nearBike ? 1 : 0.85); }
 }
@@ -4957,10 +5094,10 @@ function loop() {
   else if (MODE === 'city' || MODE === 'talk') { updateCity(dt); updateWorld(dt, t); }
   skyMesh.position.copy(camera.position);
   if (TALKNPC) { const u = TALKNPC.userData; u.armR.rotation.x = Math.sin(t * 3) * 0.15 - 0.2; u.head.rotation.y = Math.sin(t * 0.8) * 0.15; }
-  if (G) tutUpdate(dt);
+  if (G) { tutUpdate(dt); careerTick(dt); }
   updateTouchUI();
   if (window.__camOv) { const o = window.__camOv; camera.position.set(o[0], o[1], o[2]); camera.lookAt(o[3], o[4], o[5]); }
-  composer.render();
+  composer.render(); photoAfterRender();
 }
 function resize() {
   const w = innerWidth, h = innerHeight; renderer.setSize(w, h, false); composer.setSize(w, h); camera.aspect = w / h; camera.fov = w < h ? 75 : 62; camera.updateProjectionMatrix();
@@ -4995,7 +5132,7 @@ async function boot() {
   G = { day: 1, ap: 100, drift: 0, weather: { w: 'cloud', t: 29 } };
   setupSaleSigns(); G = null;
   $('boot').hidden = true; toTitle(); loop();
-  window.__fz = { MRT_EXITS, UNDER_EXITS, MRT_E, INFRA, makeVehMesh, makeHeavyMesh, makeMotoMesh, makePed, ACT: () => ACT, findAction, tutOwner, talk, BTg: () => BT, fillVars, AU, FROZEN: () => FROZEN, LAMPS, setupLampLights, BM, COPV: () => COPV, copWitness, KEY, updateCity, loop, playerHitsStatic, collideCity, pBox, OFF, makePerson, suitUp, scene, NODES, EDGES, FACES, LINES, H, CHUNKS, updateChunks, STREAM, nearestEdge, computeRoute, updateEvents, edgesNear, projectOnEdge, CORNERS, spawnPed, spawnVehicle, CAM, toggleRide, PARK, startPlayerChase, COP: () => COP, onNpcRedRun, EVENTS, rivalDayStart, openShop, openSkills, openAch, openBag, addXP, obbMTV, vBox, renderer, CORNER_BLD, PARKS, OFFICE: () => OFFICE, MRT_U, EXPWY, UNDERPASS, TSTAT, updateSignals, updateVehicles, updatePeds, PAUSE: () => PAUSE, BUB, say, camera, VEH, PEDS, TLC, BLD, OWN: () => OWN, G: () => G, POOLS, MODE: () => MODE, PLAYER, investigate, setTarget, visitTarget, endDay, ending, goalReached, OP };
+  window.__fz = { MRT_EXITS, UNDER_EXITS, MRT_E, INFRA, makeVehMesh, makeHeavyMesh, makeMotoMesh, makePed, ACT: () => ACT, findAction, tutOwner, talk, BTg: () => BT, fillVars, AU, FROZEN: () => FROZEN, LAMPS, setupLampLights, BM, COPV: () => COPV, copWitness, KEY, updateCity, loop, playerHitsStatic, collideCity, pBox, OFF, makePerson, suitUp, scene, NODES, EDGES, FACES, LINES, H, CHUNKS, updateChunks, STREAM, nearestEdge, computeRoute, updateEvents, edgesNear, projectOnEdge, CORNERS, spawnPed, spawnVehicle, CAM, toggleRide, PARK, startPlayerChase, COP: () => COP, onNpcRedRun, EVENTS, rivalDayStart, openShop, openSkills, openAch, openBag, addXP, obbMTV, vBox, renderer, CORNER_BLD, PARKS, OFFICE: () => OFFICE, MRT_U, EXPWY, UNDERPASS, TSTAT, updateSignals, updateVehicles, updatePeds, PAUSE: () => PAUSE, BUB, say, camera, VEH, PEDS, TLC, BLD, OWN: () => OWN, G: () => G, POOLS, MODE: () => MODE, PLAYER, investigate, setTarget, visitTarget, endDay, ending, goalReached, OP, startDM, offerDM, updateDM, startRace, careerDayStart, newBuyer, startShowing, negotiate, closeDeal, startPhoto, photoShutter, endPhoto, scorePhoto, PHOTO: () => PHOTO, liKey, famOf, addFam, gainIntel, ownerBattle, syncBuyers, buyerAt, RV: () => RV, enterOffice, enterCity, morningLines, answer, BUYER_MESH, DM_SPR, rivalAttempt };
 }
 
 // ===================== 交通建設：高架捷運、地下捷運、高架快速道路、行人地下道 =====================
@@ -5267,8 +5404,9 @@ function ensureState() {
   d('cnt', {}); const c = G.cnt; ['rej', 'guardWin', 'clueWin', 'help', 'fines', 'km', 'perfect', 'intel', 'dog', 'beatRival', 'buy'].forEach(k => { if (c[k] == null) c[k] = 0; });
   if (!c.alleys) c.alleys = []; if (!c.chatWho) c.chatWho = {};
   d('redRun', false); d('dayKm', 0); d('evT', 50); d('rival', null); d('lost', 0); d('rivalNews', null);
+  careerEnsure();
 }
-function decorateOwners() { OWN.forEach(o => { o.per = PERS_KEYS[Math.floor(mulberry32(G.seed + o.id * 131)() * PERS_KEYS.length)]; const s = o.st; if (s.intel == null) s.intel = 0; if (s.perKnown == null) s.perKnown = false; if (s.lost == null) s.lost = false; }); }
+function decorateOwners() { OWN.forEach(o => { o.per = PERS_KEYS[Math.floor(mulberry32(G.seed + o.id * 131)() * PERS_KEYS.length)]; const s = o.st; if (s.intel == null) s.intel = 0; if (s.perKnown == null) s.perKnown = false; if (s.lost == null) s.lost = false; careerDecorate(o); }); }
 const apMax = () => 100 + (G.skills ? G.skills.stamina * 10 : 0);
 const invCost = () => 10 - (G.skills ? G.skills.legs * 2 : 0);
 const TALK_COST = 20;
@@ -5314,7 +5452,7 @@ function openShop(title = '好鄰居便利商店') {
 function openBag() {
   if (!G || (MODE !== 'city' && MODE !== 'office')) return; sfx('click');
   const rows = SHOP.map(it => { const n = it.perm ? G.perm[it.k] : G.inv[it.k]; return `<li><div class="shT"><b>${it.name}</b><span>${it.perm ? `等級 ${n}/${it.perm}` : `× ${n}`}</span></div><p>${it.desc}</p>${it.k === 'coffee' ? `<button class="btn sm" id="useCoffee" ${!n || G.coffeeToday >= 2 ? 'disabled' : ''}>喝一罐</button>` : ''}</li>`; }).join('');
-  openModal(`<h3>背包 <small>錢包 NT$${fmt(G.money)}</small></h3><ul class="shop">${rows}</ul><p class="dim">手搖飲、伴手禮、實價登錄表要在交涉畫面裡使用。便利商店（地圖上的綠點）和公司櫃檯的 Amy 都能補貨。</p><div class="mbtns"><button class="btn" id="bagSkill">技能${G.sp ? `（${G.sp} 點可用）` : ''}</button><button class="btn ghost" id="bagBack">關閉</button></div>`, 'wide');
+  openModal(`<h3>背包 <small>錢包 NT$${fmt(G.money)}</small></h3><ul class="shop">${rows}</ul><p class="dim">手搖飲、伴手禮、實價登錄表要在交涉畫面裡使用。便利商店（地圖上的綠點）和公司櫃檯的家蓁 都能補貨。</p><div class="mbtns"><button class="btn" id="bagSkill">技能${G.sp ? `（${G.sp} 點可用）` : ''}</button><button class="btn ghost" id="bagBack">關閉</button></div>`, 'wide');
   const c = $('useCoffee'); if (c) c.onclick = () => { G.inv.coffee--; G.coffeeToday++; G.ap = Math.min(apMax() + 30, G.ap + 15); sfx('good'); updateHUD(); toast('喝了罐裝咖啡，體力 +15'); openBag(); };
   $('bagSkill').onclick = () => openSkills(openBag);
   $('bagBack').onclick = () => { sfx('cancel'); closeModal(); };
@@ -5324,8 +5462,8 @@ function openBag() {
 function gainIntel(o, reveal, why) {
   o.st.intel = Math.min(3, (o.st.intel || 0) + 1); G.cnt.intel++;
   let msg = `情報 +1：${o.sn}＊＊`;
-  if (reveal && !o.st.perKnown) { o.st.perKnown = true; msg += `是「${PERS[o.per].name}」——${PERS[o.per].hint}`; }
-  else if (why) msg += '，' + why;
+  const k = reveal ? revealSlot(o, typeof reveal === 'string' ? reveal : null) : null;
+  if (k) msg += SLOT_TXT[k](o); else if (why) msg += '，' + why;
   toast(msg, 'intel'); sfx('notify'); emit('intel', { o }); addXP(10);
 }
 function intelLine(o) { if (!o) return ''; const n = o.st.intel || 0; if (!n && !o.st.perKnown) return ''; return `情報 ${'●'.repeat(n)}${'○'.repeat(3 - n)}${o.st.perKnown ? `　${PERS[o.per].name}：${PERS[o.per].hint}` : '　個性未知'}`; }
@@ -5334,7 +5472,8 @@ function intelLine(o) { if (!o) return ''; const n = o.st.intel || 0; if (!n && 
 function battleSetup() {
   BT.miss = 0; BT.usedItems = {};
   if (BT.role === 'owner') { BT.res = BT.res0 = Math.max(40, BT.res - (BT.o.st.intel || 0) * 6); }
-  $('bIntel').textContent = BT.role === 'owner' ? intelLine(BT.o) : ''; $('bIntel').hidden = !$('bIntel').textContent;
+  $('bIntel').textContent = BT.role === 'owner' ? intelLine(BT.o) : BT.role === 'buyer' ? `${BT.cb.buyer.kind} · 開價 ${fmtWan(BT.o.price)}${BT.o.st.photo ? ' · 屋況照片 ' + starStr(photoStars(BT.o.st.photo)) : ' · 還沒有屋況照片'}` : ''; $('bIntel').hidden = !$('bIntel').textContent;
+  careerBattleSetup();
   renderBattleItems();
 }
 function battleOwnerPick(cand) {
@@ -5354,6 +5493,7 @@ function battleMult(q) {
 }
 function battleRoundShown(opts) {
   BT.opts = opts; BT.perBonus = false;
+  careerRoundShown();
   if (G.skills.insight && Math.random() < G.skills.insight * 0.15) strikeWrong('洞察');
   renderBattleItems();
 }
@@ -5368,8 +5508,9 @@ function renderBattleItems() {
   if (BT.role === 'owner') can.push(['gift', '伴手禮', '戒心 -15']);
   if (BT.role === 'guard' || BT.role === 'neighbor' || BT.role === 'clue') can.push(['drink', '手搖飲', '戒心 -20']);
   if (BT.role !== 'stranger') can.push(['ref', '實價登錄表', '劃掉錯誤選項']);
-  box.innerHTML = can.map(([k, n, d]) => `<button class="itm" data-k="${k}" ${!G.inv[k] || BT.usedItems[k] || (k === 'ref' && $('bOpts').hidden) ? 'disabled' : ''}>${n} ×${G.inv[k]}<small>${d}</small></button>`).join('');
-  box.querySelectorAll('.itm').forEach(b => b.onclick = () => useBattleItem(b.dataset.k));
+  careerBattleItems(can);
+  box.innerHTML = can.map(([k, n, d]) => k === 'hob' ? `<button class="itm hob" data-k="hob">${n}<small>${d}</small></button>` : `<button class="itm" data-k="${k}" ${!G.inv[k] || BT.usedItems[k] || (k === 'ref' && $('bOpts').hidden) ? 'disabled' : ''}>${n} ×${G.inv[k]}<small>${d}</small></button>`).join('');
+  box.querySelectorAll('.itm').forEach(b => b.onclick = () => b.dataset.k === 'hob' ? useHobby() : useBattleItem(b.dataset.k));
 }
 function useBattleItem(k) {
   if (!BT || !G.inv[k] || BT.usedItems[k]) return;
@@ -5379,6 +5520,7 @@ function useBattleItem(k) {
 }
 function battleAnswered(q) { if (q === 0) BT.miss++; if (q === 2) { emit('q2'); addXP(6); } if (BT.perBonus) $('bCoach').insertAdjacentHTML('beforeend', ' <b class="q2">情報加成</b>'); renderBattleItems(); }
 function battleFinished(bt, win) {
+  careerBattleFinished(bt, win);
   emit('talk', { role: bt.role });
   if (bt.role === 'owner') {
     if (win) {
@@ -5483,8 +5625,8 @@ const EVENTS = [
   { id: 'granny', w: 3, run: () => {
     const p = nearPed(); if (p) say(p, '少年仔，借問一下！', 3);
     choice('阿嬤問路', '<p class="quote">「少年仔，請問菜市場怎麼走？我在這附近繞了好久……」</p><p class="dim">阿嬤提著菜籃，看起來有點累。</p>', [
-      { label: '親自帶她過去', sub: '體力 -10', fn: () => { G.ap = Math.max(0, G.ap - 10); updateHUD(); G.cnt.help++; G.contacts++; emit('help'); addXP(30); const t = OWN.filter(o => o.st.inv && !o.st.perKnown && !o.st.signed);
-        if (t.length && Math.random() < 0.5) { const o = pk(t, Math.random); dialog([{ name: '阿嬤', text: `你在做房仲喔？${o.sn}家那個喔，我認識啦！` }, { name: '阿嬤', text: PERS[o.per].obs.replace('門口', '他家門口') + '你去找他要注意喔。' }], () => gainIntel(o, true)); }
+      { label: '親自帶她過去', sub: '體力 -10', fn: () => { G.ap = Math.max(0, G.ap - 10); updateHUD(); G.cnt.help++; G.contacts++; emit('help'); addXP(30); const t = OWN.filter(o => o.st.inv && !o.st.perKnown && !o.st.signed && !o.st.lost);
+        if (t.length && Math.random() < 0.5) { const o = pk(t, Math.random); dialog([{ name: '阿嬤', text: `你在做房仲喔？${o.sn}家那個喔，我認識啦！` }, { name: '阿嬤', text: PERS[o.per].obs.replace('門口', '他家門口') + '你去找他要注意喔。' }], () => gainIntel(o, 'per')); }
         else toast('阿嬤一直跟你道謝（人脈 +1）'); } },
       { label: '幫她指個方向', fn: () => { addXP(8); toast('阿嬤點點頭，慢慢走遠了'); } },
       { label: '我在趕時間', cls: 'ghost', fn: () => { } }]);
@@ -5496,9 +5638,9 @@ const EVENTS = [
     { label: '買一份', sub: 'NT$50 · 體力 +15', dis: G.money < 50, fn: () => { addMoney(-50); G.ap += 15; updateHUD(); toast('香腸好吃，體力 +15'); } },
     { label: '試吃一塊就好', sub: '體力 +5', fn: () => { G.ap += 5; updateHUD(); } }]) },
   { id: 'classmate', w: 2, run: () => {
-    const t = OWN.filter(o => o.appear <= G.day && !o.st.signed && !o.st.lost && !(o.st.perKnown && o.st.intel >= 3));
+    const t = OWN.filter(o => o.appear <= G.day && !o.st.signed && !o.st.lost && !o.st.perKnown);
     if (!t.length) return false; const o = pk(t, Math.random), b = BLD[o.bid];
-    dialog([{ name: '國中同學', text: `欸！${G.name}！好久不見，你在做房仲喔？` }, { name: '國中同學', text: `${b.street}那間在賣的，屋主是我遠房親戚啦。` }, { name: '國中同學', text: `他是「${PERS[o.per].name}」的人，${PERS[o.per].hint}。你要去的話自己小心。` }], () => gainIntel(o, true));
+    dialog([{ name: '國中同學', text: `欸！${G.name}！好久不見，你在做房仲喔？` }, { name: '國中同學', text: `${b.street}那間在賣的，屋主是我遠房親戚啦。` }, { name: '國中同學', text: `他是「${PERS[o.per].name}」的人，${PERS[o.per].hint}。你要去的話自己小心。` }], () => gainIntel(o, 'per'));
   } },
   { id: 'chief', w: 1, run: () => choice('里長發傳單', '<p class="quote">「我是這裡的里長啦！你是房仲喔？要不要我在里民 LINE 群組幫你宣傳一下？」</p>', [
     { label: '贊助里民活動', sub: 'NT$300 · 人脈 +2', dis: G.money < 300, fn: () => { addMoney(-300); G.contacts += 2; addXP(20); toast('里長答應幫你宣傳（開發信回電機率提升）'); } },
@@ -5621,6 +5763,7 @@ function updateRival(dt) {
   if (dp < 8 && !updateRival.cd && MODE === 'city' && !PAUSE) { updateRival.cd = 1; say(RIVAL_PROXY, pk(['菜鳥，讓開啦！', '這區是我的地盤喔！', '你也來搶喔？太慢了啦！'], Math.random), 2.6); setTimeout(() => updateRival.cd = 0, 15000); }
 }
 function rivalAttempt(o) {
+  if (raceRivalArrives(o)) { rivalRetarget(); return; }
   const R_ = G.rival, chance = R_.today >= 1 ? 0 : 0.2 + Math.min(0.15, G.day * 0.006);
   if (Math.random() < chance) {
     o.st.lost = true; R_.today++; G.lost++; refreshSign(o); G.rivalNews = addrOf(BLD[o.bid]);
@@ -5649,6 +5792,453 @@ function setupStores() {
 let STORE_MAT = null;
 
 if (document.body.classList.contains('touch')) $('qBox').classList.remove('open');
+
+// ===================== 業務生涯：社區熟悉度、派報、情報卡、急件、搶件賽、帶看成交、屋況拍照 =====================
+
+// ---------- 資料 ----------
+const LI_NAMES = ['福德', '興隆', '永安', '仁愛', '博愛', '民生', '民權', '中正', '光明', '長春', '和平', '自強', '復興', '建國', '文化', '信義', '忠孝', '新興', '永和', '太平',
+  '安樂', '吉祥', '龍泉', '鳳山', '華山', '瑞豐', '明德', '崇德', '立德', '育英', '振興', '中興', '新生', '文昌', '福安', '富民', '惠安', '嘉興', '長樂', '永寧',
+  '泰安', '樂群', '莒光', '勝利', '大同', '正義', '中華', '青山', '翠華', '松柏', '竹林', '梅花', '蘭亭', '菊村', '荷塘', '柳營', '楓林', '桂林', '榮華', '鼎盛',
+  '金山', '銀川', '玉泉', '寶珠', '錦華', '春暉', '秋陽', '冬青', '夏荷', '晨曦', '晴光', '彩虹', '雲霞', '星辰', '月光', '日新', '海光', '港口', '漁村', '南華',
+  '北辰', '東昇', '西園', '廣福', '德興', '安和', '康寧', '昌平', '仁德', '光復', '五福', '四維', '三民', '二聖', '一心', '百齡', '千秋', '萬壽', '承天', '朝陽'];
+const OWNER_JOBS = [
+  { n: '退休公務員', prep: '你準備了退休族換屋的稅費試算' }, { n: '國小老師', prep: '你把附近學區的資料整理得清清楚楚' }, { n: '工程師', prep: '你帶了一份用數據說話的行情分析' },
+  { n: '傳統市場攤商', prep: '你挑了他收攤後的時間，講話直來直往' }, { n: '診所護理師', prep: '你把流程寫成一頁，不浪費她的時間' }, { n: '小吃店老闆', prep: '你先去他店裡吃了一碗，開場就有話聊' },
+  { n: '貨車司機', prep: '你把重點濃縮成三句話' }, { n: '銀行行員', prep: '你準備了貸款與資金規劃的試算表' }, { n: '退休軍人', prep: '你站得筆直，講話有條有理' },
+  { n: '保險業務', prep: '你用同為業務的角度跟他交流' }, { n: '水電師傅', prep: '你帶了屋況與修繕的估價單' }, { n: '大學教授', prep: '你準備了區域發展與都市計畫的資料' },
+];
+const HOBBIES = [
+  { n: '釣魚', rep: '（眼睛一亮）你也有在釣喔？上禮拜我在堤防釣到一尾快一斤的！' }, { n: '爬山', rep: '你也爬山喔？我每個禮拜六都去柴山，空氣好啊。' },
+  { n: '泡茶', rep: '（笑了）來來來，坐下喝一杯。這是我朋友自己種的高山茶。' }, { n: '種花', rep: '你有注意到我門口那盆蘭花喔？那盆我養了十年了。' },
+  { n: '看棒球', rep: '昨天那場九局下逆轉你有看嗎？我在電視前面跳起來！' }, { n: '跳廣場舞', rep: '（不好意思地笑）被你知道了，每天晚上在公園跳啦。' },
+  { n: '下象棋', rep: '你會下棋喔？改天來殺一盤，我讓你一隻車。' }, { n: '拜拜', rep: '對啊，我每個月初一十五都去拜。做人要知道感恩。' },
+  { n: '唱卡拉OK', rep: '哈哈，我最愛唱〈愛拼才會贏〉，改天一起去唱！' }, { n: '養狗', rep: '（蹲下摸了摸腳邊的狗）牠叫旺財，很乖吧？' },
+];
+const TABOOS = [
+  { n: '被殺價', opt: '老實說這間開價偏高，建議您先降個一兩成，比較好賣。', rep: '我的房子哪裡不值這個錢？你根本不懂！' },
+  { n: '被催簽約', opt: '您今天先簽，價格我們之後再慢慢談就好。', rep: '催什麼催？我最討厭被人催！' },
+  { n: '被批評裝潢', opt: '這種舊裝潢買方都會打掉重做，您不用太在意。', rep: '這裝潢是我親手設計的，你說打掉就打掉？' },
+  { n: '聽人說同業壞話', opt: '大鴻房屋賣得比較慢，給我們日勝比較快啦。', rep: '靠說別人壞話來拉生意？我最看不起這種人。' },
+  { n: '被問家務事', opt: '冒昧問一下，房子是不是要分給兄弟姊妹？', rep: '我家的事跟你有什麼關係？' },
+  { n: '被說風水不好', opt: '這間格局風水不太好，所以早點賣掉也好。', rep: '你說我家風水不好？呸呸呸！' },
+];
+const URGENT_WHY = ['要移民，月底前想把房子處理掉', '換了工作要搬到北部', '兄弟分遺產，大家說好盡快賣掉', '做生意需要一筆週轉金', '已經買好新房子，舊的要趕快賣', '小孩出國念書需要一筆錢'];
+const BUYER_KIND = [['首購的年輕夫妻'], ['換屋的小家庭'], ['退休的夫妻'], ['準備結婚的新人'], ['在附近上班的工程師'], ['幫小孩看房子的媽媽', 1], ['幫女兒看房子的爸爸', 0], ['想就近照顧爸媽的上班族']];
+const UNIT_PRICE = { 白雲區: 27, 鳳鳴區: 34, 青埔區: 23, 松濤區: 31 };       // 萬/坪
+const FLOOR_K = { nostalgic: 0.95, calc: 0.92, suspicious: 0.95, busy: 0.93, proud: 0.97, family: 0.94 };   // 屋主心中底價 ÷ 開價
+
+// ---------- 狀態 ----------
+function careerEnsure() {
+  const d = (k, v) => { if (G[k] === undefined || G[k] === null) G[k] = v; };
+  d('fam', {}); d('buyers', []); d('deals', 0); d('dealAmt', 0); d('dm', null); d('race', null);
+  const c = G.cnt; ['dmDone', 'raceWin', 'urgentWin', 'deal', 'photo5', 'taboo'].forEach(k => { if (c[k] == null) c[k] = 0; });
+}
+function careerDecorate(o) {
+  const R = mulberry32(G.seed * 7 + o.id * 977 + 13), b = BLD[o.bid];
+  o.job = Math.floor(R() * OWNER_JOBS.length); o.hob = Math.floor(R() * HOBBIES.length); o.tab = Math.floor(R() * TABOOS.length);
+  const ping = (o.floorsArea.reduce((a, c) => a + c, 0) + o.balc) * 0.3025, tk = b.type === 'tower' ? 1.12 : b.type === 'apt' ? 1 : 0.92;
+  o.price = Math.max(580, Math.round(ping * UNIT_PRICE[district(b.cx, b.cz)] * tk * (0.86 + R() * 0.28) / 10) * 10);
+  o.floor0 = Math.round(o.price * (FLOOR_K[o.per] || 0.94) * (0.98 + R() * 0.03));
+  const s = o.st; ['jobK', 'hobK', 'tabK', 'sold', 'dm'].forEach(k => { if (s[k] == null) s[k] = false; }); if (s.photo == null) s.photo = 0;
+}
+const fmtWan = n => fmt(Math.round(n)) + ' 萬';
+
+// ---------- 里（社區）與熟悉度 ----------
+const LI_SIZE = 240, LI_N = Math.ceil(2 * EXT / LI_SIZE);
+const liKey = (x, z) => clamp(Math.floor((x + EXT) / LI_SIZE), 0, LI_N - 1) * LI_N + clamp(Math.floor((z + EXT) / LI_SIZE), 0, LI_N - 1);
+const liName = k => LI_NAMES[k % LI_NAMES.length] + '里';
+const liOf = b => liKey(b.fx, b.fz);
+const famOf = k => (G && G.fam && G.fam[k]) || 0;
+const famStars = n => Math.min(5, Math.floor(n / 20));
+const starStr = (n, max = 5) => '★'.repeat(n) + '☆'.repeat(max - n);
+const famOwner = o => famOf(liOf(BLD[o.bid]));
+function addFam(k, n) {
+  const a = famOf(k), b = clamp(a + n, 0, 100); G.fam[k] = b;
+  if (famStars(b) > famStars(a)) { toast(`${liName(k)}的熟悉度提升到 ${starStr(famStars(b))}`, 'star'); sfx('quest'); }
+}
+function famOwnerAct(o, n) { if (o) addFam(liOf(BLD[o.bid]), n); }
+function careerHud() {
+  const el = $('liTag'); if (!el || !G || !G.fam) return;
+  const k = liKey(PLAYER.x, PLAYER.z), f = famOf(k);
+  el.textContent = `${liName(k)} · 熟悉度 ${starStr(famStars(f))}`;
+}
+
+// ---------- 派報 ----------
+let DM_G = null; const DM_SPR = {};
+function dmSprite() { const c = cvs(160, 120), x = c.getContext('2d'); x.fillStyle = '#1f6fd0'; x.beginPath(); x.roundRect(8, 8, 144, 88, 14); x.fill(); x.strokeStyle = '#fff'; x.lineWidth = 6; x.stroke(); x.beginPath(); x.moveTo(20, 22); x.lineTo(80, 62); x.lineTo(140, 22); x.stroke(); x.fillStyle = '#fff'; x.font = `900 34px ${FONT_SANS}`; x.textAlign = 'center'; x.fillText('DM', 80, 88); x.fillStyle = '#1f6fd0'; x.beginPath(); x.moveTo(66, 96); x.lineTo(80, 116); x.lineTo(94, 96); x.fill();
+  const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: texFrom(c, false), depthTest: false, transparent: true })); s.scale.set(1.8, 1.35, 1); s.renderOrder = 6; return s; }
+function syncDM() {
+  if (!DM_G) { DM_G = new THREE.Group(); scene.add(DM_G); }
+  const want = new Set(G && G.dm && G.dm.day === G.day ? G.dm.stops.filter(b => !G.dm.done.includes(b)) : []);
+  for (const k in DM_SPR) if (!want.has(+k)) { DM_G.remove(DM_SPR[k]); delete DM_SPR[k]; }
+  for (const bid of want) if (!DM_SPR[bid]) { const b = BLD[bid], s = dmSprite(); s.position.set(b.door.x + b.n.x * 1.4, b.y + 2.7, b.door.z + b.n.z * 1.4); DM_G.add(s); DM_SPR[bid] = s; }
+}
+function dmChoices() {
+  const cnt = {};
+  for (const b of BLD) { if (b.store || b === OFFICE) continue; const k = liOf(b); (cnt[k] || (cnt[k] = { k, n: 0, sale: 0, x: 0, z: 0 })); cnt[k].n++; cnt[k].x += b.fx; cnt[k].z += b.fz; }
+  for (const o of activeOwners()) if (!o.st.signed && !o.st.lost) { const c = cnt[liOf(BLD[o.bid])]; if (c) c.sale++; }
+  return Object.values(cnt).filter(c => c.n >= 12).map(c => ({ ...c, x: c.x / c.n, z: c.z / c.n, d: Math.hypot(c.x / c.n - OFFICE.fx, c.z / c.n - OFFICE.fz) }))
+    .sort((a, b) => a.d - b.d).slice(0, 6).sort((a, b) => b.sale - a.sale).slice(0, 3);
+}
+function offerDM() {
+  if (G.dm && G.dm.day === G.day) { choice('派報', `<p class="quote">家蓁：「今天的 DM 已經給你了喔，${liName(G.dm.li)}還有 ${G.dm.stops.length - G.dm.done.length} 戶沒發。」</p>`, [{ label: '好', fn: () => { } }]); return; }
+  const L = dmChoices();
+  choice('領取派報 DM', `<p class="quote">家蓁：「這是今天印好的 DM，一疊 12 份。挑一個里去發吧！」</p><p class="dim">騎車或走路經過標著藍色「DM」的住戶門口就會自動投遞。發完整條路線，那個里的熟悉度會大幅提升，屋主也比較願意回電。</p>`,
+    L.map(c => ({ label: liName(c.k), sub: `掛售 ${c.sale} 間 · 熟悉度 ${starStr(famStars(famOf(c.k)))} · 距公司 ${Math.round(c.d)} 公尺`, fn: () => startDM(c.k) })).concat([{ label: '今天先不用', cls: 'ghost', fn: () => { } }]));
+}
+function startDM(k) {
+  const pool = BLD.filter(b => !b.store && b !== OFFICE && liOf(b) === k);
+  const stops = []; let cx = OFFICE.fx, cz = OFFICE.fz; const left = pool.slice();
+  // 從離公司最近的一戶開始，每次走到最近的下一戶，排成一條順路的路線
+  while (stops.length < 12 && left.length) { let bi = 0, bd = 1e9; left.forEach((b, i) => { const d = Math.hypot(b.fx - cx, b.fz - cz); if (d < bd) { bd = d; bi = i; } }); const b = left.splice(bi, 1)[0]; stops.push(b.id); cx = b.fx; cz = b.fz; for (let j = left.length - 1; j >= 0; j--) if (Math.hypot(left[j].fx - b.fx, left[j].fz - b.fz) < 9) left.splice(j, 1); }
+  G.dm = { day: G.day, li: k, stops, done: [], t0: 0 }; sfx('letter'); syncDM();
+  toast(`領到 12 份 DM：去${liName(k)}發吧（地圖上的藍色方塊）`, 'quest');
+}
+function updateDM() {
+  const D = G.dm; if (!D || D.day !== G.day || D.done.length >= D.stops.length) return;
+  for (const bid of D.stops) {
+    if (D.done.includes(bid)) continue; const b = BLD[bid];
+    if (Math.hypot(PLAYER.x - b.front.x, PLAYER.z - b.front.z) < 5.5 || Math.hypot(PLAYER.x - b.door.x, PLAYER.z - b.door.z) < 3.2) {
+      D.done.push(bid); addFam(D.li, 2); sfx('letter'); floatText('DM ' + D.done.length + '/' + D.stops.length, 'xp'); syncDM(); emit('dm');
+      if (D.done.length >= D.stops.length) completeDM();
+      break;
+    }
+  }
+}
+function completeDM() {
+  const D = G.dm; addFam(D.li, 10); G.cnt.dmDone++; addXP(60); addMoney(300); sfx('quest');
+  OWN.forEach(o => { if (!o.st.signed && !o.st.lost && liOf(BLD[o.bid]) === D.li) o.st.dm = true; });
+  toast(`${liName(D.li)}的 DM 發完了！熟悉度大幅提升，公司派報獎金 NT$300`, 'quest');
+  const t = OWN.filter(o => o.appear <= G.day && !o.st.signed && !o.st.lost && liOf(BLD[o.bid]) === D.li && !(o.st.perKnown && o.st.jobK && o.st.hobK && o.st.tabK));
+  if (t.length && Math.random() < 0.5) setTimeout(() => { if (MODE !== 'city' || ui.modalOpen || DLG) return; const o = pk(t, Math.random), p = nearPed(); if (p) say(p, '欸，你是發 DM 的那個喔？', 3);
+    dialog([{ name: '路過的阿姨', text: '欸，你是發 DM 的那個房仲喔？' }, { name: '路過的阿姨', text: `${BLD[o.bid].street}在賣的那間喔，屋主${o.sn}${o.g ? '小姐' : '先生'}我認識啦，我跟你講……` }], () => gainIntel(o, true)); }, 1800);
+}
+
+// ---------- 情報卡 ----------
+const SLOT_TXT = {
+  per: o => `個性是「${PERS[o.per].name}」——${PERS[o.per].hint}`,
+  job: o => `職業是${OWNER_JOBS[o.job].n}（交涉時戒心 -10）`,
+  hob: o => `喜歡${HOBBIES[o.hob].n}（交涉時可以聊這個話題）`,
+  tab: o => `最忌諱${TABOOS[o.tab].n}（交涉時會幫你標出地雷選項）`,
+};
+const slotKnown = (o, k) => k === 'per' ? o.st.perKnown : o.st[k + 'K'];
+function revealSlot(o, prefer) {
+  const unk = ['per', 'job', 'hob', 'tab'].filter(k => !slotKnown(o, k)); if (!unk.length) return null;
+  const k = prefer && unk.includes(prefer) ? prefer : unk.includes('per') && Math.random() < 0.5 ? 'per' : pk(unk, Math.random);
+  if (k === 'per') o.st.perKnown = true; else o.st[k + 'K'] = true;
+  return k;
+}
+function cardHtml(o) {
+  const cell = (lbl, k, val) => `<div class="icard${slotKnown(o, k) ? ' on' : ''}"><small>${lbl}</small><b>${slotKnown(o, k) ? val : '？？？'}</b></div>`;
+  return `<div class="icards">${cell('個性', 'per', PERS[o.per].name)}${cell('職業', 'job', OWNER_JOBS[o.job].n)}${cell('喜好', 'hob', HOBBIES[o.hob].n)}${cell('忌諱', 'tab', TABOOS[o.tab].n)}</div>`;
+}
+function careerIntelLine(o) {
+  const parts = [];
+  if (o.st.jobK) parts.push('職業：' + OWNER_JOBS[o.job].n); if (o.st.hobK) parts.push('喜好：' + HOBBIES[o.hob].n); if (o.st.tabK) parts.push('忌諱：' + TABOOS[o.tab].n);
+  const f = famOwner(o); if (f >= 20) parts.push(`${liName(liOf(BLD[o.bid]))}熟悉度 ${starStr(famStars(f))}`);
+  return parts.join(' · ');
+}
+
+// ---------- 交涉加成 ----------
+function careerBattleSetup() {
+  const o = BT.o; if (!o) return;
+  let cut = 0; const notes = [];
+  if (BT.role === 'owner') {
+    const f = Math.round(famOwner(o) * 0.2); if (f) { cut += f; notes.push(`社區熟悉度 -${f}`); }
+    if (o.st.jobK) { cut += 10; notes.push(OWNER_JOBS[o.job].prep + ' -10'); }
+    if (o.st.urgent) { cut += 15; notes.push('屋主急著賣 -15'); }
+    if (BT.cb.race) { cut += 12; notes.push('搶先阿豪一步 -12'); }
+    BT.tabooRound = ri(2, 4, Math.random); BT.hobUsed = false;
+  } else if (BT.role === 'guard' || BT.role === 'neighbor' || BT.role === 'clue') {
+    const f = Math.round(famOwner(o) * 0.25); if (f) { cut += f; notes.push(`社區熟悉度 -${f}`); }
+  }
+  if (cut) { BT.res = BT.res0 = Math.max(30, BT.res - cut); setBars && $('bRes') && setBars(); }
+  const extra = careerIntelLine(o);
+  if (BT.role === 'owner' || notes.length) { const t = [$('bIntel').textContent, BT.role === 'owner' ? extra : '', notes.length ? '戒心加成：' + notes.join('、') : ''].filter(Boolean).join('　'); $('bIntel').textContent = t; $('bIntel').hidden = !t; }
+}
+function careerOpts(opts) {
+  if (!BT || BT.role !== 'owner' || BT.round !== BT.tabooRound) return;
+  const i = opts.findIndex(op => op.q === 0); if (i < 0) return;
+  opts[i] = { t: TABOOS[BT.o.tab].opt, q: 0, taboo: true };
+}
+function careerRoundShown() {
+  if (!BT || BT.role !== 'owner') return;
+  const i = BT.opts.findIndex(op => op.taboo); if (i < 0 || !BT.o.st.tabK) return;
+  const el = $('bOpts').querySelectorAll('.opt')[i]; if (!el || el.classList.contains('struck')) return;
+  el.classList.add('struck'); el.disabled = true; el.insertAdjacentHTML('beforeend', `<em class="stk">情報：他最忌諱${TABOOS[BT.o.tab].n}</em>`);
+}
+function careerTabooHit() {
+  const o = BT.o, T = TABOOS[o.tab];
+  BT.conf -= Math.round(ROLE.owner.bad * 0.6); BT.res = Math.min(BT.res0, BT.res + 8); G.cnt.taboo++;
+  if (!o.st.tabK) { o.st.tabK = true; setTimeout(() => toast(`踩到地雷了！${o.sn}＊＊最忌諱${T.n}（已記在情報卡）`, 'warn'), 400); }
+  return '（臉色大變）' + T.rep;
+}
+function careerBattleItems(can) {
+  if (BT && BT.role === 'owner' && BT.o.st.hobK && !BT.hobUsed) can.unshift(['hob', '聊' + HOBBIES[BT.o.hob].n, '戒心 -18']);
+}
+function useHobby() {
+  if (!BT || BT.hobUsed) return; BT.hobUsed = true; BT.res = Math.max(1, BT.res - 18); setBars(); shake('enemy'); sfx('good');
+  toast(`${BT.name}：「${HOBBIES[BT.o.hob].rep}」`); renderBattleItems();
+}
+function careerBattleFinished(bt, win) {
+  const o = bt.o;
+  if (bt.role === 'owner') {
+    famOwnerAct(o, 3);
+    if (win) {
+      if (o.st.urgent) { o.st.urgent = null; G.cnt.urgentWin++; addMoney(3000); addXP(60); toast('急件簽下來了！急件獎金 NT$3,000', 'star'); }
+      if (bt.cb.race) { G.cnt.raceWin++; addMoney(2000); addXP(80); toast('搶件賽獲勝！公司加發 NT$2,000', 'star'); }
+      o.st.signDay = G.day;
+    } else if (!o.st.jobK && Math.random() < 0.4) { o.st.jobK = true; G.cnt.intel++; setTimeout(() => toast(`雖然沒談成，但你從聊天中得知：${o.sn}＊＊的職業是${OWNER_JOBS[o.job].n}`, 'intel'), 900); }
+    if (G.race && G.race.oid === o.id) G.race = null;
+  } else if (bt.role === 'buyer' && bt.cb.buyer) { bt.cb.buyer.conf = bt.conf; bt.cb.buyer.miss = bt.miss; addXP(win ? 40 : 10); }
+  else if (bt.role !== 'stranger') famOwnerAct(o, 2);
+}
+
+// ---------- 急件 ----------
+function careerDayStart() {
+  // 急件到期：沒簽下來就被別家接走
+  for (const o of OWN) if (o.st.urgent && o.st.urgent.until < G.day) { o.st.urgent = null; if (!o.st.signed && !o.st.lost) { o.st.lost = true; G.lost++; G.urgentNews = addrOf(BLD[o.bid]); if (G.target && G.target.oid === o.id) G.target = null; } refreshSign(o); }
+  if (G.race) G.race = null;
+  // 買方：昨天約了沒去帶看的，今天就不等了
+  const missed = G.buyers.filter(b => b.st === 'wait' && b.day < G.day); if (missed.length) G.buyerMissed = missed.map(b => b.name).join('、');
+  G.buyers = G.buyers.filter(b => b.st === 'wait' && b.day >= G.day);
+  G.urgentNew = null; G.buyerNew = [];
+  if (G.day >= 2 && !OWN.some(o => o.st.urgent) && Math.random() < 0.45) {
+    const c = activeOwners().filter(o => !o.st.signed && !o.st.lost && !o.tut);
+    if (c.length) { const o = pk(c, Math.random); o.st.urgent = { until: G.day + 1, why: pk(URGENT_WHY, Math.random) }; G.urgentNew = o.id; refreshSign(o); if (!G.target) G.target = { kind: 'meet', oid: o.id, bid: o.bid }; }
+  }
+  // 委託物件：有廣告就有買方詢問（屋況照片越漂亮，買方越多）
+  let n = 0;
+  for (const o of shuffle(OWN.filter(o => o.st.signed && !o.st.sold && (o.st.signDay || 0) < G.day))) {
+    if (n >= 2 || G.buyers.some(b => b.oid === o.id)) continue;
+    const stars = photoStars(o.st.photo);
+    if (Math.random() < 0.3 + stars * 0.09) { n++; G.buyers.push(newBuyer(o)); G.buyerNew.push(o.id); }
+  }
+}
+function careerMorning(L) {
+  const S = 'Simon 店長';
+  if (G.urgentNews) { L.push({ name: S, text: `${G.urgentNews}那個急件，屋主等不到人，已經給別家賣了。下次動作要快。` }); G.urgentNews = null; }
+  if (G.buyerMissed) { L.push({ name: S, text: `昨天約好的買方${G.buyerMissed}說等不到你，去看別家了。帶看要準時啊！` }); G.buyerMissed = null; }
+  if (G.urgentNew != null) { const o = OWN[G.urgentNew], b = BLD[o.bid]; L.push({ name: S, text: `剛剛有位${ownerName(o)}打來公司，說${o.st.urgent.why}，房子在${addrOf(b)}。` }, { name: S, text: '他今明兩天都會在房子那邊，你先過去跟他談！急件簽下來獎金加倍，我已經幫你設好導航了。' }); }
+  for (const oid of G.buyerNew || []) { const o = OWN[oid], by = G.buyers.find(b => b.oid === oid); if (!by) continue;
+    L.push({ name: S, text: `好消息！有一組${by.kind}，${by.name}，看到${BLD[o.bid].street}那間的廣告，約今天到現場看屋。` });
+    if (!o.st.photo) L.push({ name: S, text: '那間還沒有屋況照片喔。拍幾張漂亮的照片放上網，買方詢問會多很多。' }); }
+  if ((G.buyerNew || []).length) L.push({ name: S, text: '帶看的時候，買方會在房子門口等你。打開謄本紀錄（R）就能導航過去。' });
+  if (G.day === 2 && !G.cnt.dmDone) L.push({ name: S, text: '對了，櫃檯的家蓁那邊每天都有印好的 DM。去社區派報，大家認識你之後，屋主比較願意回電。' });
+}
+
+// ---------- 搶件賽 ----------
+function canRace() { return G.rival && G.day >= 3 && !G.race && !G.target && hourNow() < 18 && !COP && !DLG; }
+function startRace() {
+  const c = rivalCandidates().filter(o => o.st.lastDay !== G.day && !o.st.urgent).map(o => ({ o, d: Math.hypot(BLD[o.bid].front.x - PLAYER.x, BLD[o.bid].front.z - PLAYER.z) })).filter(e => e.d > 220 && e.d < 620);
+  if (!c.length) return false;
+  const { o, d } = pk(c, Math.random), b = BLD[o.bid];
+  // 阿豪的出發點：跟你到物件的距離差不多（略遠一點），公平競爭
+  let best = null, bs = 1e9;
+  for (const n of NODES) { if (!n.edges.some(id => !EDGES[id].alley)) continue; const dn = Math.hypot(n.x - b.front.x, n.z - b.front.z), dp = Math.hypot(n.x - PLAYER.x, n.z - PLAYER.z); if (dp < 90) continue; const s = Math.abs(dn - d * 1.12); if (s < bs) { bs = s; best = n; } }
+  if (!best) return false;
+  G.rival.x = best.x; G.rival.z = best.z; G.rival.oid = o.id; const tn = nearestNode(b.front.x, b.front.z, n => n.edges.some(id => !EDGES[id].alley)); G.rival.tn = tn ? tn.id : null; placeRival();
+  G.race = { oid: o.id, st: 'on', t: 360 };
+  sfx('ring');
+  dialog([{ name: 'Simon 店長（來電）', text: `${G.name}！${ownerName(o)}今天在${addrOf(b)}現場等估價，他說誰先到就先跟誰談。` }, { name: 'Simon 店長（來電）', text: '大鴻的阿豪也收到消息，已經出發了。快！騎過去搶在他前面！' }],
+    () => { setTarget({ kind: 'race', oid: o.id, bid: o.bid }); toast('搶件賽開始！先抵達物件按 E 拜訪屋主', 'warn'); });
+  return true;
+}
+function updateRace(dt) {
+  const R_ = G.race; if (!R_ || R_.st !== 'on') return;
+  R_.t -= dt;
+  const o = OWN[R_.oid], b = BLD[o.bid];
+  if (R_.t <= 0 || o.st.signed || o.st.lost) { if (R_.t <= 0) toast('屋主等不到人，先離開了。搶件賽結束'); G.race = null; if (G.target && G.target.kind === 'race') { G.target = null; show('nav', false); } return; }
+  if (G.target && G.target.kind === 'race' && RV) { const rd = Math.round(Math.hypot(RV.rx - b.front.x, RV.rz - b.front.z)); $('navLbl').textContent = `搶件賽！阿豪離物件還有 ${rd} 公尺`; }
+}
+// 阿豪先到：屋主跟他簽了
+function raceRivalArrives(o) {
+  if (!G.race || G.race.oid !== o.id || G.race.st !== 'on') return false;
+  G.race = null; o.st.lost = true; G.rival.today++; G.lost++; refreshSign(o);
+  if (G.target && G.target.oid === o.id) { G.target = null; show('nav', false); }
+  sfx('lose');
+  if (MODE === 'city' && !ui.modalOpen && !DLG && !BT) choice('慢了一步', `<p>阿豪比你先到，${ownerName(o)}已經跟他簽了專任。</p><p class="quote">阿豪：「菜鳥，下次早點出門啦！」</p>`, [{ label: '可惡……', fn: afterAction }]);
+  else toast(`搶件賽輸了：阿豪先到，簽走了 ${addrOf(BLD[o.bid])}`, 'warn');
+  return true;
+}
+
+EVENTS.push({ id: 'race', w: 3, cond: canRace, run: startRace });
+
+// ---------- 帶看與成交 ----------
+const BUYER_MESH = {};
+NPC_STYLES.buyer = () => ({ shirt: pk(['#f0f0f0', '#2a4a7a', '#c8783a', '#6a8a5a', '#d88ab0', '#333'], Math.random), pants: pk(['#2a2e38', '#3a4a6a', '#8a8a8a'], Math.random), hair: pk(['#1a1410', '#3a2a1a', '#666'], Math.random), hairLong: Math.random() < 0.45, glasses: Math.random() < 0.35 });
+function newBuyer(o) {
+  const K = pk(BUYER_KIND, Math.random), g = K[1] != null ? K[1] : Math.random() < 0.5 ? 1 : 0, stars = photoStars(o.st.photo);
+  return { id: Date.now() % 1e7 + Math.floor(Math.random() * 1000), oid: o.id, name: pk(SURNAMES, Math.random) + (g ? '小姐' : '先生'), g, kind: K[0], day: G.day, st: 'wait',
+    budget: Math.round(o.price * (0.9 + Math.random() * 0.1 + stars * 0.012)), style: NPC_STYLES.buyer() };
+}
+function tagSprite(txt, bg) { const c = cvs(320, 96), x = c.getContext('2d'); x.fillStyle = bg; x.fillRect(0, 0, 320, 72); x.beginPath(); x.moveTo(140, 72); x.lineTo(160, 94); x.lineTo(180, 72); x.fill(); x.fillStyle = '#fff'; x.font = `900 40px ${FONT_SANS}`; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(txt, 160, 38);
+  const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: texFrom(c, false), depthTest: false, transparent: true })); s.scale.set(1.5, 0.45, 1); s.renderOrder = 6; return s; }
+function syncBuyers() {
+  const want = new Set((G && G.buyers || []).filter(b => b.st === 'wait' && b.day === G.day).map(b => b.id));
+  for (const k in BUYER_MESH) if (!want.has(+k)) { scene.remove(BUYER_MESH[k]); delete BUYER_MESH[k]; }
+  for (const by of G.buyers) {
+    if (!want.has(by.id) || BUYER_MESH[by.id]) continue;
+    const b = BLD[OWN[by.oid].bid], m = makePerson(by.style), tg = tagSprite('看屋買方', 'rgba(31,154,74,.95)'); tg.position.y = 2.35; m.add(tg);
+    const q = { x: b.door.x + b.n.x * 1.6 + b.t.x * 0.8, z: b.door.z + b.n.z * 1.6 + b.t.z * 0.8 };
+    m.position.set(q.x, H(q.x, q.z) + 0.18, q.z); m.rotation.y = b.ry; m.userData.by = by; scene.add(m); BUYER_MESH[by.id] = m;
+  }
+}
+function buyerAt(o) { return G.buyers.find(b => b.oid === o.id && b.st === 'wait' && b.day === G.day); }
+function updateBuyers(t) {
+  for (const k in BUYER_MESH) { const m = BUYER_MESH[k]; m.visible = MODE === 'city' || (MODE === 'talk' && !(BT && BT.cb && BT.cb.buyer && BT.cb.buyer.id === +k)); const u = m.userData; if (u.head) u.head.rotation.y = Math.sin(t * 0.7 + +k) * 0.5; }
+}
+function startShowing(o, by) {
+  VISIT_B = o.bid;
+  if (BUYER_MESH[by.id]) say({ x: BUYER_MESH[by.id].position.x, z: BUYER_MESH[by.id].position.z, m: BUYER_MESH[by.id] }, '你好，我是來看房子的！', 2);
+  talk('buyer', o, { buyer: by, onWin: () => negotiate(o, by), onLose: () => { by.st = 'gone'; syncBuyers(); choice('買方沒興趣', `<p class="quote">${by.name}：「嗯……我再考慮看看，謝謝你。」</p><p class="dim">這組買方的疑慮沒有被解決。別灰心，物件的廣告還在，之後還會有其他買方。</p>`, [{ label: '好', fn: afterAction }]); } });
+}
+// 議價：在買方出價與屋主底價之間來回斡旋
+function negotiate(o, by) {
+  const P = o.price, N = by.neg || (by.neg = { B: Math.round(by.budget * (0.88 + Math.random() * 0.04)), M: by.budget, F: o.st.floorNow || o.floor0, bp: 3, op: 3, dep: false, log: `${by.name}看完房子很喜歡，開口出價 ${fmtWan(0)}。` });
+  if (N.log.includes(fmtWan(0))) N.log = `${by.name}看完房子很喜歡，開口出價 ${fmtWan(N.B)}。`;
+  const known = o.st.intel >= 2 || o.st.perKnown && o.st.jobK;
+  const stars = photoStars(o.st.photo);
+  const pB = clamp(0.45 + (by.conf || 50) / 250 + stars * 0.03 + (N.dep ? 0.1 : 0), 0.3, 0.88), pO = clamp(0.4 + (o.st.intel || 0) * 0.07 + (o.st.perKnown ? 0.05 : 0) + famOwner(o) * 0.002, 0.3, 0.85);
+  const gap = N.F - N.B, gapPct = clamp(gap / P, -0.1, 0.15), pip = n => '●'.repeat(n) + '○'.repeat(3 - n);
+  const html = `<div class="neg"><div class="negRow"><div><small>開價</small><b>${fmtWan(P)}</b></div><div class="nb"><small>買方出價</small><b>${fmtWan(N.B)}</b></div><div class="no"><small>屋主底價</small><b>${known ? fmtWan(N.F) : '？？？'}</b></div></div>
+    <div class="negBar"><i style="left:${clamp((N.B / P - 0.8) / 0.25 * 100, 0, 100)}%" class="b"></i><i style="left:${clamp((N.F / P - 0.8) / 0.25 * 100, 0, 100)}%" class="o${known ? '' : ' unk'}"></i></div>
+    <div class="negRow sm"><div>買方耐心 <b class="pip">${pip(N.bp)}</b></div><div>屋主耐心 <b class="pip">${pip(N.op)}</b></div></div>
+    <p class="negLog">${N.log}</p>${known ? '' : '<p class="dim">屋主情報 2 張以上（或知道個性和職業），才看得出他心中的底價。</p>'}</div>`;
+  choice('議價斡旋 <small>' + addrOf(BLD[o.bid]) + '</small>', html, [
+    { label: '說服買方加價', sub: `成功率 ${Math.round(pB * 100)}%`, close: false, dis: N.B >= N.M, fn: () => { if (Math.random() < pB) { const inc = Math.round(P * rr(0.012, 0.025, Math.random)); N.B = Math.min(N.M, N.B + inc); sfx('good'); N.log = N.B >= N.M ? `${by.name}：「好啦，${fmtWan(N.B)}，這真的是我的極限了。」` : `${by.name}點頭加價到 ${fmtWan(N.B)}。`; } else { N.bp--; sfx('bad'); N.log = `${by.name}：「我已經很有誠意了，你怎麼一直叫我加？」`; } negNext(o, by); } },
+    { label: '回頭說服屋主讓價', sub: `體力 -5 · 成功率 ${Math.round(pO * 100)}%`, close: false, fn: () => { if (!spendAP(5)) return negotiate(o, by); if (Math.random() < pO) { const dec = Math.round(P * rr(0.01, 0.02, Math.random)); N.F = Math.max(Math.round(o.floor0 * 0.96), N.F - dec); o.st.floorNow = N.F; sfx('good'); N.log = `${ownerName(o)}想了想：「好吧，可以再讓一點。」`; } else { N.op--; sfx('bad'); N.log = `${ownerName(o)}：「這個價錢我不賣啦，你是幫誰講話？」`; } negNext(o, by); } },
+    { label: N.dep ? '已收斡旋金' : '請買方付斡旋金', sub: '買方更有誠意 · 只能一次', close: false, dis: N.dep, fn: () => { N.dep = true; N.M += Math.round(P * 0.015); N.B += Math.round(P * 0.005); N.bp = Math.min(3, N.bp + 1); sfx('coin'); N.log = `${by.name}簽下斡旋金，出價調整為 ${fmtWan(N.B)}。拿著斡旋金去談，屋主會比較認真。`; negNext(o, by); } },
+    { label: '約雙方見面議價', sub: gap <= 0 ? '價格已經對上了！' : gapPct <= 0.015 ? '差距很小，有機會' : '差距還太大', close: false, fn: () => {
+      if (N.B >= N.F || (N.F - N.B <= P * 0.015 && Math.random() < 0.55)) return closeDeal(o, by, N.B >= N.F ? N.B : Math.round((N.B + N.F) / 2));
+      N.bp--; N.op--; sfx('bad'); N.log = '雙方坐下來談，價格還是差太多，不歡而散。'; negNext(o, by); } },
+    { label: '放棄這組買方', cls: 'ghost', fn: () => { by.st = 'gone'; syncBuyers(); afterAction(); } },
+  ], 'wide');
+}
+function negNext(o, by) {
+  const N = by.neg;
+  if (N.bp <= 0 || N.op <= 0) { by.st = 'gone'; syncBuyers(); closeModalSoft(); choice('破局了', `<p>${N.bp <= 0 ? `${by.name}失去耐心，決定去看別間了。` : `${ownerName(o)}不想再談了：「這個價錢免談。」`}</p><p class="dim">這次沒有成交。物件還在，之後還會有新的買方。</p>`, [{ label: '下次再加油', fn: afterAction }]); return; }
+  negotiate(o, by);
+}
+function closeDeal(o, by, D) {
+  by.st = 'done'; o.st.sold = true; o.st.dealPrice = D; G.deals++; G.dealAmt += D; G.cnt.deal++; refreshSign(o); syncBuyers();
+  const fee = Math.round(D * 10000 * 0.06), bonus = Math.round(fee * 0.2 / 100) * 100;
+  addMoney(bonus); addXP(220); sfx('sign'); emit('deal'); closeModalSoft();
+  choice('成交！', `<div class="bigwin">成交</div><p>${addrOf(BLD[o.bid])}以 <b>${fmtWan(D)}</b> 成交（開價 ${fmtWan(o.price)}）。</p><p class="quote">${by.name}：「謝謝你，我們終於有自己的家了！」</p><ul class="stats"><li><span>公司服務費（6%）</span><b>NT$${fmt(fee)}</b></li><li><span>你的業績獎金（20%）</span><b>NT$${fmt(bonus)}</b></li><li><span>本月成交</span><b>${G.deals} 件</b></li></ul>`, [{ label: '太好了', fn: afterAction }], 'win wide');
+}
+
+// ---------- 屋況拍照 ----------
+let PHOTO = null, PHOTO_RC = null;
+const photoStars = s => !s ? 0 : s >= 85 ? 5 : s >= 70 ? 4 : s >= 55 ? 3 : s >= 35 ? 2 : 1;
+function startPhoto(o) {
+  if (PLAYER.ride) { toast('先下車（F）才能拍照'); sfx('deny'); return; }
+  const b = BLD[o.bid];
+  PHOTO = { o, b, fov: 60, snap: false };
+  CAM.pitch = 0.2; CAM.yaw = Math.atan2(b.cx - PLAYER.x, b.cz - PLAYER.z) - PLAYER.h; CAM.snap = true;
+  document.body.classList.add('photo'); show('photoUI', true); $('phFov').textContent = fovLabel();
+  $('phHint').textContent = document.body.classList.contains('touch') ? '左半邊搖桿走動 · 右半邊拖曳取景 · 按白色圓鈕拍照' : '拖曳取景 · WASD 走動 · 滾輪／Z X 調焦距 · 空白鍵拍照 · Esc 結束';
+  toast('往後退到能拍到整棟房子，保持鏡頭水平，按空白鍵拍照');
+}
+const fovLabel = () => `焦距 ${Math.round(24 * Math.tan(31 * Math.PI / 180) / Math.tan(PHOTO.fov / 2 * Math.PI / 180))}mm`;
+function photoZoom(d) { if (!PHOTO) return; PHOTO.fov = clamp(PHOTO.fov + d, 34, 84); $('phFov').textContent = fovLabel(); }
+function endPhoto() {
+  if (!PHOTO) return; PHOTO = null; document.body.classList.remove('photo'); show('photoUI', false);
+  CAM.pitch = clamp(CAM.pitch, -0.05, 1.1); CAM.pitch = Math.max(CAM.pitch, 0.24); CAM.snap = true; resize();
+}
+function photoShutter() { if (!PHOTO || PAUSE) return; PHOTO.snap = true; sfx('click'); const f = $('phFlash'); f.classList.remove('on'); void f.offsetWidth; f.classList.add('on'); }
+// 每一幀 render 之後呼叫：真的拍下畫面並評分
+function photoAfterRender() {
+  if (!PHOTO || !PHOTO.snap) return; PHOTO.snap = false;
+  let url = ''; try { const c = cvs(480, Math.round(480 * innerHeight * 0.86 / (innerWidth * 0.82))); const W = renderer.domElement.width, Hh = renderer.domElement.height; c.getContext('2d').drawImage(renderer.domElement, W * 0.09, Hh * 0.07, W * 0.82, Hh * 0.86, 0, 0, c.width, c.height); url = c.toDataURL('image/jpeg', 0.82); } catch (e) { }
+  const r = scorePhoto(PHOTO.b), o = PHOTO.o, prev = o.st.photo || 0;
+  if (r.score > prev) o.st.photo = r.score;
+  const st = photoStars(r.score);
+  if (st >= 5 && photoStars(prev) < 5) G.cnt.photo5++;
+  if (st >= 3 && photoStars(prev) < 3) addXP(30);
+  emit('photo');
+  choice('屋況照片', `<div class="photoRes">${url ? `<img src="${url}" alt="剛拍的照片">` : ''}<div><div class="stars">${starStr(st)}</div><b class="pscore">${r.score} 分</b>${r.score > prev ? '<span class="tag">最佳照片</span>' : `<span class="dim">目前最佳 ${prev} 分</span>`}<ul>${r.tips.map(t => `<li>${t}</li>`).join('')}</ul><p class="dim">照片越好，網路廣告的效果越好：買方詢問越多、出價也越漂亮。</p></div></div>`,
+    [{ label: '再拍一張', fn: () => { } }, { label: '完成拍照', cls: 'ghost', fn: endPhoto }], 'wide');
+}
+function scorePhoto(b) {
+  const top = b.y + b.h, v = new THREE.Vector3(), pts = [];
+  for (const q of b.poly) for (const y of [b.ymin, top]) { v.set(q.x, y, q.z).project(camera); pts.push({ x: v.x, y: v.y, z: v.z }); }
+  const tips = [];
+  if (pts.every(p => p.z > 1 || p.z < -1) || pts.filter(p => p.z <= 1).length < 4) return { score: 0, tips: ['照片裡沒有拍到房子。轉過身，讓房子出現在取景框裡。'] };
+  const VX = 0.82, VY = 0.86;   // 取景框（畫面四周留邊）
+  const x0 = Math.min(...pts.map(p => p.x)), x1 = Math.max(...pts.map(p => p.x)), y0 = Math.min(...pts.map(p => p.y)), y1 = Math.max(...pts.map(p => p.y));
+  const cx0 = clamp(x0, -VX, VX), cx1 = clamp(x1, -VX, VX), cy0 = clamp(y0, -VY, VY), cy1 = clamp(y1, -VY, VY);
+  const full = Math.max(1e-6, (x1 - x0) * (y1 - y0)), clip = Math.max(0, cx1 - cx0) * Math.max(0, cy1 - cy0);
+  const inside = clip / full, fill = Math.max((cx1 - cx0) / (2 * VX), (cy1 - cy0) / (2 * VY)), off = Math.hypot((cx0 + cx1) / 2 / VX, (cy0 + cy1) / 2 / VY);
+  const dx = camera.position.x - b.door.x, dz = camera.position.z - b.door.z, dl = Math.hypot(dx, dz) || 1, face = (dx * b.n.x + dz * b.n.z) / dl;
+  const tilt = Math.abs(CAM.pitch - 0.2);
+  const sIn = clamp((inside - 0.5) / 0.45, 0, 1), sFill = clamp(fill / 0.6, 0, 1), sC = 1 - clamp(off / 0.7, 0, 1) * 0.6, sF = clamp((face - 0.15) / 0.6, 0, 1), sL = 1 - clamp((tilt - 0.07) / 0.4, 0, 1) * 0.7;
+  let score = 100 * sIn * sFill * (0.4 + 0.6 * sC) * (0.45 + 0.55 * sF) * sL;
+  if (inside < 0.9) tips.push('房子沒有完整入鏡：往後退，或把焦距調廣一點。');
+  if (fill < 0.5) tips.push('房子在畫面裡太小了：靠近一點，或把焦距拉長。');
+  if (off > 0.35) tips.push('主體偏了：把房子放在取景框中間。');
+  if (face < 0.45) tips.push('角度太斜：站到房子的正前方或斜前方再拍。');
+  if (tilt > 0.13) tips.push('鏡頭仰角太大，牆線會歪：往後退，保持鏡頭水平。');
+  if (NIGHT > 0.5) { score -= 22; tips.push('晚上光線不足，白天再拍效果更好。'); } else if (NIGHT > 0.15) { score -= 8; tips.push('天色有點暗了，白天光線比較好。'); }
+  if (G.weather.w === 'rain') { score -= 12; tips.push('雨天拍起來灰濛濛的，晴天再拍會更好看。'); }
+  // 路人、車輛擋在房子前面
+  const dB = Math.hypot(camera.position.x - b.fx, camera.position.z - b.fz); let blk = 0;
+  const hit = (x, y, z) => { v.set(x, y, z).project(camera); return v.z < 1 && v.x > cx0 && v.x < cx1 && v.y > cy0 && v.y < cy1 && Math.hypot(camera.position.x - x, camera.position.z - z) < dB - 1; };
+  for (const p of PEDS) if (p.m.visible && hit(p.x, H(p.x, p.z) + 1, p.z)) blk++;
+  for (const c of VEH) if (c.m && c.m.visible && hit(c.x, H(c.x, c.z) + 1, c.z)) blk += 2;
+  if (blk) { score -= Math.min(24, blk * 6); tips.push('有路人或車子擋到房子：等他們離開再按快門。'); }
+  // 電線桿、號誌、路樹擋在房子前面：從鏡頭往立面打幾條射線檢查
+  { const rc = PHOTO_RC || (PHOTO_RC = new THREE.Raycaster()); rc.camera = camera; let n = 0, hitN = 0; const A = b.poly[0], B_ = b.poly[1], dir = new THREE.Vector3(), tgt = new THREE.Vector3();
+    for (const u of [0.2, 0.5, 0.8]) for (const hy of [2, b.h * 0.5, b.h * 0.85]) {
+      tgt.set(lerp(A.x, B_.x, u), b.y + hy, lerp(A.z, B_.z, u)); v.copy(tgt).project(camera); if (v.z > 1 || v.x < -VX || v.x > VX || v.y < -VY || v.y > VY) continue;
+      n++; dir.copy(tgt).sub(camera.position); const L = dir.length(); dir.normalize(); rc.set(camera.position, dir); rc.far = L;
+      const h = rc.intersectObjects(scene.children, true).find(i => i.object.isMesh && i.object.visible !== false); if (h && h.distance < L - 2.2) hitN++; }
+    PHOTO_RC.__occ = n + ':' + hitN;
+    if (n && hitN) { const f = hitN / n; score -= Math.round(36 * f); tips.push('電線桿、號誌或路樹擋到房子了：換個位置再拍。'); } }
+  score = Math.round(clamp(score, 0, 100));
+  if (!tips.length) tips.push('構圖完整、光線充足，這張可以直接放上網！');
+  return { score, tips: tips.slice(0, 3), dbg: { inside: +inside.toFixed(2), fill: +fill.toFixed(2), off: +off.toFixed(2), face: +face.toFixed(2), tilt: +tilt.toFixed(2), blk, occ: PHOTO_RC && PHOTO_RC.__occ } };
+}
+
+// ---------- 地圖標示 ----------
+function careerMap(x, X, Z, inV, big) {
+  if (!G) return;
+  if (G.dm && G.dm.day === G.day) for (const bid of G.dm.stops) { if (G.dm.done.includes(bid)) continue; const b = BLD[bid], mx = X(b.fx), mz = Z(b.fz); if (!inV(mx, mz)) continue; const r = big ? 5 : 3.5; x.fillStyle = '#3f8cf0'; x.fillRect(mx - r, mz - r, r * 2, r * 2); x.strokeStyle = '#fff'; x.lineWidth = 1.2; x.strokeRect(mx - r, mz - r, r * 2, r * 2); }
+  for (const o of OWN) {
+    const by = buyerAt(o), u = o.st.urgent && !o.st.signed && !o.st.lost; if (!by && !u) continue;
+    const b = BLD[o.bid], mx = X(b.fx), mz = Z(b.fz); if (!inV(mx, mz)) continue; const r = big ? 13 : 9;
+    x.strokeStyle = by ? '#2fd07a' : '#ffcf3a'; x.lineWidth = 3; x.beginPath(); x.arc(mx, mz, r + Math.sin(performance.now() / 200) * 1.5, 0, 7); x.stroke();
+    if (big) { x.fillStyle = by ? '#2fd07a' : '#ffcf3a'; x.font = `900 12px ${FONT_SANS}`; x.fillText(by ? '帶看' : '急件', mx, mz - r - 8); }
+  }
+}
+
+// ---------- 成就 ----------
+ACH.push(
+  ['dm1', '社區新面孔', '發完一整條派報路線', g => g.cnt.dmDone >= 1],
+  ['famMax', '里長也認識你', '讓一個里的熟悉度達到五顆星', g => Object.values(g.fam || {}).some(v => v >= 100)],
+  ['card4', '知己知彼', '集滿一位屋主的四張情報卡', () => OWN.some(o => o.st.perKnown && o.st.jobK && o.st.hobK && o.st.tabK)],
+  ['urgent', '急件救火隊', '簽下一件限時急件', g => g.cnt.urgentWin >= 1],
+  ['race', '快狠準', '在搶件賽中贏過阿豪', g => g.cnt.raceWin >= 1],
+  ['deal1', '第一次成交', '帶看、議價，成交第一間房子', g => g.cnt.deal >= 1],
+  ['deal3', '成交王', '一個月成交 3 間房子', g => g.cnt.deal >= 3],
+  ['photo5', '攝影大師', '拍出一張五星屋況照片', g => g.cnt.photo5 >= 1],
+);
+
+// ---------- 每一幀 ----------
+function careerTick(dt) {
+  if (!G || !G.cnt) return;
+  if (MODE === 'city' && !PAUSE) { updateDM(); updateRace(dt); }
+  updateBuyers(loop.wt || 0);
+  if (DM_G) DM_G.visible = MODE === 'city' || MODE === 'talk';
+  if (PHOTO && (MODE !== 'city' || PLAYER.ride)) endPhoto();
+  if (PHOTO) { const t = CAM.pitch - 0.2, ok = Math.abs(t) < 0.06; $('phLevel').classList.toggle('ok', ok); $('phTilt').textContent = ok ? '水平' : (t < 0 ? '仰角 ' : '俯角 ') + Math.round(Math.abs(t) * 57.3) + '°'; }
+}
+function careerEnterCity() { syncDM(); syncBuyers(); }
+
+// 拍照模式的按鈕
+$('phShot').onclick = () => photoShutter();
+$('phExit').onclick = () => endPhoto();
+$('phIn').onclick = () => photoZoom(-6);
+$('phOut').onclick = () => photoZoom(6);
 
 // ===================== 執法與緊急車輛：NPC 闖紅燈追捕、交通警察攔停主角 =====================
 // ---------- 警車追捕闖紅燈的 NPC ----------
@@ -5930,7 +6520,7 @@ function openCheat() {
     else if (e.key === 'Enter') {
       const fn = CHEATS[normCheat(inp.value)];
       if (!fn) { sfx('deny'); box.querySelector('#cheatMsg').textContent = '沒有這個密技'; inp.select(); return; }
-      G.cheat = G.cheat || {}; const msg = fn(); closeCheat(); sfx('quest'); toast('密技啟動：' + msg);
+      G.cheat = G.cheat || {}; G.cheat.used = true; const msg = fn(); closeCheat(); sfx('quest'); toast('密技啟動：' + msg);
     }
   });
   setTimeout(() => inp.focus(), 30);
@@ -5955,7 +6545,7 @@ function makeConvertible(withDriver) {
   P_.push(cbox(1.92, 0.06, 4.52, 0, 0.88, 0, DK));                       // 腰線
   for (const [x, z] of [[-0.88, 1.4], [0.88, 1.4], [-0.88, -1.4], [0.88, -1.4]]) { P_.push(cbox(0.26, 0.68, 0.68, x, 0.34, z, '#141414')); P_.push(cbox(0.28, 0.32, 0.32, x, 0.34, z, '#c8ccd4')); }
   const b = new THREE.Mesh(mergeGeometries(P_), MAT.col); b.castShadow = true; g.add(b);
-  for (const sx of [-1, 1]) { const hl = new THREE.Mesh(new THREE.BoxGeometry(0.36, 0.16, 0.05), MAT.headlight); hl.position.set(sx * 0.66, 0.74, 2.26); g.add(hl); }
+  for (const sx of [-1, 1]) { const hl = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.2, 0.08), MAT.headlight); hl.position.set(sx * 0.62, 0.72, 2.27); g.add(hl); }   // 左右兩顆車頭燈
   const tl = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.12, 0.05), MAT.taillight); tl.position.set(0, 0.78, -2.26); g.add(tl);
   g.userData.tail = tl; g.userData.poncho = new THREE.Group(); g.add(g.userData.poncho); g.userData.poncho.visible = false;
   if (withDriver) {
@@ -5975,6 +6565,9 @@ function applyCarCheat() {
   if (PLAYER.mesh === want) return;
   const old = PLAYER.mesh, kids = old.children.filter(c => c === PLAYER.light || c === PLAYER.light.target);
   kids.forEach(c => { old.remove(c); want.add(c); });
+  // 車燈：敞篷車放在車頭保險桿上方（機車維持原位），燈光才會從車頭照出去，不會照亮座艙
+  if (on) { PLAYER.light.position.set(0, 0.78, 2.35); PLAYER.light.target.position.set(0, 0, 14); PLAYER.light.angle = 0.62; }
+  else { PLAYER.light.position.set(0, 1.2, 0.6); PLAYER.light.target.position.set(0, 0, 12); PLAYER.light.angle = 0.5; }
   want.position.copy(old.position); want.rotation.copy(old.rotation); want.visible = old.visible;
   scene.remove(old); scene.add(want); PLAYER.mesh = want; if (typeof syncRideMeshes === 'function' && (MODE === 'city' || MODE === 'talk')) syncRideMeshes();
 }
