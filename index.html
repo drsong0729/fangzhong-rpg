@@ -3784,7 +3784,7 @@ const hourNow = () => clamp(9 + (G.apUsed || 0) * 0.06 + G.drift, 9, 22.5);
 
 function newGame(name) {
   const seed = (Date.now() % 1e9) | 0;
-  G = { v: 1, seed, name, day: 1, ap: 100, comm: 0, drift: 0, seen: {}, stats: { inv: 0, letters: 0, talks: 0 }, today: { inv: 0, talk: 0, sign: 0 }, contacts: 0, call: null, meet: null, target: null, garb: false, goalShown: false, weather: rollWeather() };
+  G = { v: 1, seed, name, day: 1, ap: 100, comm: 0, drift: 0, seen: {}, stats: { inv: 0, letters: 0, talks: 0 }, today: { inv: 0, talk: 0, sign: 0 }, contacts: 0, call: null, meet: null, target: null, garb: false, goalShown: false, cityIntro: false, weather: rollWeather() };
   ensureState(); G.tut = -1; G.genV = 3; OWN = genOwners(seed, 3); decorateOwners(); tutSetupOwner(); setupSaleSigns(); MAPNAV = null; ROUTE.pts = []; G.ap = apMax(); RIVAL_MESH && (RIVAL_MESH.visible = false);
 }
 function rollWeather() { const w = Math.random() < 0.25 ? 'rain' : pk(['sun', 'cloud', 'cloud', 'sun', 'overcast'], Math.random); return { w, t: ri(w === 'rain' ? 24 : 26, w === 'rain' ? 28 : 32, Math.random) }; }
@@ -3865,7 +3865,7 @@ $('credBack').onclick = () => { sfx('cancel'); show('credits', false); show('tit
 $('nameBack').onclick = () => { sfx('cancel'); show('nameScr', false); show('title', true); MODE = 'title'; };
 $('nameForm').addEventListener('submit', e => {
   e.preventDefault(); const n = $('nameIn').value.trim(); if (!n) { $('nameErr').hidden = false; sfx('deny'); return; }
-  $('nameErr').hidden = true; sfx('confirm'); newGame(n.slice(0, 8)); show('nameScr', false); fadeTo(() => enterOffice(true));
+  $('nameErr').hidden = true; sfx('confirm'); $('nameIn').blur(); releaseIME(); newGame(n.slice(0, 8)); show('nameScr', false); fadeTo(() => enterOffice(true));
 });
 
 // ===================== 辦公室流程 =====================
@@ -3930,7 +3930,14 @@ function enterCity(fromLoad) {
   if (G.target) setTarget(G.target, true);
   if (G.weather.w === 'rain') setTimeout(rainBanner, 1500);
   tutEnterCity(); applyCarCheat();
-  setTimeout(() => toast('你的機車就停在店門口（頭上有標示），走過去按「上車」就能騎走，也可以直接走路'), 900);
+  const bikeTip = () => toast('你的機車就停在店門口（頭上有標示），走過去按「上車」就能騎走，也可以直接走路');
+  if (G.cityIntro === false) {   // 新遊戲第一次走出店門：新手提示
+    G.cityIntro = true; saveGame(true);
+    setTimeout(() => { if (MODE !== 'city' || ui.modalOpen) { bikeTip(); return; }
+      choice('新手提示', `<p>騎上你的機車或徒步（雖然我不建議）踏遍整座城市（或看地圖上的標示），看到建築物外貼著紅色的「<b style="color:#e3242b">售</b>」就代表這間房子在出售，靠近它就可以按 <b>E</b> 調閱電傳，就可以留開發信或者到屋主戶籍地拜訪，期待你可以委託達標！</p><p style="color:#ff8a7a;margin-top:10px">（注意：小心不要闖紅燈，如果被警察看到會被開罰單喔！）</p>`,
+        [{ label: '知道了，出發！', fn: () => setTimeout(bikeTip, 300) }]);
+    }, 700);
+  } else setTimeout(bikeTip, 900);
 }
 function syncRideMeshes() {
   const city = MODE === 'city' || MODE === 'talk';
@@ -4458,7 +4465,7 @@ function openMenu() {
     <button class="btn ghost" id="mAch">成就</button>
     <button class="btn ghost" id="mSet">設定</button>
     <button class="btn ghost fsBtn" id="mFs">${fsLabel()} </button>
-    <div class="help"><b>操作</b>　拖曳畫面轉視角 · 滾輪拉近 · W/↑ 加速 · S/↓ 煞車 · A D/← → 轉向 · 空白鍵 喇叭 · E 互動 · M 地圖 · R 謄本紀錄 · B 背包 · K 技能<br><b>手機</b>　左半邊按住出現搖桿 · 右半邊拖曳轉視角 · 右下圓鍵互動</div>
+    <div class="help"><b>操作</b>　拖曳畫面轉視角 · 滾輪拉近 · V 切換視角 · 按住 C 看後方 · W/↑ 加速 · S/↓ 煞車 · A D/← → 轉向 · 空白鍵 喇叭 · E 互動 · M 地圖 · R 謄本紀錄 · B 背包 · K 技能<br><b>手機</b>　左半邊按住出現搖桿 · 右半邊拖曳轉視角 · 右下圓鍵互動</div>
     <button class="btn ghost" id="mTitle">回主畫面</button></div>`);
   $('mResume').onclick = () => { sfx('click'); closeModal(); };
   $('mSave').onclick = () => saveGame();
@@ -4633,9 +4640,20 @@ function drawSpeedo(kmh) {
 
 // ===================== 輸入 =====================
 const KEY = {}; const JOY = { x: 0, y: 0, mag: 0, on: false };
+// 依「實體按鍵位置」判斷（e.code），中文輸入法開著也一樣：注音的 ㄊ 鍵就是 W
+const CODE_KEY = { Space: ' ', Enter: 'enter', NumpadEnter: 'enter', Escape: 'escape', ArrowUp: 'arrowup', ArrowDown: 'arrowdown', ArrowLeft: 'arrowleft', ArrowRight: 'arrowright', ShiftLeft: 'shift', ShiftRight: 'shift', Tab: 'tab' };
+function keyOf(e) {
+  const c = e.code || '';
+  if (/^Key[A-Z]$/.test(c)) return c[3].toLowerCase();
+  if (/^(Digit|Numpad)[0-9]$/.test(c)) return c.slice(-1);
+  if (CODE_KEY[c]) return CODE_KEY[c];
+  return (e.key || '').toLowerCase();
+}
+// 名字輸入完：把焦點從輸入框拿走，讓輸入法回到一般狀態（瀏覽器無法直接切換系統輸入法，所以改用實體按鍵判斷）
+function releaseIME() { try { const a = document.activeElement; if (a && a !== document.body) a.blur(); } catch (e) { } }
 addEventListener('keydown', e => {
   if (e.target && e.target.tagName === 'INPUT') return;
-  const k = e.key.toLowerCase(); KEY[k] = true;
+  const k = keyOf(e); KEY[k] = true; if (e.keyCode === 229 || e.key === 'Process') e.preventDefault();
   if (DLG && (k === 'enter' || k === ' ' || k === 'e')) { e.preventDefault(); advanceDlg(); return; }
   if (MODE === 'talk' && BT) { if ($('bFb').hidden && ['1', '2', '3', '4'].includes(k)) { const b = $('bOpts').querySelectorAll('.opt')[+k - 1]; b && b.click(); } else if (!$('bFb').hidden && (k === 'enter' || k === ' ' || k === 'e')) { e.preventDefault(); $('bNext').click(); } return; }
   if (!$('mapScr').hidden) { if (k === 'm' || k === 'escape') closeMap(); return; }
@@ -4643,11 +4661,11 @@ addEventListener('keydown', e => {
   if ((MODE === 'city' || MODE === 'office') && k === 't') { e.preventDefault(); openCheat(); return; }
   if (MODE === 'city') {
     if (k === 'm') openMap(); else if (k === 'r') openRecords(); else if (k === 'b') openBag(); else if (k === 'k') openSkills(); else if (k === 'escape') openMenu();
-    else if (k === 'e' || k === 'enter') { e.preventDefault(); doAction(); } else if (k === 'f') toggleRide(); else if (k === ' ') { e.preventDefault(); if (PLAYER.ride) sfx('horn'); }
+    else if (k === 'e' || k === 'enter') { e.preventDefault(); doAction(); } else if (k === 'f') toggleRide(); else if (k === 'v' && !e.repeat) cycleView(); else if (k === ' ') { e.preventDefault(); if (PLAYER.ride) sfx('horn'); }
   } else if (MODE === 'office') { if (k === 'escape') openMenu(); else if (k === 'b') openBag(); else if (k === 'k') openSkills(); else if (k === 'e' || k === 'enter') { e.preventDefault(); doAction(); } }
   if (['arrowup', 'arrowdown', 'arrowleft', 'arrowright', ' '].includes(k)) e.preventDefault();
 });
-addEventListener('keyup', e => { KEY[e.key.toLowerCase()] = false; });
+addEventListener('keyup', e => { KEY[keyOf(e)] = false; if (e.key) KEY[e.key.toLowerCase()] = false; });
 addEventListener('blur', () => { for (const k in KEY) KEY[k] = false; setTimeout(() => { if (!document.hasFocus()) onLeaveGame(); }, 200); });
 addEventListener('focus', onBackGame);
 // 離開遊戲畫面（切換分頁、縮小視窗、手機切到其他 App）：自動打開暫停選單，畫面與音樂、音效全部暫停
@@ -4743,7 +4761,13 @@ function officeChat(n) {
 const clock = new THREE.Clock(); let miniT = 0, hudT = 0, stepT = 0;
 const tmpV = new THREE.Vector3();
 function collideList(x, z, r, list) { for (const c of list) if (x > c.x0 - r && x < c.x1 + r && z > c.z0 - r && z < c.z1 + r) return true; return false; }
-const CAM = { yaw: 0, pitch: 0.24, dist: 6.6, drag: null, last: -9 };
+const CAM = { yaw: 0, pitch: 0.24, dist: 6.6, drag: null, last: -9, view: 0, back: false, fp: false, fpMesh: null };
+// 視角：V 循環切換（標準 → 近一點 → 第一人稱 → 遠一點），按住 C 看正後方
+const VIEWS = [{ n: '標準視角', k: 1 }, { n: '近一點', k: 0.58 }, { n: '第一人稱視角', fp: true }, { n: '遠一點', k: 1.7 }];
+try { CAM.view = clamp(+localStorage.getItem('fzrpg3d.view') || 0, 0, VIEWS.length - 1); } catch (e) { }
+function cycleView() { CAM.view = (CAM.view + 1) % VIEWS.length; CAM.snap = true; try { localStorage.setItem('fzrpg3d.view', CAM.view); } catch (e) { } sfx('click'); toast('視角：' + VIEWS[CAM.view].n + '（V 切換）'); }
+// 第一人稱時主角（含機車／敞篷車）不畫在鏡頭裡，但車燈照常
+function fpLayers(on) { CAM.fp = on; CAM.fpMesh = PLAYER.mesh; [typeof SCOOTER_MESH !== 'undefined' && SCOOTER_MESH, typeof CAR_MESH !== 'undefined' && CAR_MESH, PLAYER.mesh, WALKER].forEach(m => m && m.traverse(o => { if (o.isMesh || o.isSprite) o.layers.set(on ? 1 : 0); })); }
 {
   const g = $('gl'); g.addEventListener('contextmenu', e => e.preventDefault());
   g.addEventListener('pointerdown', e => { if (!(MODE === 'city' || MODE === 'office') || PAUSE) return; CAM.drag = { id: e.pointerId, x: e.clientX, y: e.clientY }; try { g.setPointerCapture(e.pointerId); } catch (_) { } g.classList.add('grabbing'); });
@@ -4832,6 +4856,7 @@ function updateCityView(dt, rode) {
   updateLampLights(dt);
   if (!rode) updateWalk(dt);
   // 相機：拖曳轉視角，騎車時慢慢回正
+  { const fpNow = !!(VIEWS[CAM.view] || {}).fp && MODE === 'city'; if (fpNow !== CAM.fp || (fpNow && CAM.fpMesh !== PLAYER.mesh)) fpLayers(fpNow); }
   if (MODE === 'talk' && BT && BT.cam) talkCam(BT.cam.b, 1 - Math.pow(0.02, dt));
   else {
     CAM.yaw = Math.atan2(Math.sin(CAM.yaw), Math.cos(CAM.yaw));   // 保持在 ±180° 內，回正時才不會繞一大圈
@@ -4842,13 +4867,26 @@ function updateCityView(dt, rode) {
     if (CAM.turnBack && (CAM.drag || Math.abs(p.v) < 0.3 || Math.abs(CAM.yaw) < 0.08)) CAM.turnBack = false;
     if (CAM.turnBack) CAM.yaw *= Math.pow(0.25, dt);
     else if (p.ride && !CAM.drag && performance.now() / 1000 - CAM.last > 1.8 && Math.abs(p.v) > 1.5) CAM.yaw *= Math.pow(document.body.classList.contains('touch') && JOY.on ? 0.55 : 0.2, dt);
-    const yaw = p.h + CAM.yaw, back = (p.ride ? CAM.dist + (p.car ? 2.5 : 0) : CAM.dist * 0.72) + Math.abs(p.v) * (p.car ? 0.05 : 0.08);
+    const V = VIEWS[CAM.view] || VIEWS[0], lookBack = MODE === 'city' && !PAUSE && !!KEY['c'], fp = !!V.fp && MODE === 'city';
+    if (lookBack !== CAM.back) { CAM.back = lookBack; CAM.snap = true; }
+    const yaw = p.h + CAM.yaw + (lookBack ? Math.PI : 0);
+    if (fp) {
+      // 第一人稱：鏡頭放在主角眼睛的位置（開敞篷車時在駕駛座）
+      const gy0 = H(p.x, p.z), fx = Math.sin(p.h), fz = Math.cos(p.h), seat = p.ride && p.car ? 0.42 : 0;
+      const ex = p.x + fz * seat + fx * (p.ride ? (p.car ? -0.25 : -0.05) : 0.15), ez = p.z - fx * seat + fz * (p.ride ? (p.car ? -0.25 : -0.05) : 0.15);
+      const ey = gy0 + (p.ride ? (p.car ? 1.55 : 1.62) : 1.7) + (!p.ride && Math.abs(p.v) > 0.3 ? Math.abs(Math.sin(performance.now() / 160)) * 0.04 : 0);
+      camera.position.set(ex, ey, ez); CAM.snap = false;
+      const tilt = Math.tan(clamp(CAM.pitch - 0.2, -0.45, 0.9)) * 10;
+      camera.lookAt(ex + Math.sin(yaw) * 10, ey - tilt, ez + Math.cos(yaw) * 10);
+    } else {
+    const back = ((p.ride ? CAM.dist + (p.car ? 2.5 : 0) : CAM.dist * 0.72) + Math.abs(p.v) * (p.car ? 0.05 : 0.08)) * (V.k || 1);
     let f = 1;
     for (const k of [1, 0.75, 0.55, 0.35]) { f = k; const hx = p.x - Math.sin(yaw) * back * Math.cos(CAM.pitch) * k, hz = p.z - Math.cos(yaw) * back * Math.cos(CAM.pitch) * k; if (!collideCity(hx, hz, 0.3, true)) break; }
     const gy0 = H(p.x, p.z), cx_ = p.x - Math.sin(yaw) * back * Math.cos(CAM.pitch) * f, cz_ = p.z - Math.cos(yaw) * back * Math.cos(CAM.pitch) * f;
     tmpV.set(cx_, Math.max(gy0 + (p.ride ? 1.6 : 1.4) + back * Math.sin(CAM.pitch) * f + 0.6, H(cx_, cz_) + 1.2), cz_);
-    camera.position.lerp(tmpV, 1 - Math.pow(CAM.drag ? 0.00002 : 0.004, dt));
+    if (CAM.snap) { camera.position.copy(tmpV); CAM.snap = false; } else camera.position.lerp(tmpV, 1 - Math.pow(CAM.drag ? 0.00002 : 0.004, dt));
     camera.lookAt(p.x + Math.sin(yaw) * 2.5, gy0 + 1.5, p.z + Math.cos(yaw) * 2.5);
+    }
   }
   const sd = sun.userData.dir || new THREE.Vector3(0.4, 1, 0.3);
   { const gy0 = H(p.x, p.z); sun.position.set(p.x + sd.x * 120, gy0 + sd.y * 120, p.z + sd.z * 120); sun.target.position.set(p.x, gy0, p.z); }
