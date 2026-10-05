@@ -44,7 +44,7 @@ kbd{font-family:var(--f-num);font-size:.8em;border:1px solid var(--line);border-
 .mbtn small{font-size:12px;font-weight:400;letter-spacing:.02em;color:var(--muted)}
 .mbtn:hover:not(:disabled){transform:translateX(6px);background:var(--panel2);border-left-color:var(--neon)}
 .mbtn:disabled{opacity:.42;border-left-color:#555;cursor:not-allowed;filter:grayscale(1)}
-.foot{position:fixed;bottom:max(14px,env(safe-area-inset-bottom));left:max(16px,7vw);font-size:12px;color:var(--muted);letter-spacing:.08em}
+.foot{position:fixed;bottom:max(14px,env(safe-area-inset-bottom));right:max(16px,4vw);left:auto;max-width:44vw;text-align:right;font-size:12px;color:var(--muted);letter-spacing:.08em}
 .card{background:var(--panel);border:1px solid var(--line);padding:22px;max-width:440px;display:flex;flex-direction:column;gap:14px}
 .card h2{margin:0;font-family:var(--f-sign);font-size:28px;letter-spacing:.06em}
 .card p{margin:0;color:var(--muted);line-height:1.7}
@@ -372,7 +372,7 @@ body.touch #mini{right:max(186px,calc(env(safe-area-inset-right) + 178px))!impor
   #title .titleSign{grid-column:1;grid-row:2;align-self:end}
   #title .subline{grid-column:1;grid-row:3;align-self:start;font-size:13px;margin:0}
   #title .menu{grid-column:2;grid-row:1/4;align-self:center;gap:7px;width:100%}
-  #title .foot{position:fixed;left:max(16px,5vw);bottom:max(8px,env(safe-area-inset-bottom));font-size:11px}
+  #title .foot{position:fixed;right:max(16px,env(safe-area-inset-right));left:auto;bottom:max(6px,env(safe-area-inset-bottom));font-size:10px}
   .titleSign .tag{font-size:17vh}
   .titleSign .name b{font-size:10vh}
   .titleSign .name small{font-size:11px}
