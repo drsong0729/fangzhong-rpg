@@ -256,7 +256,17 @@ input[type=range]{accent-color:var(--red);width:100%}
 #endLines p{margin:.25em 0;font-size:clamp(17px,2.5vw,24px);font-family:var(--f-sign);font-weight:700;opacity:0;animation:lin 1s forwards}
 #endLines p.hl{color:var(--neon);font-size:clamp(20px,3vw,30px)}
 @keyframes lin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-#endBack{align-self:flex-start;opacity:0;animation:lin 1s 9.5s forwards}
+#endBack{align-self:flex-start}
+.endBtns{display:flex;gap:10px;flex-wrap:wrap;opacity:0;animation:lin 1s 9.5s forwards}
+.board{display:flex;flex-direction:column;gap:3px;max-height:min(56vh,460px);overflow:auto}
+.board .bhd,.board .brow{display:grid;grid-template-columns:52px 1fr 86px 64px;gap:8px;align-items:center;padding:7px 10px}
+.board .bhd{font-size:12px;color:var(--muted);letter-spacing:.1em;position:sticky;top:0;background:#151a24}
+.board .brow{background:rgba(255,255,255,.04);font-weight:700}
+.board .brow.mine{background:rgba(255,207,58,.14);outline:1px solid rgba(255,207,58,.5)}
+.board .rk{font-family:var(--f-num);font-size:18px;text-align:center}
+.board .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.board .dy,.board .sg{text-align:right;font-variant-numeric:tabular-nums}
+#endRank{color:var(--neon);font-weight:800;min-height:1.2em;margin:0}
 #endLinks{display:flex;flex-wrap:wrap;gap:10px;opacity:0;animation:lin 1s 10s forwards}
 #endLinks a{display:inline-flex;align-items:center;gap:8px;padding:11px 18px;border-radius:8px;color:#fff;font-weight:800;font-size:16px;letter-spacing:.04em;text-decoration:none;box-shadow:0 4px 14px rgba(0,0,0,.35)}
 #endLinks a:hover{filter:brightness(1.1)}
@@ -362,6 +372,7 @@ body.touch #mini{right:max(186px,calc(env(safe-area-inset-right) + 178px))!impor
   #battle{padding:10px 12px;gap:8px}
   #bLine{font-size:15px;padding:8px 10px}
 }
+@media (max-height:720px) and (orientation:landscape) and (min-height:521px){#title .menu{display:grid;grid-template-columns:1fr 1fr;width:min(660px,100%);gap:8px}}
 @media (max-height:820px) and (orientation:landscape) and (min-height:521px){#title.screen{gap:12px;justify-content:flex-start;padding-top:22px}#title .brandLogo{width:clamp(140px,15vw,210px)}#title .menu .mbtn{padding-block:9px}}
 @media (max-height:820px){.doc{font-size:13px;line-height:1.42}.docHead b{font-size:17px}.mbox{padding:14px 16px;gap:8px}.mbox.paper .btn{padding:8px 14px}}
 
@@ -432,7 +443,7 @@ body.touch #mini{right:max(186px,calc(env(safe-area-inset-right) + 178px))!impor
   .legend{font-size:11px;gap:8px}
   .mapHead h3{font-size:17px}
 }
-@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}#endLines p,#endBack{opacity:1}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}#endLines p,.endBtns{opacity:1}}
 </style>
 
 </head>
@@ -472,6 +483,7 @@ body.touch #mini{right:max(186px,calc(env(safe-area-inset-right) + 178px))!impor
       <button class="mbtn" id="tNew">新遊戲 <small>從第一天開始</small></button>
       <button class="mbtn" id="tLoad" disabled>載入遊戲 <small id="tLoadSub">尚無存檔</small></button>
       <button class="mbtn" id="tAch">成就 <small>跨存檔收集</small></button>
+      <button class="mbtn" id="tBoard">排行榜 <small>最少天數簽滿 6 件</small></button>
       <button class="mbtn" id="tSet">設定 <small>音量・畫質</small></button>
       <button class="mbtn fsBtn" id="tFs">全螢幕 <small>Fullscreen</small></button>
       <button class="mbtn" id="tCred">製作人員 <small>Credits</small></button>
@@ -529,9 +541,10 @@ body.touch #mini{right:max(186px,calc(env(safe-area-inset-right) + 178px))!impor
   <section id="ending" hidden>
     <h1 id="endTitle"></h1>
     <p id="endSub"></p>
+    <p id="endRank"></p>
     <ul class="stats" id="endStats"></ul>
     <div id="endLines"></div>
-    <button class="btn" id="endBack">回到主畫面</button>
+    <div class="endBtns"><button class="btn" id="endBack">回到主畫面</button><button class="btn ghost" id="endBoard">排行榜</button></div>
     <div id="endLinks"><a class="j104" href="https://www.104.com.tw/company/1a2x6bngpb?jobsource=google" target="_blank" rel="noopener">104人力銀行</a><a class="jline" href="https://page.line.me/supersun.realty" target="_blank" rel="noopener">LINE官方帳號</a></div>
   </section>
   <div id="fade"></div>
@@ -4325,7 +4338,7 @@ function phoneCall() {
     dialog([{ name: ownerName(o), text: `喂，你是日勝的${G.name}嗎？我收到你留的信了。` }, { name: ownerName(o), text: `${when}我在${addrOf(meetB)}，你過來聊聊吧。` }], () => setTarget({ kind: 'meet', oid: o.id, bid: meetB.id })); };
 }
 function goalReached() {
-  G.goalShown = true; sfx('win');
+  G.goalShown = true; if (!G.goalDay) G.goalDay = G.day; sfx('win');
   choice('目標達成！', `<div class="bigwin">6 / 6</div><p>第 ${G.day} 天，你完成了本月 6 件委託的目標。</p><p class="dim">可以立即結算，或是繼續衝到第 30 天，簽得越多越好。</p>`, [
     { label: '立即結算', fn: () => fadeTo(ending) }, { label: '繼續衝刺', cls: 'ghost', fn: afterAction }], 'win');
 }
@@ -4338,6 +4351,14 @@ function ending() {
   const L = ['房仲這份工作不只是出一張嘴', '還要有強大的毅力與抗壓力', '這只是一款遊戲', '現實會比這個更辛苦', '如果你想挑戰自己、獲取無上限的薪水', '歡迎加入日勝國際不動產！', '歡迎致電：0755-777-88'];
   $('endLines').innerHTML = L.map((l, i) => `<p style="animation-delay:${1.2 + i * 1.1}s" class="${i >= 5 ? 'hl' : ''}">${l}</p>`).join('');
   playMusic(pass ? 'ending' : 'sad'); sfx(pass ? 'win' : 'lose');
+  // 排行榜：通關就登錄成績，並顯示目前名次
+  $('endRank').textContent = '';
+  if (pass) boardSubmit().then(res => {
+    if (!res) return;
+    if (res.cheat) { $('endRank').textContent = '這一局用了密技，成績不列入排行榜。'; return; }
+    $('endRank').textContent = `成績已登上排行榜：第 ${res.days} 天簽滿 6 件委託！`;
+    boardFetch().then(({ rows, shared }) => { rows.sort(boardSort); const i = rows.findIndex(r => r.ts === res.ts); if (i >= 0) $('endRank').textContent = `成績已登上排行榜：第 ${res.days} 天簽滿 6 件，目前${shared ? '' : '本機'}排名第 ${i + 1} 名！`; });
+  });
 }
 $('endBack').onclick = () => { sfx('confirm'); show('ending', false); toTitle(); };
 
@@ -4936,7 +4957,7 @@ async function boot() {
   G = { day: 1, ap: 100, drift: 0, weather: { w: 'cloud', t: 29 } };
   setupSaleSigns(); G = null;
   $('boot').hidden = true; toTitle(); loop();
-  window.__fz = { MRT_EXITS, UNDER_EXITS, MRT_E, INFRA, makeVehMesh, makeHeavyMesh, makeMotoMesh, makePed, ACT: () => ACT, findAction, tutOwner, talk, BTg: () => BT, fillVars, AU, FROZEN: () => FROZEN, LAMPS, setupLampLights, BM, COPV: () => COPV, copWitness, KEY, updateCity, loop, playerHitsStatic, collideCity, pBox, OFF, makePerson, suitUp, scene, NODES, EDGES, FACES, LINES, H, CHUNKS, updateChunks, STREAM, nearestEdge, computeRoute, updateEvents, edgesNear, projectOnEdge, CORNERS, spawnPed, spawnVehicle, CAM, toggleRide, PARK, startPlayerChase, COP: () => COP, onNpcRedRun, EVENTS, rivalDayStart, openShop, openSkills, openAch, openBag, addXP, obbMTV, vBox, renderer, CORNER_BLD, PARKS, OFFICE: () => OFFICE, MRT_U, EXPWY, UNDERPASS, TSTAT, updateSignals, updateVehicles, updatePeds, PAUSE: () => PAUSE, BUB, say, camera, VEH, PEDS, TLC, BLD, OWN: () => OWN, G: () => G, POOLS, MODE: () => MODE, PLAYER, investigate, setTarget, visitTarget, endDay, OP };
+  window.__fz = { MRT_EXITS, UNDER_EXITS, MRT_E, INFRA, makeVehMesh, makeHeavyMesh, makeMotoMesh, makePed, ACT: () => ACT, findAction, tutOwner, talk, BTg: () => BT, fillVars, AU, FROZEN: () => FROZEN, LAMPS, setupLampLights, BM, COPV: () => COPV, copWitness, KEY, updateCity, loop, playerHitsStatic, collideCity, pBox, OFF, makePerson, suitUp, scene, NODES, EDGES, FACES, LINES, H, CHUNKS, updateChunks, STREAM, nearestEdge, computeRoute, updateEvents, edgesNear, projectOnEdge, CORNERS, spawnPed, spawnVehicle, CAM, toggleRide, PARK, startPlayerChase, COP: () => COP, onNpcRedRun, EVENTS, rivalDayStart, openShop, openSkills, openAch, openBag, addXP, obbMTV, vBox, renderer, CORNER_BLD, PARKS, OFFICE: () => OFFICE, MRT_U, EXPWY, UNDERPASS, TSTAT, updateSignals, updateVehicles, updatePeds, PAUSE: () => PAUSE, BUB, say, camera, VEH, PEDS, TLC, BLD, OWN: () => OWN, G: () => G, POOLS, MODE: () => MODE, PLAYER, investigate, setTarget, visitTarget, endDay, ending, goalReached, OP };
 }
 
 // ===================== 交通建設：高架捷運、地下捷運、高架快速道路、行人地下道 =====================
@@ -5921,6 +5942,62 @@ function applyCarCheat() {
 }
 // 每一幀：無限體力
 function cheatTick() { if (G && G.cheat && G.cheat.super && G.ap < apMax()) { G.ap = apMax(); updateHUD(); } }
+
+// ===================== 排行榜：誰用最少天數簽到 6 件委託 =====================
+// 共用 2D 版的 Firebase 專案（集合 leaderboard，規則只允許新增、欄位 name/days/signed/ts）
+// 3D 版上線（2026-10-05）之前的紀錄是 2D 版的成績，3D 排行榜不列入
+const FIREBASE = { apiKey: 'AIzaSyAUbp8KWE5mquSNX9M4j3oumauTjZo1xKU', projectId: 'fangzhong-rpg', collection: 'leaderboard' };
+const BOARD_SINCE = Date.UTC(2026, 9, 4, 16);
+const BOARD_KEY = 'fzrpg3d.board.v1';
+const FS_URL = () => `https://firestore.googleapis.com/v1/projects/${FIREBASE.projectId}/databases/(default)/documents/${FIREBASE.collection}?key=${FIREBASE.apiKey}`;
+const boardLocal = () => { try { return JSON.parse(localStorage.getItem(BOARD_KEY) || '[]'); } catch (e) { return []; } };
+const boardSaveLocal = L => { try { localStorage.setItem(BOARD_KEY, JSON.stringify(L.slice(0, 100))); } catch (e) { } };
+const boardSort = (a, b) => a.days - b.days || b.signed - a.signed || a.ts - b.ts;
+const usedCheat = () => !!(G && G.cheat && Object.values(G.cheat).some(Boolean));
+// 通關時登錄成績（每一局只登錄一次；用過密技的不列入）
+async function boardSubmit() {
+  if (!G || G.boardSent || !(G.goalDay || G.comm >= 6)) return null;
+  if (usedCheat()) return { cheat: true };
+  G.boardSent = true; saveGame(true);
+  const entry = { name: String(G.name || '菜鳥').slice(0, 12), days: clamp(G.goalDay || G.day, 1, 30), signed: clamp(G.comm, 6, 60), ts: Date.now() };
+  const L = boardLocal(); L.push(entry); L.sort(boardSort); boardSaveLocal(L);
+  try {
+    await fetch(FS_URL(), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ fields: { name: { stringValue: entry.name }, days: { integerValue: String(entry.days) }, signed: { integerValue: String(entry.signed) }, ts: { integerValue: String(entry.ts) } } }) });
+  } catch (e) { }
+  return entry;
+}
+async function boardFetch() {
+  const local = boardLocal().map(e => ({ ...e, mine: true }));
+  try {
+    let rows = [], tok = '';
+    for (let page = 0; page < 5; page++) {
+      const r = await fetch(FS_URL() + '&pageSize=300' + (tok ? '&pageToken=' + encodeURIComponent(tok) : '')); if (!r.ok) throw 0;
+      const j = await r.json();
+      rows = rows.concat((j.documents || []).map(d => ({ name: (d.fields.name || {}).stringValue || '—', days: +((d.fields.days || {}).integerValue || 99), signed: +((d.fields.signed || {}).integerValue || 0), ts: +((d.fields.ts || {}).integerValue || 0) })));
+      tok = j.nextPageToken; if (!tok) break;
+    }
+    const mine = new Set(local.map(e => e.ts));
+    rows = rows.filter(r => r.ts >= BOARD_SINCE).map(r => ({ ...r, mine: mine.has(r.ts) }));
+    return { rows, shared: true };
+  } catch (e) { return { rows: local, shared: false }; }
+}
+const escH = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+function openBoard(back) {
+  sfx('click');
+  const fromEnd = MODE === 'ending'; if (fromEnd) $('modal').style.zIndex = 60;
+  openModal(`<h3>排行榜 <small>誰最快簽到 6 件委託</small></h3><div id="bdBody" class="bdBody"><p class="dim">讀取中……</p></div><div class="mbtns"><button class="btn ghost" id="bdBack">關閉</button></div>`, 'wide');
+  $('bdBack').onclick = () => { sfx('cancel'); $('modal').style.zIndex = ''; closeModalSoft(); if (fromEnd) PAUSE = true; back && back(); };
+  boardFetch().then(({ rows, shared }) => {
+    const box = $('bdBody'); if (!box) return;
+    rows.sort(boardSort);
+    if (!rows.length) { box.innerHTML = '<p class="dim">還沒有人上榜。30 天內簽到 6 件委託，名字就會出現在這裡！</p>'; return; }
+    const medal = ['🥇', '🥈', '🥉'];
+    box.innerHTML = `<div class="board"><div class="bhd"><span>名次</span><span>玩家</span><span>天數</span><span>委託</span></div>${rows.slice(0, 50).map((r, i) => `<div class="brow${r.mine ? ' mine' : ''}"><span class="rk">${i < 3 ? medal[i] : i + 1}</span><span class="nm">${escH(r.name)}</span><span class="dy">第 ${r.days} 天</span><span class="sg">${r.signed} 件</span></div>`).join('')}</div>
+      <p class="dim" style="margin-top:8px">${shared ? '所有玩家共用同一份排行榜，依「簽到第 6 件的天數」排名，天數相同比委託數。用過密技的成績不列入。' : '目前連不到共享排行榜，先顯示這台裝置的紀錄。'}</p>`;
+  });
+}
+$('tBoard').onclick = () => { audioInit(); openBoard(); };
+$('endBoard').onclick = () => openBoard();
 
 boot();
 
