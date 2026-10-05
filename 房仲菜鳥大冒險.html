@@ -3858,7 +3858,8 @@ $('nameForm').addEventListener('submit', e => {
 // ===================== 辦公室流程 =====================
 function enterOffice(first) {
   MODE = 'office'; renderPass.scene = OFF.scene; show('hud', true); $('hud').classList.add('office'); playMusic('office');
-  OP.x = -1.4; OP.z = 2.4; OP.h = Math.PI; OFF.me.position.set(OP.x, 0, OP.z); CAM.yaw = 0; CAM.pitch = 0.24;
+  // 起始位置：長桌與椅子前方的空地，不會被卡住
+  OP.x = -1.0; OP.z = 4.8; OP.h = Math.PI; OFF.me.position.set(OP.x, 0, OP.z); CAM.yaw = 0; CAM.pitch = 0.24;
   camera.position.set(OP.x, 7, OP.z + 9);
   OFF.win.material.color.set('#9cc6e8');
   updateHUD();
