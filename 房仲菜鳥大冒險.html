@@ -4648,7 +4648,9 @@ $('rideBtn').onclick = () => toggleRide(); $('bMap').onclick = openMap; $('bRec'
 document.addEventListener('click', e => { const b = e.target.closest('button'); if (b && !b.disabled && !b.classList.contains('opt') && !b.closest('.mbtns') && !b.closest('#title') && b.id !== 'bNext' && b.id !== 'iBtn') sfx('click'); });
 document.addEventListener('pointerover', e => { const b = e.target.closest && e.target.closest('button'); if (b && !b.disabled && e.pointerType === 'mouse') sfx('hover'); });
 // ---------- 觸控：左半邊任一點按住出現搖桿（類比），右下互動鍵 ----------
-const setTouch = on => document.body.classList.toggle('touch', on);
+// 手機版的「上車」圓鈕要脫離 #hudBR（它有 transform 縮放，fixed 定位會跟著跑掉、壓到路牌）
+const placeRideBtn = () => { const t = document.body.classList.contains('touch'), b = $('rideBtn'), host = t ? $('hud') : $('hudBR'); if (b && host && b.parentElement !== host) { if (t) host.appendChild(b); else host.insertBefore(b, host.firstChild); } };
+const setTouch = on => { document.body.classList.toggle('touch', on); placeRideBtn(); };
 try { if (matchMedia('(pointer: coarse)').matches || navigator.maxTouchPoints > 0 && !matchMedia('(pointer: fine)').matches) setTouch(true); } catch (e) { }
 addEventListener('pointerdown', e => { if (e.pointerType === 'touch') setTouch(true); }, { capture: true });
 {
