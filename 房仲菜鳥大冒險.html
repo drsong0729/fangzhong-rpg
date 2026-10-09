@@ -492,6 +492,18 @@ body.photo #iWrap{display:none!important}
 #phFlash.on{animation:phFlash .35s ease-out}
 @keyframes phFlash{0%{opacity:.9}100%{opacity:0}}
 @media (max-width:640px){.icards{grid-template-columns:repeat(2,1fr)}.photoRes{grid-template-columns:1fr}.negRow b{font-size:18px}}
+
+/* ---- 主畫面：歡迎加入日勝房屋 ---- */
+.joinBox{position:fixed;right:max(16px,4vw);bottom:calc(max(14px,env(safe-area-inset-bottom)) + 30px);margin:0;border:1px solid rgba(255,255,255,.55);padding:6px 14px 12px;background:rgba(8,10,16,.5);min-inline-size:0}
+.joinBox legend{padding:0 8px;margin:0 auto;font-size:13px;font-weight:800;letter-spacing:.22em;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.6)}
+.joinL{display:flex;gap:10px;justify-content:center}
+.joinL a{display:inline-flex;align-items:center;padding:9px 16px;border-radius:8px;color:#fff;font-weight:800;font-size:15px;letter-spacing:.04em;text-decoration:none;box-shadow:0 4px 14px rgba(0,0,0,.35);white-space:nowrap}
+.joinL a:hover{filter:brightness(1.1)}
+.joinL .j104{background:#ff7800}.joinL .jline{background:#06c755}
+@media (orientation:landscape) and (max-height:520px){#title .joinBox{position:static;grid-column:1;grid-row:4;justify-self:start;align-self:start;padding:4px 10px 8px}#title .joinBox legend{font-size:11px}#title .joinL a{padding:6px 12px;font-size:13px}}
+@media (orientation:landscape) and (max-height:520px){#title .menu{grid-row:1/5}}
+@media (max-height:720px) and (orientation:landscape) and (min-height:521px){.joinL{flex-direction:column;gap:8px}.joinL a{justify-content:center}}
+@media (orientation:portrait){#title.screen{overflow-y:auto;justify-content:safe center}#title .joinBox{position:static;align-self:flex-start;padding:4px 12px 10px;flex-shrink:0}#title .joinL a{padding:8px 14px;font-size:14px}#title .foot{position:static;max-width:none;text-align:left;flex-shrink:0}#title > *{flex-shrink:0}}
 </style>
 
 </head>
@@ -538,6 +550,7 @@ body.photo #iWrap{display:none!important}
       <button class="mbtn fsBtn" id="tFs">全螢幕 <small>Fullscreen</small></button>
       <button class="mbtn" id="tCred">製作人員 <small>Credits</small></button>
     </div>
+    <fieldset class="joinBox"><legend>歡迎加入日勝房屋</legend><div class="joinL"><a class="j104" href="https://www.104.com.tw/company/1a2x6bngpb?jobsource=google" target="_blank" rel="noopener">104人力銀行</a><a class="jline" href="https://page.line.me/supersun.realty" target="_blank" rel="noopener">LINE官方帳號</a></div></fieldset>
     <div class="foot"><span class="keyhint">WASD／方向鍵騎車 · E 互動 · M 地圖 · </span><span class="touchhint">左下搖桿騎車 · 點紅色按鈕互動 · </span>建議開啟聲音</div>
   </section>
 
