@@ -191,6 +191,7 @@ body.touch #dlg .dlgNext{display:none}
 .mbtns.col{flex-direction:column}
 .mbtns.col .btn{align-items:center}
 .mbox.wide{width:min(720px,100%)}
+.recs .rD{font-size:12.5px;color:var(--cyan);margin-top:2px}
 .mbox.win{border-top-color:var(--green)}
 .bigwin{font-family:var(--f-num);font-size:72px;font-weight:700;color:var(--green);line-height:1}
 .stats{list-style:none;padding:0;margin:8px 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px}
@@ -205,6 +206,8 @@ body.touch #dlg .dlgNext{display:none}
 .seg{background:transparent;border:0;border-right:1px solid var(--line);padding:10px 0;font-size:16px;font-weight:700}
 .seg:last-child{border-right:0}
 .seg.on{background:var(--red);color:#fff}
+.segs.two{grid-template-columns:1fr 1fr}
+.stats.two{grid-template-columns:1fr 1fr}
 input[type=range]{accent-color:var(--red);width:100%}
 .help{font-size:12.5px;color:var(--muted);line-height:1.7}
 .recs{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
@@ -4008,6 +4011,7 @@ $('nameForm').addEventListener('submit', e => {
 
 // ===================== 辦公室流程 =====================
 function enterOffice(first) {
+  G.midOffice = false;
   MODE = 'office'; renderPass.scene = OFF.scene; show('hud', true); $('hud').classList.add('office'); playMusic('office');
   // 起始位置：長桌與椅子前方的空地，不會被卡住
   OP.x = -1.0; OP.z = 4.8; OP.h = Math.PI; OFF.me.position.set(OP.x, 0, OP.z); CAM.yaw = 0; CAM.pitch = 0.24;
@@ -4055,7 +4059,7 @@ function enterCity(fromLoad) {
       if (free(x, z)) { PARK.x = x; PARK.z = z; done = true; break; } } if (done) break; }
     if (!done) { PARK.x = b.fx + b.n.x * (SW + 1.6) - ax * 2.2; PARK.z = b.fz + b.n.z * (SW + 1.6) - az * 2.2; }
   }
-  PLAYER.ride = false; PLAYER.x = b.fx + b.n.x * 2.0 + ax * 1.6; PLAYER.z = b.fz + b.n.z * 2.0 + az * 1.6; PLAYER.h = PARK.h; PLAYER.v = 0; CAM.yaw = 0.5; CAM.pitch = 0.3;
+  PLAYER.ride = false; PLAYER.x = b.fx + b.n.x * 2.0 + ax * 2.6; PLAYER.z = b.fz + b.n.z * 2.0 + az * 2.6; PLAYER.h = PARK.h; PLAYER.v = 0; CAM.yaw = 0.5; CAM.pitch = 0.3;
   if (COP) copToTraffic(); TRAIL.length = 0;
   PEDS.forEach(p => spawnPed(p, true)); VEH.forEach(v => { if (!v.rival) spawnVehicle(v, true); });
   if (G.rival) placeRival();
@@ -4117,7 +4121,7 @@ function afterAction() {
 // 調閱電傳
 function investigate(o) {
   if (o.st.lost) { toast('這間已經被大鴻房屋簽走專任了'); return; }
-  if (!o.st.inv) { if (!spendAP(invCost())) return; o.st.inv = true; G.stats.inv++; G.today.inv++; sfx('fax'); const b = BLD[o.bid]; emit('inv', { alley: !!b.alley, cls: ROAD_CLASS[b.street] }); addXP(10);
+  if (!o.st.inv) { if (!spendAP(invCost())) return; o.st.inv = true; o.st.invT = Date.now(); G.stats.inv++; G.today.inv++; sfx('fax'); const b = BLD[o.bid]; emit('inv', { alley: !!b.alley, cls: ROAD_CLASS[b.street] }); addXP(10);
     if ((o.cause === '繼承' || o.cause === '贈與') && !o.st.causeIntel) { o.st.causeIntel = true; setTimeout(() => gainIntel(o, false, `登記原因是「${o.cause}」，房子對他可能有特別的意義`), 900); } }
   else sfx('click');
   showTranscript(o);
@@ -4548,8 +4552,8 @@ const QUALITY = {
 };
 let COARSE = false; try { COARSE = matchMedia('(pointer: coarse)').matches; } catch (e) { }
 const SETTINGS = { quality: COARSE ? 'mid' : 'high' };
-try { const d = JSON.parse(localStorage.getItem(SET_KEY) || 'null'); if (d) { Object.assign(SETTINGS, { quality: d.quality || SETTINGS.quality }); Object.assign(AU.vol, d.vol || {}); } } catch (e) { }
-function saveSettings() { try { localStorage.setItem(SET_KEY, JSON.stringify({ quality: SETTINGS.quality, vol: AU.vol })); } catch (e) { } }
+try { const d = JSON.parse(localStorage.getItem(SET_KEY) || 'null'); if (d) { Object.assign(SETTINGS, { quality: d.quality || SETTINGS.quality, cops: d.cops !== false }); Object.assign(AU.vol, d.vol || {}); } } catch (e) { }
+function saveSettings() { try { localStorage.setItem(SET_KEY, JSON.stringify({ quality: SETTINGS.quality, cops: SETTINGS.cops !== false, vol: AU.vol })); } catch (e) { } }
 function applyQuality() {
   const q = QUALITY[SETTINGS.quality] || QUALITY.high;
   const pr = SETTINGS.quality === 'low' ? Math.min(devicePixelRatio, 1) * q.pr : Math.min(devicePixelRatio, q.pr);
@@ -4575,11 +4579,15 @@ function openSettings(back) {
       ${slider('vMas', '主音量', 'master')}${slider('vMus', '背景音樂', 'music')}${slider('vSfx', '音效', 'sfx')}${slider('vAmb', '引擎環境音', 'amb')}</div>
     <div class="setGroup"><div class="setLbl">遊戲畫質</div><div class="segs" role="group" aria-label="遊戲畫質">${qBtns}</div>
       <p class="dim" id="qNote"></p></div>
+    <div class="setGroup"><div class="setLbl">闖紅燈被警察追捕</div><div class="segs two" role="group" aria-label="闖紅燈被警察追捕"><button class="seg cop ${SETTINGS.cops !== false ? 'on' : ''}" data-c="1" aria-pressed="${SETTINGS.cops !== false}">開啟</button><button class="seg cop ${SETTINGS.cops === false ? 'on' : ''}" data-c="0" aria-pressed="${SETTINGS.cops === false}">關閉</button></div>
+      <p class="dim" id="cNote"></p></div>
     <div class="mbtns"><button class="btn" id="sBack">完成</button></div>`);
   const note = () => { const q = QUALITY[SETTINGS.quality]; $('qNote').textContent = `解析度 ×${q.pr}　陰影 ${q.shadow ? q.shadow + 'px' : '關閉'}　光暈 ${q.bloom ? '開' : '關'}　行人 ${q.peds}　車輛 ${q.veh}　視距 ${q.far} 公尺`; };
   note();
+  const cNote = () => { $('cNote').textContent = SETTINGS.cops !== false ? '闖紅燈被交通警察看到會追你，被攔下要繳罰單。' : '闖紅燈不會被警察追（「今天一次紅燈都不闖」的任務還是照算）。'; }; cNote();
+  $('mbox').querySelectorAll('.seg.cop').forEach(b => b.onclick = () => { SETTINGS.cops = b.dataset.c === '1'; $('mbox').querySelectorAll('.seg.cop').forEach(x => { x.classList.toggle('on', x === b); x.setAttribute('aria-pressed', x === b); }); sfx('confirm'); if (!SETTINGS.cops && typeof COP !== 'undefined' && COP) copToTraffic(); saveSettings(); cNote(); });
   [['vMas', 'master'], ['vMus', 'music'], ['vSfx', 'sfx'], ['vAmb', 'amb']].forEach(([id, k]) => $(id).oninput = e => { AU.vol[k] = +e.target.value; $(id + 'o').textContent = Math.round(AU.vol[k] * 100); setVolumes(); if (k === 'sfx' || k === 'master') sfx('click'); saveSettings(); });
-  $('mbox').querySelectorAll('.seg').forEach(b => b.onclick = () => { SETTINGS.quality = b.dataset.q; $('mbox').querySelectorAll('.seg').forEach(x => { x.classList.toggle('on', x === b); x.setAttribute('aria-pressed', x === b); }); sfx('confirm'); applyQuality(); saveSettings(); note(); });
+  $('mbox').querySelectorAll('.seg[data-q]').forEach(b => b.onclick = () => { SETTINGS.quality = b.dataset.q; $('mbox').querySelectorAll('.seg[data-q]').forEach(x => { x.classList.toggle('on', x === b); x.setAttribute('aria-pressed', x === b); }); sfx('confirm'); applyQuality(); saveSettings(); note(); });
   $('sBack').onclick = () => { sfx('cancel'); closeModalSoft(); back ? back() : (MODE === 'title' ? null : closeModal()); };
 }
 const fsEl = () => document.fullscreenElement || document.webkitFullscreenElement;
@@ -4603,7 +4611,8 @@ function openMenu() {
   openModal(`<h3>選單</h3><div class="mbtns col">
     <button class="btn" id="mResume">繼續遊戲</button>
     <button class="btn" id="mSave">存檔</button>
-    ${MODE === 'city' ? '<button class="btn" id="mEnd">結束今天</button>' : ''}
+    ${MODE === 'city' ? '<button class="btn" id="mOffice">返回公司</button>' : ''}
+    ${MODE === 'city' || (MODE === 'office' && G.midOffice) ? '<button class="btn" id="mEnd">結束今天</button>' : ''}
     <button class="btn ghost" id="mBag">背包</button>
     <button class="btn ghost" id="mSk">技能${G.sp ? `（${G.sp} 點可用）` : ''}</button>
     <button class="btn ghost" id="mAch">成就</button>
@@ -4614,6 +4623,7 @@ function openMenu() {
   $('mResume').onclick = () => { sfx('click'); closeModal(); };
   $('mSave').onclick = () => saveGame();
   if ($('mEnd')) $('mEnd').onclick = () => { sfx('click'); closeModalSoft(); endDayPrompt(false); };
+  if ($('mOffice')) $('mOffice').onclick = () => { closeModalSoft(); backToOffice(); };
   $('mSet').onclick = () => openSettings(() => openMenu());
   $('mBag').onclick = () => openBag();
   $('mSk').onclick = () => openSkills(() => openMenu());
@@ -4623,10 +4633,12 @@ function openMenu() {
 }
 function openRecords() {
   if (MODE !== 'city') return; sfx('click');
-  const list = OWN.filter(o => o.st.inv);
+  const list = OWN.filter(o => o.st.inv).sort((a, b) => (b.st.invT || 0) - (a.st.invT || 0));   // 最近調閱的排最上面
+  const dTxt = bid => { const q = BLD[bid].front, d = Math.hypot(q.x - PLAYER.x, q.z - PLAYER.z); return d < 1000 ? Math.round(d / 10) * 10 + ' 公尺' : (d / 1000).toFixed(1) + ' 公里'; };
   const rows = list.length ? list.map(o => {
     const b = BLD[o.bid], chips = [o.st.signed ? '<i class="c ok">已委託</i>' : '', o.st.letter ? '<i class="c">已留信</i>' : '', o.hidden ? '<i class="c warn">戶籍隱匿</i>' : '', o.st.clue ? '<i class="c clue">有線索</i>' : '', o.st.tries ? `<i class="c">拒絕 ${o.st.tries} 次</i>` : '', o.st.lost ? '<i class="c warn">被阿豪搶走</i>' : '', o.st.perKnown ? `<i class="c clue">${PERS[o.per].name}</i>` : '', o.st.intel ? `<i class="c">情報 ${o.st.intel}</i>` : '', G.rival && G.rival.oid === o.id ? '<i class="c warn">阿豪鎖定中</i>' : '', o.st.urgent && !o.st.signed && !o.st.lost ? '<i class="c warn">急件</i>' : '', o.st.signed ? `<i class="c">開價 ${fmtWan(o.price)}</i>` : '', o.st.sold ? '<i class="c ok">已成交</i>' : '', buyerAt(o) ? '<i class="c ok">今日帶看</i>' : '', o.st.signed && !o.st.sold ? `<i class="c">照片 ${o.st.photo ? starStr(photoStars(o.st.photo)) : '未拍'}</i>` : ''].join('');
-    return `<li><div class="rT"><b>${o.sn}＊＊</b><span>${addrOf(b, o.unit)}</span><div>${chips}</div></div><div class="rB">
+    const dist = [`物件 ${dTxt(o.bid)}`, o.hidden ? '戶籍地 隱匿' : `戶籍地 ${dTxt(o.hh)}`, o.st.clue && !o.st.signed ? `所在地 ${dTxt(o.loc)}` : ''].filter(Boolean).join('　·　');
+    return `<li><div class="rT"><b>${o.sn}＊＊</b><span>${addrOf(b, o.unit)}</span><div class="rD">距離你：${dist}</div><div>${chips}</div></div><div class="rB">
       <button class="btn sm" data-a="doc" data-o="${o.id}">謄本</button>
       <button class="btn sm" data-a="sale" data-o="${o.id}">物件</button>
       ${!o.hidden && !o.st.signed ? `<button class="btn sm" data-a="hh" data-o="${o.id}">戶籍地</button>` : ''}
@@ -4864,12 +4876,44 @@ function updateTouchUI() {
   b.parentElement.style.bottom = panel && !LANDSCAPE_MQ.matches ? Math.min(panel.offsetHeight + 22, innerHeight * 0.42) + 'px' : '';
 }
 
+
+// ===================== 回公司（不結束今天） =====================
+let PORTAL = null;
+function makePortal() {
+  const g = new THREE.Group(), b = OFFICE;
+  const col = new THREE.Mesh(new THREE.CylinderGeometry(0.85, 0.85, 3.2, 24, 1, true), new THREE.MeshBasicMaterial({ color: '#3fa6ff', transparent: true, opacity: 0.22, depthWrite: false, side: THREE.DoubleSide, blending: THREE.AdditiveBlending })); col.position.y = 1.6;
+  const ring = new THREE.Mesh(new THREE.RingGeometry(0.75, 1.0, 40), new THREE.MeshBasicMaterial({ color: '#3fa6ff', transparent: true, opacity: 0.85, side: THREE.DoubleSide })); ring.rotation.x = -Math.PI / 2; ring.position.y = 0.05;
+  const c = cvs(320, 96), x = c.getContext('2d'); x.fillStyle = 'rgba(17,79,156,.95)'; x.fillRect(0, 0, 320, 72); x.beginPath(); x.moveTo(140, 72); x.lineTo(160, 94); x.lineTo(180, 72); x.fill(); x.fillStyle = '#fff'; x.font = `900 40px ${FONT_SANS}`; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('進入公司', 160, 38);
+  const tag = new THREE.Sprite(new THREE.SpriteMaterial({ map: texFrom(c, false), depthTest: false, transparent: true })); tag.scale.set(1.25, 0.375, 1); tag.position.y = 3.6; tag.renderOrder = 6;
+  g.add(col, ring, tag); g.userData.col = col; g.userData.ring = ring;
+  // 就在公司門口正前方
+  const px = b.door.x + b.n.x * 0.9, pz = b.door.z + b.n.z * 0.9;
+  g.position.set(px, H(px, pz) + 0.12, pz); scene.add(g); return g;
+}
+function updatePortal(t) { if (!PORTAL) return; PORTAL.visible = MODE === 'city' || MODE === 'talk'; PORTAL.userData.ring.rotation.z = t * 0.8; PORTAL.userData.col.material.opacity = 0.16 + Math.sin(t * 2.4) * 0.06; }
+function backToOffice() {
+  if (MODE !== 'city' || !G) return;
+  if (COP && !COP.done) { toast('被警察追的時候不能回公司！'); sfx('deny'); return; }
+  if (PHOTO) endPhoto();
+  if (DOG) { scene.remove(DOG.m); DOG = null; }
+  PAUSE = true; sfx('door');
+  fadeTo(() => enterOfficeMid());
+}
+function enterOfficeMid() {
+  MODE = 'office'; PAUSE = false; renderPass.scene = OFF.scene; show('hud', true); $('hud').classList.add('office'); playMusic('office');
+  G.midOffice = true; engineUpdate(false, 0, 0);
+  OP.x = DOOR_X; OP.z = OFFZ - 1.8; OP.h = Math.PI; OFF.me.position.set(OP.x, 0, OP.z); CAM.yaw = 0; CAM.pitch = 0.24;
+  camera.position.set(OP.x, 7, OP.z + 9); updateHUD();
+  toast('回到公司了。找同事聊聊、跟家蓁買東西；走到出口（藍色光圈）就能再出門');
+}
+
 // ===================== 互動判定 =====================
 let ACT = null;
 function findAction() {
   if (MODE === 'office' && !PAUSE) { let best = null, bd = 2.0; for (const n of OFF.npcs) { if (Math.sign(OP.x) !== Math.sign(n.x) && (OP.z > 7.5 || OP.z < 2.5 || n.z > 7.5 || n.z < 2.5)) continue; const d = Math.hypot(OP.x - n.x, OP.z - n.z); if (d < bd) { bd = d; best = n; } } return best ? { kind: 'chat', npc: best, label: best.key === 'amy' ? '找家蓁（聊天／福利社）' : '和' + OFFICE_NPC[best.key].name.replace(/（.*）/, '') + '聊聊', sub: '不耗體力' } : null; }
   if (MODE !== 'city' || PAUSE || PHOTO) return null;
   if (COP && !COP.done) return { kind: 'none', label: '交通警察在後面追你', sub: '逃不掉的，乖乖停車吧' };
+  if (PORTAL && Math.hypot(PLAYER.x - PORTAL.position.x, PLAYER.z - PORTAL.position.z) < 1.6) return { kind: 'portal', label: '進入公司', sub: PLAYER.ride ? '先下車（F）再進去' : '回辦公室找同事、買東西（不會結束今天）' };
   const d = (b) => Math.hypot(PLAYER.x - b.front.x, PLAYER.z - b.front.z);
   if (G.target) { const b = BLD[G.target.bid]; if (d(b) < 8) { const o = OWN[G.target.oid]; return { kind: 'visit', label: G.target.kind === 'meet' ? '赴約見面' : G.target.kind === 'race' ? '搶先拜訪屋主' : '拜訪', sub: addrOf(b) + (G.target.kind === 'hh' && o.kase !== 2 && o.kase !== 6 ? ` · 交談體力 -${TALK_COST}` : '') }; } }
   const ni = nearInfra(); if (ni) return ni.kind === 'mrt' ? { kind: 'mrt', e: ni.e, label: '搭乘捷運', sub: `${ni.e.name}站 · ${ni.e.line.name}（${ni.e.line.kind}）` } : { kind: 'under', u: ni.u, label: '走地下道', sub: '到馬路對面' };
@@ -4889,6 +4933,7 @@ function doAction() {
   else if (ACT.kind === 'mrt') openMRT(ACT.e);
   else if (ACT.kind === 'under') walkUnderpass(ACT.u);
   else if (ACT.kind === 'office') endDayPrompt(false);
+  else if (ACT.kind === 'portal') { if (PLAYER.ride) { toast('先下車（F）再進公司'); sfx('deny'); } else backToOffice(); }
   else if (ACT.kind === 'chat') { if (ACT.npc.key === 'amy') { const n = ACT.npc; choice('家蓁（行政秘書）', '<p class="quote">「要聊聊，還是去公司福利社買點東西？」</p>', [{ label: '聊聊', fn: () => officeChat(n) }, { label: '領取派報 DM', sub: G.dm && G.dm.day === G.day ? '今天已經領過了' : '每天一疊，去社區發', fn: offerDM }, { label: '公司福利社', sub: `錢包 NT$${fmt(G.money)}`, fn: () => openShop('公司福利社') }, { label: '不用了', cls: 'ghost', fn: () => { } }]); } else officeChat(ACT.npc); }
   else if (ACT.kind === 'shop') openShop();
   else if (ACT.kind === 'show') startShowing(ACT.o, ACT.by);
@@ -5108,6 +5153,7 @@ function loop() {
   skyMesh.position.copy(camera.position);
   if (TALKNPC) { const u = TALKNPC.userData; u.armR.rotation.x = Math.sin(t * 3) * 0.15 - 0.2; u.head.rotation.y = Math.sin(t * 0.8) * 0.15; }
   if (G) { tutUpdate(dt); careerTick(dt); }
+  updatePortal(t);
   updateTouchUI();
   if (window.__camOv) { const o = window.__camOv; camera.position.set(o[0], o[1], o[2]); camera.lookAt(o[3], o[4], o[5]); }
   composer.render(); photoAfterRender();
@@ -5139,13 +5185,14 @@ async function boot() {
   scene.add(PARKED);
   const spot = new THREE.SpotLight(0xfff2d0, 0, 40, 0.5, 0.6, 1.2); spot.position.set(0, 1.2, 0.6); const st = new THREE.Object3D(); st.position.set(0, 0, 12); PLAYER.mesh.add(spot, st); spot.target = st; PLAYER.light = spot;
   spawnPeds(scene, 110); spawnTraffic(scene, 40, 30); buildInfra(scene); initBubbles(); buildStaticMap();
+  PORTAL = makePortal();
   composer = new EffectComposer(renderer); renderPass = new RenderPass(scene, camera); composer.addPass(renderPass);
   bloom = new UnrealBloomPass(new THREE.Vector2(innerWidth / 2, innerHeight / 2), 0.5, 0.5, 0.86); composer.addPass(bloom); composer.addPass(new OutputPass());
   applyQuality(); setVolumes();
   G = { day: 1, ap: 100, drift: 0, weather: { w: 'cloud', t: 29 } };
   setupSaleSigns(); G = null;
   $('boot').hidden = true; toTitle(); loop();
-  window.__fz = { MRT_EXITS, UNDER_EXITS, MRT_E, INFRA, makeVehMesh, makeHeavyMesh, makeMotoMesh, makePed, ACT: () => ACT, findAction, tutOwner, talk, BTg: () => BT, fillVars, AU, FROZEN: () => FROZEN, LAMPS, setupLampLights, BM, COPV: () => COPV, copWitness, KEY, updateCity, loop, playerHitsStatic, collideCity, pBox, OFF, makePerson, suitUp, scene, NODES, EDGES, FACES, LINES, H, CHUNKS, updateChunks, STREAM, nearestEdge, computeRoute, updateEvents, edgesNear, projectOnEdge, CORNERS, spawnPed, spawnVehicle, CAM, toggleRide, PARK, startPlayerChase, COP: () => COP, onNpcRedRun, EVENTS, rivalDayStart, openShop, openSkills, openAch, openBag, addXP, obbMTV, vBox, renderer, CORNER_BLD, PARKS, OFFICE: () => OFFICE, MRT_U, EXPWY, UNDERPASS, TSTAT, updateSignals, updateVehicles, updatePeds, PAUSE: () => PAUSE, BUB, say, camera, VEH, PEDS, TLC, BLD, OWN: () => OWN, G: () => G, POOLS, MODE: () => MODE, PLAYER, investigate, setTarget, visitTarget, endDay, ending, goalReached, OP, startDM, offerDM, updateDM, startRace, careerDayStart, newBuyer, startShowing, negotiate, closeDeal, startPhoto, photoShutter, endPhoto, scorePhoto, PHOTO: () => PHOTO, liKey, famOf, addFam, gainIntel, ownerBattle, syncBuyers, buyerAt, RV: () => RV, enterOffice, enterCity, morningLines, answer, BUYER_MESH, DM_SPR, rivalAttempt };
+  window.__fz = { MRT_EXITS, UNDER_EXITS, MRT_E, INFRA, makeVehMesh, makeHeavyMesh, makeMotoMesh, makePed, ACT: () => ACT, findAction, tutOwner, talk, BTg: () => BT, fillVars, AU, FROZEN: () => FROZEN, LAMPS, setupLampLights, BM, COPV: () => COPV, copWitness, KEY, updateCity, loop, playerHitsStatic, collideCity, pBox, OFF, makePerson, suitUp, scene, NODES, EDGES, FACES, LINES, H, CHUNKS, updateChunks, STREAM, nearestEdge, computeRoute, updateEvents, edgesNear, projectOnEdge, CORNERS, spawnPed, spawnVehicle, CAM, toggleRide, PARK, startPlayerChase, COP: () => COP, onNpcRedRun, EVENTS, rivalDayStart, openShop, openSkills, openAch, openBag, addXP, obbMTV, vBox, renderer, CORNER_BLD, PARKS, OFFICE: () => OFFICE, MRT_U, EXPWY, UNDERPASS, TSTAT, updateSignals, updateVehicles, updatePeds, PAUSE: () => PAUSE, BUB, say, camera, VEH, PEDS, TLC, BLD, OWN: () => OWN, G: () => G, POOLS, MODE: () => MODE, PLAYER, investigate, setTarget, visitTarget, endDay, ending, goalReached, OP, PORTAL: () => PORTAL, startDM, offerDM, updateDM, startRace, careerDayStart, newBuyer, startShowing, negotiate, closeDeal, startPhoto, photoShutter, endPhoto, scorePhoto, PHOTO: () => PHOTO, liKey, famOf, addFam, gainIntel, ownerBattle, syncBuyers, buyerAt, RV: () => RV, enterOffice, enterCity, morningLines, answer, BUYER_MESH, DM_SPR, rivalAttempt };
 }
 
 // ===================== 交通建設：高架捷運、地下捷運、高架快速道路、行人地下道 =====================
@@ -5697,6 +5744,7 @@ function updateEvents(dt) {
     const q = G.quests && G.quests.find(q => q.id === 'safe' && !q.done); if (q && !q.fail) { q.fail = true; renderQuests(); }
     // 大多數時候僥倖沒被抓到，少數情況交通警察剛好在後面
     if (G.cheat && G.cheat.nocop) { sfx('deny'); toast('闖紅燈了！（密技：警察不會追你）', 'warn'); }
+    else if (SETTINGS.cops === false) { sfx('deny'); toast('闖紅燈了！（設定：警察追捕已關閉）', 'warn'); }
     else { const wit = copWitness(); if (wit) startPlayerChase(wit); else if (Math.random() < 0.15) startPlayerChase(); else { sfx('deny'); toast('闖紅燈了！好險這次沒被警察看到……', 'warn'); } }
   }
   // 野狗
@@ -6135,9 +6183,10 @@ function negNext(o, by) {
 }
 function closeDeal(o, by, D) {
   by.st = 'done'; o.st.sold = true; o.st.dealPrice = D; G.deals++; G.dealAmt += D; G.cnt.deal++; refreshSign(o); syncBuyers();
-  const fee = Math.round(D * 10000 * 0.06), bonus = Math.round(fee * 0.2 / 100) * 100;
+  // 服務費 6% → 業績分成 80% → 其中 72% 是業務實際拿到的錢
+  const fee = Math.round(D * 10000 * 0.06), share = Math.round(fee * 0.8), bonus = Math.round(share * 0.72 / 100) * 100;
   addMoney(bonus); addXP(220); sfx('sign'); emit('deal'); closeModalSoft();
-  choice('成交！', `<div class="bigwin">成交</div><p>${addrOf(BLD[o.bid])}以 <b>${fmtWan(D)}</b> 成交（開價 ${fmtWan(o.price)}）。</p><p class="quote">${by.name}：「謝謝你，我們終於有自己的家了！」</p><ul class="stats"><li><span>公司服務費（6%）</span><b>NT$${fmt(fee)}</b></li><li><span>你的業績獎金（20%）</span><b>NT$${fmt(bonus)}</b></li><li><span>本月成交</span><b>${G.deals} 件</b></li></ul>`, [{ label: '太好了', fn: afterAction }], 'win wide');
+  choice('成交！', `<div class="bigwin">成交</div><p>${addrOf(BLD[o.bid])}以 <b>${fmtWan(D)}</b> 成交（開價 ${fmtWan(o.price)}）。</p><p class="quote">${by.name}：「謝謝你，我們終於有自己的家了！」</p><ul class="stats two"><li><span>公司服務費（6%）</span><b>NT$${fmt(fee)}</b></li><li><span>業績分成（80%）</span><b>NT$${fmt(share)}</b></li><li><span>實際入帳（分成的 72%）</span><b>NT$${fmt(bonus)}</b></li><li><span>本月成交</span><b>${G.deals} 件</b></li></ul>`, [{ label: '太好了', fn: afterAction }], 'win wide');
 }
 
 // ---------- 屋況拍照 ----------
@@ -6332,7 +6381,7 @@ function copWitness() {
   return best;
 }
 function startPlayerChase(fromV) {
-  if (COP || !G || (G.cheat && G.cheat.nocop)) return;
+  if (COP || !G || (G.cheat && G.cheat.nocop) || SETTINGS.cops === false) return;
   if (fromV) {
     // 目擊的交通警察直接從他所在的位置追過來
     let k = TRAIL.length - 1, bd = 1e9; const cx = fromV.rx ?? fromV.x, cz = fromV.rz ?? fromV.z;
