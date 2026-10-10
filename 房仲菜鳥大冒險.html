@@ -507,6 +507,27 @@ body.photo #iWrap{display:none!important}
 @media (orientation:landscape) and (max-height:520px){#title .menu{grid-row:1/5}}
 @media (max-height:720px) and (orientation:landscape) and (min-height:521px){.joinL{flex-direction:column;gap:8px}.joinL a{justify-content:center}}
 @media (orientation:portrait){#title.screen{overflow-y:auto;justify-content:safe center}#title .joinBox{position:static;align-self:flex-start;padding:4px 12px 10px;flex-shrink:0}#title .joinL a{padding:8px 14px;font-size:14px}#title .foot{position:static;max-width:none;text-align:left;flex-shrink:0}#title > *{flex-shrink:0}}
+
+/* ---- 存檔欄位與 Google 帳號 ---- */
+#tAcct{position:fixed;top:max(14px,env(safe-area-inset-top));right:max(16px,4vw);display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.94);color:#1f1f1f;border:0;border-radius:999px;padding:7px 14px 7px 8px;font-size:13.5px;font-weight:700;box-shadow:0 3px 12px rgba(0,0,0,.35);max-width:44vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;z-index:2}
+#tAcct:hover{filter:brightness(1.05)}
+.gIco{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:conic-gradient(#ea4335 0 25%,#fbbc05 0 50%,#34a853 0 75%,#4285f4 0);color:#fff;font:900 13px/1 Arial,sans-serif;flex-shrink:0;text-shadow:0 0 2px rgba(0,0,0,.4)}
+.acct{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.05);border:1px solid var(--line);padding:8px 10px}
+.acct > div{flex:1;min-width:0;display:flex;flex-direction:column}
+.acct b{font-size:14px}.acct small{font-size:11.5px;color:var(--muted);overflow-wrap:anywhere}
+.acct.on{border-color:rgba(66,133,244,.6)}
+.acctErr{margin:4px 0 0;font-size:12.5px;color:#ff8a7a}
+.slots{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.slots li{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.05);padding:7px 10px;border-left:4px solid var(--line)}
+.slots li.cur{border-left-color:var(--neon)}
+.slots li.empty{opacity:.75}
+.slots .sn{font-family:var(--f-num);font-size:20px;width:26px;text-align:center;color:var(--neon)}
+.slots .si{flex:1;min-width:0;display:flex;flex-direction:column}
+.slots .si span{font-size:14px;font-weight:700;overflow-wrap:anywhere}.slots .si small{font-size:11.5px;color:var(--muted)}
+.slots .sb{display:flex;gap:6px;flex-shrink:0}
+.btn.warn{background:#c8161d;color:#fff;border-color:#c8161d}
+@media (orientation:landscape) and (max-height:520px){#tAcct{display:none}.slots li{padding:5px 8px}.slots .sn{font-size:16px}}
+@media (max-width:520px){.acct{flex-wrap:wrap}.acct .btn{width:100%}#tAcct{font-size:12px;padding:5px 10px 5px 6px}}
 </style>
 
 </head>
@@ -541,6 +562,7 @@ body.photo #iWrap{display:none!important}
   </div>
 
   <section id="title" class="screen" hidden>
+    <button id="tAcct" type="button"></button>
     <img class="brandLogo" src="data:image/png;base64,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" alt="日勝房屋 Super Sun Realty" width="588" height="163">
     <div class="titleSign"><div class="tag">售</div><div class="name"><small>日勝國際不動產 出品</small><b>房仲菜鳥大冒險</b></div></div>
     <p class="subline">溪虹市，十月。新人到職，<b>30</b> 天內簽下 <b>6</b> 件委託。街上每一塊紅色「售」牌背後，都有一位需要被說服的屋主。</p>
@@ -3929,17 +3951,24 @@ function newGame(name) {
   ensureState(); G.tut = -1; G.genV = 3; OWN = genOwners(seed, 3); decorateOwners(); tutSetupOwner(); setupSaleSigns(); MAPNAV = null; ROUTE.pts = []; G.ap = apMax(); RIVAL_MESH && (RIVAL_MESH.visible = false);
 }
 function rollWeather() { const w = Math.random() < 0.25 ? 'rain' : pk(['sun', 'cloud', 'cloud', 'sun', 'overcast'], Math.random); return { w, t: ri(w === 'rain' ? 24 : 26, w === 'rain' ? 28 : 32, Math.random) }; }
-function hasSave() { try { return !!localStorage.getItem(SAVE_KEY); } catch (e) { return false; } }
-function saveGame(silent) {
-  try { const data = Object.assign({}, G, { ost: OWN.map(o => o.st), savedAt: Date.now() }); localStorage.setItem(SAVE_KEY, JSON.stringify(data)); if (!silent) { toast('已存檔：第 ' + G.day + ' 天'); sfx('save'); } return true; }
+// 十個存檔欄位：fzrpg3d.slot.1 ~ .10（舊版單一存檔自動搬到第 1 格）
+const SLOT_N = 10, slotKey = n => 'fzrpg3d.slot.' + n;
+function slotRead(n) { try { return JSON.parse(localStorage.getItem(slotKey(n)) || 'null'); } catch (e) { return null; } }
+function slotWrite(n, d) { localStorage.setItem(slotKey(n), JSON.stringify(d)); try { localStorage.removeItem(slotKey(n) + '.del'); } catch (e) { } }
+try { const old = localStorage.getItem(SAVE_KEY); if (old && !localStorage.getItem('fzrpg3d.slotMigrated')) { if (!localStorage.getItem(slotKey(1))) { const d = JSON.parse(old); d.slot = 1; localStorage.setItem(slotKey(1), JSON.stringify(d)); } localStorage.setItem('fzrpg3d.slotMigrated', '1'); } } catch (e) { }
+const slotCount = () => { let n = 0; for (let i = 1; i <= SLOT_N; i++) if (localStorage.getItem(slotKey(i))) n++; return n; };
+const firstEmptySlot = () => { for (let i = 1; i <= SLOT_N; i++) if (!localStorage.getItem(slotKey(i))) return i; return 0; };
+function hasSave() { try { return slotCount() > 0; } catch (e) { return false; } }
+function saveGame(silent, slot) {
+  try { const n = slot || G.slot || firstEmptySlot() || 1; G.slot = n; const data = Object.assign({}, G, { ost: OWN.map(o => o.st), savedAt: Date.now() }); slotWrite(n, data); cloudPut(n, data); if (!silent) { toast(`已存檔到第 ${n} 格：第 ${G.day} 天`); sfx('save'); } return true; }
   catch (e) { if (!silent) toast('這個瀏覽器無法存檔'); return false; }
 }
-function loadGame() {
-  try { const d = JSON.parse(localStorage.getItem(SAVE_KEY)); if (!d) return false; G = d; const ost = d.ost; delete G.ost; const hadAU = d.apUsed != null; ensureState(); if (!hadAU) G.apUsed = Math.max(0, apMax() - G.ap); OWN = genOwners(G.seed, G.genV || 1); OWN.forEach((o, i) => { if (ost[i]) o.st = ost[i]; }); decorateOwners(); G.tut = -1;   // 新手教學關卡已移除
+function loadGame(n) {
+  try { const d = slotRead(n); if (!d) return false; G = d; G.slot = n; const ost = d.ost; delete G.ost; const hadAU = d.apUsed != null; ensureState(); if (!hadAU) G.apUsed = Math.max(0, apMax() - G.ap); OWN = genOwners(G.seed, G.genV || 1); OWN.forEach((o, i) => { if (ost[i]) o.st = ost[i]; }); decorateOwners(); G.tut = -1;   // 新手教學關卡已移除
     tutSetupOwner(); G.today = G.today || { inv: 0, talk: 0, sign: 0 }; G.race = null; setupSaleSigns(); return true; }
   catch (e) { return false; }
 }
-function saveInfo() { try { const d = JSON.parse(localStorage.getItem(SAVE_KEY)); return d ? `${d.name} · Lv.${d.lv || 1} · 第 ${d.day} 天 · 委託 ${d.comm}/6` : ''; } catch (e) { return ''; } }
+function saveInfo(d) { return d ? `${d.name} · Lv.${d.lv || 1} · 第 ${d.day} 天 · 委託 ${d.comm}/6` : ''; }
 
 function setupSaleSigns() {
   Object.values(SALE_MESH).forEach(m => { scene.remove(m); m.geometry.dispose(); });
@@ -3994,11 +4023,13 @@ function show(id, on) { $(id).hidden = !on; }
 function toTitle() {
   MODE = 'title'; PAUSE = false;
   ['hud', 'battle', 'dlg', 'modal', 'mapScr', 'ending', 'nameScr', 'credits'].forEach(i => show(i, false)); show('title', true);
-  const has = hasSave(); $('tLoad').disabled = !has; $('tLoadSub').textContent = has ? saveInfo() : '尚無存檔';
+  refreshTitleLoad();
   renderPass.scene = scene; playMusic('title');
 }
 $('tNew').onclick = () => { audioInit(); sfx('confirm'); show('title', false); show('nameScr', true); MODE = 'name'; $('nameIn').value = ''; setTimeout(() => $('nameIn').focus(), 50); };
-$('tLoad').onclick = () => { audioInit(); if (!hasSave()) return sfx('deny'); sfx('confirm'); if (loadGame()) { show('title', false); fadeTo(() => enterCity(true)); } else toast('存檔讀取失敗'); };
+function refreshTitleLoad() { const n = slotCount(); $('tLoad').disabled = false; $('tLoadSub').textContent = n ? `${n} / ${SLOT_N} 個存檔` : '十個存檔欄位'; }
+function startFromSlot(n) { if (!loadGame(n)) { toast('存檔讀取失敗'); return; } show('title', false); fadeTo(() => enterCity(true)); }
+$('tLoad').onclick = () => { audioInit(); sfx('confirm'); openSlots('load'); };
 $('tSet').onclick = () => { audioInit(); openSettings(); };
 $('tFs').onclick = () => { audioInit(); toggleFullscreen(); };
 $('tCred').onclick = () => { audioInit(); sfx('confirm'); show('title', false); show('credits', true); MODE = 'credits'; };
@@ -4006,7 +4037,9 @@ $('credBack').onclick = () => { sfx('cancel'); show('credits', false); show('tit
 $('nameBack').onclick = () => { sfx('cancel'); show('nameScr', false); show('title', true); MODE = 'title'; };
 $('nameForm').addEventListener('submit', e => {
   e.preventDefault(); const n = $('nameIn').value.trim(); if (!n) { $('nameErr').hidden = false; sfx('deny'); return; }
-  $('nameErr').hidden = true; sfx('confirm'); $('nameIn').blur(); releaseIME(); newGame(n.slice(0, 8)); show('nameScr', false); fadeTo(() => enterOffice(true));
+  $('nameErr').hidden = true; sfx('confirm'); $('nameIn').blur(); releaseIME();
+  const go = slot => { newGame(n.slice(0, 8)); G.slot = slot; show('nameScr', false); fadeTo(() => enterOffice(true)); };
+  const e0 = firstEmptySlot(); if (e0) go(e0); else openSlots('new', null, go);   // 十格都滿了：選一格覆蓋
 });
 
 // ===================== 辦公室流程 =====================
@@ -4579,11 +4612,13 @@ function openSettings(back) {
       ${slider('vMas', '主音量', 'master')}${slider('vMus', '背景音樂', 'music')}${slider('vSfx', '音效', 'sfx')}${slider('vAmb', '引擎環境音', 'amb')}</div>
     <div class="setGroup"><div class="setLbl">遊戲畫質</div><div class="segs" role="group" aria-label="遊戲畫質">${qBtns}</div>
       <p class="dim" id="qNote"></p></div>
+    <div class="setGroup"><div class="setLbl">Google 帳號</div><div class="acctBox">${acctHtml()}</div></div>
     <div class="setGroup"><div class="setLbl">闖紅燈被警察追捕</div><div class="segs two" role="group" aria-label="闖紅燈被警察追捕"><button class="seg cop ${SETTINGS.cops !== false ? 'on' : ''}" data-c="1" aria-pressed="${SETTINGS.cops !== false}">開啟</button><button class="seg cop ${SETTINGS.cops === false ? 'on' : ''}" data-c="0" aria-pressed="${SETTINGS.cops === false}">關閉</button></div>
       <p class="dim" id="cNote"></p></div>
     <div class="mbtns"><button class="btn" id="sBack">完成</button></div>`);
   const note = () => { const q = QUALITY[SETTINGS.quality]; $('qNote').textContent = `解析度 ×${q.pr}　陰影 ${q.shadow ? q.shadow + 'px' : '關閉'}　光暈 ${q.bloom ? '開' : '關'}　行人 ${q.peds}　車輛 ${q.veh}　視距 ${q.far} 公尺`; };
   note();
+  wireAcct($('mbox'));
   const cNote = () => { $('cNote').textContent = SETTINGS.cops !== false ? '闖紅燈被交通警察看到會追你，被攔下要繳罰單。' : '闖紅燈不會被警察追（「今天一次紅燈都不闖」的任務還是照算）。'; }; cNote();
   $('mbox').querySelectorAll('.seg.cop').forEach(b => b.onclick = () => { SETTINGS.cops = b.dataset.c === '1'; $('mbox').querySelectorAll('.seg.cop').forEach(x => { x.classList.toggle('on', x === b); x.setAttribute('aria-pressed', x === b); }); sfx('confirm'); if (!SETTINGS.cops && typeof COP !== 'undefined' && COP) copToTraffic(); saveSettings(); cNote(); });
   [['vMas', 'master'], ['vMus', 'music'], ['vSfx', 'sfx'], ['vAmb', 'amb']].forEach(([id, k]) => $(id).oninput = e => { AU.vol[k] = +e.target.value; $(id + 'o').textContent = Math.round(AU.vol[k] * 100); setVolumes(); if (k === 'sfx' || k === 'master') sfx('click'); saveSettings(); });
@@ -4621,7 +4656,7 @@ function openMenu() {
     <div class="help"><b>操作</b>　拖曳畫面轉視角 · 滾輪拉近 · V 切換視角 · 按住 C 看後方 · W/↑ 加速 · S/↓ 煞車 · A D/← → 轉向 · 空白鍵 喇叭 · E 互動 · M 地圖 · R 謄本紀錄 · B 背包 · K 技能<br><b>手機</b>　左半邊按住出現搖桿 · 右半邊拖曳轉視角 · 右下圓鍵互動</div>
     <button class="btn ghost" id="mTitle">回主畫面</button></div>`);
   $('mResume').onclick = () => { sfx('click'); closeModal(); };
-  $('mSave').onclick = () => saveGame();
+  $('mSave').onclick = () => openSlots('save', () => openMenu());
   if ($('mEnd')) $('mEnd').onclick = () => { sfx('click'); closeModalSoft(); endDayPrompt(false); };
   if ($('mOffice')) $('mOffice').onclick = () => { closeModalSoft(); backToOffice(); };
   $('mSet').onclick = () => openSettings(() => openMenu());
@@ -5192,7 +5227,7 @@ async function boot() {
   G = { day: 1, ap: 100, drift: 0, weather: { w: 'cloud', t: 29 } };
   setupSaleSigns(); G = null;
   $('boot').hidden = true; toTitle(); loop();
-  window.__fz = { MRT_EXITS, UNDER_EXITS, MRT_E, INFRA, makeVehMesh, makeHeavyMesh, makeMotoMesh, makePed, ACT: () => ACT, findAction, tutOwner, talk, BTg: () => BT, fillVars, AU, FROZEN: () => FROZEN, LAMPS, setupLampLights, BM, COPV: () => COPV, copWitness, KEY, updateCity, loop, playerHitsStatic, collideCity, pBox, OFF, makePerson, suitUp, scene, NODES, EDGES, FACES, LINES, H, CHUNKS, updateChunks, STREAM, nearestEdge, computeRoute, updateEvents, edgesNear, projectOnEdge, CORNERS, spawnPed, spawnVehicle, CAM, toggleRide, PARK, startPlayerChase, COP: () => COP, onNpcRedRun, EVENTS, rivalDayStart, openShop, openSkills, openAch, openBag, addXP, obbMTV, vBox, renderer, CORNER_BLD, PARKS, OFFICE: () => OFFICE, MRT_U, EXPWY, UNDERPASS, TSTAT, updateSignals, updateVehicles, updatePeds, PAUSE: () => PAUSE, BUB, say, camera, VEH, PEDS, TLC, BLD, OWN: () => OWN, G: () => G, POOLS, MODE: () => MODE, PLAYER, investigate, setTarget, visitTarget, endDay, ending, goalReached, OP, PORTAL: () => PORTAL, startDM, offerDM, updateDM, startRace, careerDayStart, newBuyer, startShowing, negotiate, closeDeal, startPhoto, photoShutter, endPhoto, scorePhoto, PHOTO: () => PHOTO, liKey, famOf, addFam, gainIntel, ownerBattle, syncBuyers, buyerAt, RV: () => RV, enterOffice, enterCity, morningLines, answer, BUYER_MESH, DM_SPR, rivalAttempt };
+  window.__fz = { MRT_EXITS, UNDER_EXITS, MRT_E, INFRA, makeVehMesh, makeHeavyMesh, makeMotoMesh, makePed, ACT: () => ACT, findAction, tutOwner, talk, BTg: () => BT, fillVars, AU, FROZEN: () => FROZEN, LAMPS, setupLampLights, BM, COPV: () => COPV, copWitness, KEY, updateCity, loop, playerHitsStatic, collideCity, pBox, OFF, makePerson, suitUp, scene, NODES, EDGES, FACES, LINES, H, CHUNKS, updateChunks, STREAM, nearestEdge, computeRoute, updateEvents, edgesNear, projectOnEdge, CORNERS, spawnPed, spawnVehicle, CAM, toggleRide, PARK, startPlayerChase, COP: () => COP, onNpcRedRun, EVENTS, rivalDayStart, openShop, openSkills, openAch, openBag, addXP, obbMTV, vBox, renderer, CORNER_BLD, PARKS, OFFICE: () => OFFICE, MRT_U, EXPWY, UNDERPASS, TSTAT, updateSignals, updateVehicles, updatePeds, PAUSE: () => PAUSE, BUB, say, camera, VEH, PEDS, TLC, BLD, OWN: () => OWN, G: () => G, POOLS, MODE: () => MODE, PLAYER, investigate, setTarget, visitTarget, endDay, ending, goalReached, OP, acctTest: { set: u => { USER = u; renderAccount(); }, sync: () => cloudSync(), cloud: () => CLOUD, err: () => CLOUD_ERR }, openSlots, slotRead, PORTAL: () => PORTAL, startDM, offerDM, updateDM, startRace, careerDayStart, newBuyer, startShowing, negotiate, closeDeal, startPhoto, photoShutter, endPhoto, scorePhoto, PHOTO: () => PHOTO, liKey, famOf, addFam, gainIntel, ownerBattle, syncBuyers, buyerAt, RV: () => RV, enterOffice, enterCity, morningLines, answer, BUYER_MESH, DM_SPR, rivalAttempt };
 }
 
 // ===================== 交通建設：高架捷運、地下捷運、高架快速道路、行人地下道 =====================
@@ -6691,6 +6726,155 @@ function openBoard(back) {
 }
 $('tBoard').onclick = () => { audioInit(); openBoard(); };
 $('endBoard').onclick = () => openBoard();
+
+// ===================== 存檔欄位（十格）＋ Google 帳號雲端同步 =====================
+const ACCT_FLAG = 'fzrpg3d.acct', FB_VER = '10.12.2';
+const FB_CFG = { apiKey: FIREBASE.apiKey, authDomain: FIREBASE.projectId + '.firebaseapp.com', projectId: FIREBASE.projectId };
+const FS_BASE = `https://firestore.googleapis.com/v1/projects/${FIREBASE.projectId}/databases/(default)/documents`;
+let FBA = null, USER = null, CLOUD = {}, CLOUD_ERR = '', SLOT_VIEW = null;
+
+// ---------- Firebase Auth（點了登入才載入，不影響沒登入的玩家） ----------
+async function fbInit() {
+  if (FBA) return FBA;
+  const app = await import(`https://www.gstatic.com/firebasejs/${FB_VER}/firebase-app.js`);
+  const auth = await import(`https://www.gstatic.com/firebasejs/${FB_VER}/firebase-auth.js`);
+  const A = auth.getAuth(app.initializeApp(FB_CFG));
+  try { await auth.setPersistence(A, auth.browserLocalPersistence); } catch (e) { }
+  FBA = { A, auth };
+  let first = true;
+  auth.onAuthStateChanged(A, u => {
+    USER = u; CLOUD_ERR = '';
+    if (u) { try { localStorage.setItem(ACCT_FLAG, '1'); } catch (e) { } cloudSync().then(() => { renderAccount(); if (!first) toast(`已綁定 Google 帳號：${u.email || u.displayName}，存檔會同步到雲端`); first = false; }); }
+    else first = false;
+    renderAccount();
+  });
+  try { await auth.getRedirectResult(A); } catch (e) { CLOUD_ERR = authMsg(e); renderAccount(); }
+  return FBA;
+}
+function authMsg(e) {
+  const c = (e && e.code) || '';
+  if (c === 'auth/unauthorized-domain') return '這個網址還沒加入 Firebase 的授權網域';
+  if (c === 'auth/operation-not-allowed' || c === 'auth/configuration-not-found') return 'Firebase 還沒啟用 Google 登入';
+  if (c === 'auth/network-request-failed') return '連不到 Google，請檢查網路';
+  if (c === 'auth/popup-closed-by-user' || c === 'auth/cancelled-popup-request') return '';
+  return '登入失敗（' + (c || (e && e.message) || '未知錯誤') + '）';
+}
+async function acctLogin() {
+  sfx('confirm');
+  let F; try { F = await fbInit(); } catch (e) { CLOUD_ERR = '載入 Google 登入元件失敗，請檢查網路'; renderAccount(); return; }
+  const p = new F.auth.GoogleAuthProvider(); p.setCustomParameters({ prompt: 'select_account' });
+  try { await F.auth.signInWithPopup(F.A, p); }
+  catch (e) {
+    if (e.code === 'auth/popup-blocked' || e.code === 'auth/operation-not-supported-in-this-environment') { try { await F.auth.signInWithRedirect(F.A, p); return; } catch (e2) { e = e2; } }
+    CLOUD_ERR = authMsg(e); renderAccount();
+  }
+}
+async function acctLogout() {
+  sfx('cancel'); if (!FBA) return;
+  try { await FBA.auth.signOut(FBA.A); } catch (e) { }
+  try { localStorage.removeItem(ACCT_FLAG); } catch (e) { }
+  CLOUD = {}; toast('已登出 Google 帳號。存檔仍保留在這台裝置'); renderAccount();
+}
+
+// ---------- 雲端存檔（Firestore REST：saves/{uid}/slots/s1~s10） ----------
+async function cloudReq(method, path, body) {
+  const t = await USER.getIdToken();
+  const r = await fetch(FS_BASE + path, { method, headers: { Authorization: 'Bearer ' + t, 'Content-Type': 'application/json' }, body: body ? JSON.stringify(body) : undefined });
+  if (r.status === 404 && method === 'GET') return {};
+  if (!r.ok) { const err = new Error(r.status === 403 ? 'PERM' : 'HTTP ' + r.status); throw err; }
+  return r.status === 204 ? null : r.json();
+}
+const cloudErrText = e => e.message === 'PERM' ? '雲端存檔還沒開通（Firestore 規則尚未允許）' : '雲端同步失敗，稍後會再試';
+function cloudPut(n, data) {
+  if (!USER || !data) return;
+  cloudReq('PATCH', `/saves/${USER.uid}/slots/s${n}`, { fields: { data: { stringValue: JSON.stringify(data) }, savedAt: { integerValue: String(data.savedAt || 0) }, info: { stringValue: saveInfo(data) } } })
+    .then(() => { CLOUD[n] = { savedAt: data.savedAt || 0 }; CLOUD_ERR = ''; if (SLOT_VIEW) SLOT_VIEW(); })
+    .catch(e => { CLOUD_ERR = cloudErrText(e); if (SLOT_VIEW) SLOT_VIEW(); });
+}
+// 登入或打開存檔畫面時：雲端與本機逐格比對，較新的那一份勝出
+async function cloudSync() {
+  if (!USER) return;
+  try {
+    const j = await cloudReq('GET', `/saves/${USER.uid}/slots?pageSize=20`), C = {};
+    for (const d of (j && j.documents) || []) { const n = +d.name.split('/').pop().slice(1); if (n >= 1 && n <= SLOT_N) C[n] = { savedAt: +((d.fields.savedAt || {}).integerValue || 0), data: (d.fields.data || {}).stringValue }; }
+    CLOUD = {};
+    for (let n = 1; n <= SLOT_N; n++) {
+      const L = slotRead(n), c = C[n], del = +(localStorage.getItem(slotKey(n) + '.del') || 0);
+      if (c && del && c.savedAt <= del) { await cloudReq('DELETE', `/saves/${USER.uid}/slots/s${n}`); continue; }
+      if (c && (!L || c.savedAt > (L.savedAt || 0))) { try { JSON.parse(c.data); localStorage.setItem(slotKey(n), c.data); } catch (e) { } CLOUD[n] = { savedAt: c.savedAt }; }
+      else if (L && (!c || (L.savedAt || 0) > c.savedAt)) cloudPut(n, L);
+      else if (c) CLOUD[n] = { savedAt: c.savedAt };
+    }
+    CLOUD_ERR = '';
+  } catch (e) { CLOUD_ERR = cloudErrText(e); }
+  if (MODE === 'title') refreshTitleLoad();
+}
+function slotDelete(n) {
+  try { localStorage.removeItem(slotKey(n)); localStorage.setItem(slotKey(n) + '.del', String(Date.now())); } catch (e) { }
+  if (USER) cloudReq('DELETE', `/saves/${USER.uid}/slots/s${n}`).then(() => { delete CLOUD[n]; }).catch(() => { });
+  if (G && G.slot === n && MODE === 'title') G = null;
+}
+
+// ---------- 帳號區塊 ----------
+const escA = s => String(s || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+function acctHtml() {
+  const err = CLOUD_ERR ? `<p class="acctErr">${escA(CLOUD_ERR)}</p>` : '';
+  if (USER) return `<div class="acct on"><span class="gIco" aria-hidden="true">G</span><div><b>${escA(USER.displayName || 'Google 帳號')}</b><small>${escA(USER.email)} · 存檔會同步到雲端，換手機也能接著玩</small></div><button class="btn sm ghost acctOut">登出</button></div>${err}`;
+  return `<div class="acct"><span class="gIco" aria-hidden="true">G</span><div><b>尚未綁定 Google 帳號</b><small>存檔只在這台裝置。綁定後會同步到雲端，換裝置也能讀取</small></div><button class="btn sm acctIn">綁定 Google 帳號</button></div>${err}`;
+}
+function wireAcct(root) {
+  root.querySelectorAll('.acctIn').forEach(b => b.onclick = () => acctLogin());
+  root.querySelectorAll('.acctOut').forEach(b => b.onclick = () => acctLogout());
+}
+function renderAccount() {
+  const chip = $('tAcct');
+  if (chip) { chip.innerHTML = USER ? `<span class="gIco" aria-hidden="true">G</span>${escA(USER.displayName || USER.email)}` : '<span class="gIco" aria-hidden="true">G</span>綁定 Google 帳號'; chip.classList.toggle('on', !!USER); }
+  document.querySelectorAll('.acctBox').forEach(el => { el.innerHTML = acctHtml(); wireAcct(el); });
+  if (SLOT_VIEW) SLOT_VIEW();
+}
+
+// ---------- 存檔欄位畫面 ----------
+const fmtTime = t => { if (!t) return ''; const d = new Date(t), p = x => String(x).padStart(2, '0'); return `${d.getFullYear()}/${p(d.getMonth() + 1)}/${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`; };
+function openSlots(mode, back, onPick) {
+  const title = { load: '載入遊戲', save: '存檔', new: '選擇存檔欄位' }[mode];
+  const note = { load: '選一個存檔繼續玩。', save: '選一格存檔。存到有資料的欄位會覆蓋原本的紀錄。', new: '十個欄位都滿了，選一格用來存新遊戲（會覆蓋原本的紀錄）。' }[mode];
+  let confirmN = 0;
+  const draw = () => {
+    const rows = [];
+    for (let n = 1; n <= SLOT_N; n++) {
+      const d = slotRead(n), cur = G && G.slot === n && MODE !== 'title', c = CLOUD[n], synced = d && c && c.savedAt >= (d.savedAt || 0);
+      const meta = d ? `<span>${escA(saveInfo(d))}</span><small>${fmtTime(d.savedAt)}${synced ? '　☁ 已同步' : USER && d ? '　☁ 同步中…' : ''}${cur ? '　· 目前這一局' : ''}</small>` : '<span class="dim">空欄位</span>';
+      let btns = '';
+      const ask = confirmN === n;
+      if (mode === 'load') btns = d ? `<button class="btn sm" data-a="load" data-n="${n}">載入</button><button class="btn sm ghost${ask ? ' warn' : ''}" data-a="del" data-n="${n}">${ask ? '確定刪除？' : '刪除'}</button>` : '';
+      else if (mode === 'save') btns = `<button class="btn sm${ask ? ' warn' : ''}" data-a="save" data-n="${n}">${ask ? '確定覆蓋？' : d && !cur ? '覆蓋' : '存到這裡'}</button>`;
+      else btns = `<button class="btn sm${ask ? ' warn' : ''}" data-a="pick" data-n="${n}">${ask ? '確定覆蓋？' : '用這格'}</button>`;
+      rows.push(`<li class="${cur ? 'cur' : ''}${d ? '' : ' empty'}"><b class="sn">${n}</b><div class="si">${meta}</div><div class="sb">${btns}</div></li>`);
+    }
+    openModal(`<h3>${title} <small>${slotCount()} / ${SLOT_N}</small></h3><div class="acctBox">${acctHtml()}</div><p class="dim">${note}</p><ul class="slots">${rows.join('')}</ul><div class="mbtns"><button class="btn ghost" id="slBack">${mode === 'new' ? '取消' : '關閉'}</button></div>`, 'wide');
+    wireAcct($('mbox'));
+    $('slBack').onclick = () => { sfx('cancel'); SLOT_VIEW = null; closeModalSoft(); if (back) back(); };
+    $('mbox').querySelectorAll('[data-a]').forEach(b => b.onclick = () => {
+      const n = +b.dataset.n, a = b.dataset.a, d = slotRead(n);
+      if (a === 'load') { sfx('confirm'); SLOT_VIEW = null; closeModalSoft(); startFromSlot(n); return; }
+      if (a === 'del') { if (confirmN !== n) { confirmN = n; sfx('click'); return draw(); } confirmN = 0; slotDelete(n); sfx('cancel'); toast(`已刪除第 ${n} 格存檔`); refreshTitleLoad(); return draw(); }
+      const needAsk = d && !(a === 'save' && G && G.slot === n);
+      if (needAsk && confirmN !== n) { confirmN = n; sfx('click'); return draw(); }
+      confirmN = 0;
+      if (a === 'save') { saveGame(false, n); return draw(); }
+      if (a === 'pick') { SLOT_VIEW = null; closeModalSoft(); onPick && onPick(n); }
+    });
+  };
+  SLOT_VIEW = () => { if (!ui.modalOpen || !$('slBack')) { SLOT_VIEW = null; return; } draw(); };
+  draw();
+  if (USER) cloudSync().then(() => SLOT_VIEW && SLOT_VIEW());
+}
+
+// ---------- 主畫面右上角的帳號鈕 ----------
+$('tAcct').onclick = () => { audioInit(); if (USER) { openSlots('load'); } else acctLogin(); };
+renderAccount();
+// 上次登入過：背景還原登入狀態
+try { if (localStorage.getItem(ACCT_FLAG)) fbInit().catch(() => { }); } catch (e) { }
 
 boot();
 
