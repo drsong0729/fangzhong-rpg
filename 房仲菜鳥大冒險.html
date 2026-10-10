@@ -528,6 +528,16 @@ body.photo #iWrap{display:none!important}
 .btn.warn{background:#c8161d;color:#fff;border-color:#c8161d}
 @media (orientation:landscape) and (max-height:520px){#tAcct{display:none}.slots li{padding:5px 8px}.slots .sn{font-size:16px}}
 @media (max-width:520px){.acct{flex-wrap:wrap}.acct .btn{width:100%}#tAcct{font-size:12px;padding:5px 10px 5px 6px}}
+
+#credDev{font-weight:inherit;cursor:default;-webkit-user-select:none;user-select:none}
+.consent{max-height:min(52vh,420px);overflow:auto;background:rgba(255,255,255,.04);border:1px solid var(--line);padding:10px 14px;font-size:13.5px;line-height:1.7}
+.consent h4{margin:10px 0 2px;font-size:14px;color:var(--neon)}
+.consent p{margin:0 0 4px}
+.consent .meta{color:var(--muted);font-size:12.5px}
+.ulist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;max-height:60vh;overflow:auto}
+.ulist li{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.05);padding:7px 10px}
+.ulist img{width:34px;height:34px;border-radius:50%;flex-shrink:0;background:#333}
+.ulist .ui{flex:1;min-width:0;display:flex;flex-direction:column}.ulist .ui b{font-size:14px}.ulist .ui small{font-size:11.5px;color:var(--muted);overflow-wrap:anywhere}
 </style>
 
 </head>
@@ -593,7 +603,7 @@ body.photo #iWrap{display:none!important}
     <div class="card">
       <h2>製作人員</h2>
       <div class="credName"><span>出品</span>日勝國際不動產</div>
-      <div class="credName"><span>企劃・製作</span>Ryan 吳松儒</div>
+      <div class="credName"><span>企劃・製作</span>Ryan <b id="credDev">吳松儒</b></div>
       <div class="row"><button class="btn ghost" id="credBack">返回</button></div>
     </div>
   </section>
@@ -6731,7 +6741,7 @@ $('endBoard').onclick = () => openBoard();
 const ACCT_FLAG = 'fzrpg3d.acct', FB_VER = '10.12.2';
 const FB_CFG = { apiKey: FIREBASE.apiKey, authDomain: FIREBASE.projectId + '.firebaseapp.com', projectId: FIREBASE.projectId };
 const FS_BASE = `https://firestore.googleapis.com/v1/projects/${FIREBASE.projectId}/databases/(default)/documents`;
-let FBA = null, USER = null, CLOUD = {}, CLOUD_ERR = '', SLOT_VIEW = null;
+let FBA = null, USER = null, CLOUD = {}, CLOUD_ERR = '', SLOT_VIEW = null, SLOT_ARGS = ['load'];
 
 // ---------- Firebase Auth（點了登入才載入，不影響沒登入的玩家） ----------
 async function fbInit() {
@@ -6744,7 +6754,7 @@ async function fbInit() {
   let first = true;
   auth.onAuthStateChanged(A, u => {
     USER = u; CLOUD_ERR = '';
-    if (u) { try { localStorage.setItem(ACCT_FLAG, '1'); } catch (e) { } cloudSync().then(() => { renderAccount(); if (!first) toast(`已綁定 Google 帳號：${u.email || u.displayName}，存檔會同步到雲端`); first = false; }); }
+    if (u) { try { localStorage.setItem(ACCT_FLAG, '1'); } catch (e) { } registerUser(u); cloudSync().then(() => { renderAccount(); if (!first) toast(`已綁定 Google 帳號：${u.email || u.displayName}，存檔會同步到雲端`); first = false; }); }
     else first = false;
     renderAccount();
   });
@@ -6759,7 +6769,25 @@ function authMsg(e) {
   if (c === 'auth/popup-closed-by-user' || c === 'auth/cancelled-popup-request') return '';
   return '登入失敗（' + (c || (e && e.message) || '未知錯誤') + '）';
 }
-async function acctLogin() {
+// 綁定前先顯示個資同意書，按「繼續綁定」才開始 Google 登入
+const CONSENT_HTML = `<div class="consent">
+<p class="meta">蒐集主體：房仲菜鳥大冒險<br>系統開發者：吳松儒<br>適用法規：中華民國《個人資料保護法》</p>
+<h4>一、蒐集目的</h4><p>本系統蒐集個人資料之目的為提供帳號驗證與身分識別，以及使用者個人業務資料之雲端同步與備份。</p>
+<h4>二、蒐集之個人資料類別</h4><p>使用者本人資料（透過 Google 登入自動取得）：姓名、電子郵件地址、Google 帳號頭像。</p>
+<h4>三、利用期間、地區及對象</h4><p>資料自使用者登入起保存，至主動要求刪除或本系統終止服務為止。伺服器位於台灣境內（Google Firebase，asia-east1）。資料僅限該 Google 帳號之使用者本人存取，不提供予任何第三人。</p>
+<h4>四、當事人之權利</h4><p>依《個人資料保護法》第三條，您得行使查詢、閱覽、製給複製本、補充更正、停止利用及刪除等權利。請聯繫：</p><p>📧 drsong0729@gmail.com　📞 0975711267　💬 LINE：dr.song0729</p><p>本系統將於接獲請求後 15 個工作日內回覆。</p>
+<h4>五、免責聲明</h4><p>使用者應對其輸入之所有資料內容及其取得方式負完全責任。若涉及違法蒐集或未經當事人同意等情形，相關法律責任由使用者自行承擔，本系統開發者不負連帶責任。</p>
+<h4>六、條款變更</h4><p>本系統保留隨時修訂本同意書之權利，修訂後之條款將公告於登入頁面。使用者於條款修訂後繼續使用本系統，視為已同意修訂後之內容。</p></div>`;
+let CONSENT_AT = 0;
+function acctLogin() {
+  sfx('click');
+  fbInit().catch(() => { });   // 先在背景載入登入元件，按「繼續綁定」時才能馬上跳出 Google 視窗
+  const reopen = ui.modalOpen && $('slBack') ? () => openSlots(...SLOT_ARGS) : ui.modalOpen && $('sBack') ? () => openSettings(MODE === 'title' ? null : () => openMenu()) : () => { };
+  choice('個人資料蒐集、處理及利用同意書', CONSENT_HTML, [
+    { label: '繼續綁定', fn: () => { CONSENT_AT = Date.now(); acctDoLogin(); reopen(); } },
+    { label: '取消', cls: 'ghost', fn: () => { sfx('cancel'); reopen(); } }], 'wide');
+}
+async function acctDoLogin() {
   sfx('confirm');
   let F; try { F = await fbInit(); } catch (e) { CLOUD_ERR = '載入 Google 登入元件失敗，請檢查網路'; renderAccount(); return; }
   const p = new F.auth.GoogleAuthProvider(); p.setCustomParameters({ prompt: 'select_account' });
@@ -6836,6 +6864,7 @@ function renderAccount() {
 // ---------- 存檔欄位畫面 ----------
 const fmtTime = t => { if (!t) return ''; const d = new Date(t), p = x => String(x).padStart(2, '0'); return `${d.getFullYear()}/${p(d.getMonth() + 1)}/${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`; };
 function openSlots(mode, back, onPick) {
+  SLOT_ARGS = [mode, back, onPick];
   const title = { load: '載入遊戲', save: '存檔', new: '選擇存檔欄位' }[mode];
   const note = { load: '選一個存檔繼續玩。', save: '選一格存檔。存到有資料的欄位會覆蓋原本的紀錄。', new: '十個欄位都滿了，選一格用來存新遊戲（會覆蓋原本的紀錄）。' }[mode];
   let confirmN = 0;
@@ -6868,6 +6897,32 @@ function openSlots(mode, back, onPick) {
   SLOT_VIEW = () => { if (!ui.modalOpen || !$('slBack')) { SLOT_VIEW = null; return; } draw(); };
   draw();
   if (USER) cloudSync().then(() => SLOT_VIEW && SLOT_VIEW());
+}
+
+
+// 綁定紀錄：users/{uid}（名字、Email、頭像、首次與最近登入時間、同意書時間）
+function registerUser(u) {
+  const now = Date.now(), f = { name: { stringValue: u.displayName || '' }, email: { stringValue: u.email || '' }, photo: { stringValue: u.photoURL || '' }, lastAt: { integerValue: String(now) } };
+  if (CONSENT_AT) f.consentAt = { integerValue: String(CONSENT_AT) };
+  const mask = Object.keys(f).map(k => 'updateMask.fieldPaths=' + k).join('&');
+  cloudReq('PATCH', `/users/${u.uid}?${mask}`, { fields: f }).then(() => cloudReq('GET', `/users/${u.uid}`)).then(d => {
+    if (d && d.fields && !d.fields.firstAt) cloudReq('PATCH', `/users/${u.uid}?updateMask.fieldPaths=firstAt`, { fields: { firstAt: { integerValue: String(now) } } }).catch(() => { });
+  }).catch(() => { });
+}
+// 製作人員頁：連點「吳松儒」7 次 → 已綁定的 Google 帳號（只有開發者帳號能讀取）
+const ADMIN_EMAIL = 'drsong0729@gmail.com';
+{ let taps = []; $('credDev').addEventListener('click', () => { const t = performance.now(); taps = taps.filter(x => t - x < 3000); taps.push(t); if (taps.length >= 7) { taps = []; openUserList(); } }); }
+async function openUserList() {
+  sfx('quest');
+  const shell = body => openModal(`<h3>已綁定的 Google 帳號</h3>${body}<div class="mbtns"><button class="btn ghost" id="ulBack">關閉</button></div>`, 'wide') || ($('ulBack').onclick = () => { sfx('cancel'); closeModalSoft(); });
+  if (!USER || (USER.email || '').toLowerCase() !== ADMIN_EMAIL) { shell(`<p>這個頁面只有開發者帳號（${ADMIN_EMAIL}）能查看。</p><div class="acctBox">${acctHtml()}</div>`); wireAcct($('mbox')); return; }
+  shell('<p class="dim">讀取中……</p>');
+  try {
+    let rows = [], tok = '';
+    for (let i = 0; i < 10; i++) { const j = await cloudReq('GET', `/users?pageSize=300${tok ? '&pageToken=' + encodeURIComponent(tok) : ''}`); rows = rows.concat((j.documents || []).map(d => { const f = d.fields || {}, g = k => (f[k] || {}).stringValue || '', n = k => +((f[k] || {}).integerValue || 0); return { name: g('name'), email: g('email'), photo: g('photo'), first: n('firstAt'), last: n('lastAt') }; })); tok = j.nextPageToken; if (!tok) break; }
+    rows.sort((a, b) => b.last - a.last);
+    shell(`<p class="dim">共 ${rows.length} 個帳號，依最近登入排序。</p><ul class="ulist">${rows.map(r => `<li>${r.photo ? `<img src="${escA(r.photo)}" alt="" referrerpolicy="no-referrer">` : '<span class="gIco" aria-hidden="true">G</span>'}<div class="ui"><b>${escA(r.name || '（未提供名字）')}</b><small>${escA(r.email)}</small><small>首次綁定 ${fmtTime(r.first) || '—'}　最近登入 ${fmtTime(r.last) || '—'}</small></div></li>`).join('') || '<li>還沒有人綁定。</li>'}</ul>`);
+  } catch (e) { shell(`<p>讀取失敗：${e.message === 'PERM' ? 'Firestore 規則還沒開放開發者讀取 users 集合' : escA(e.message)}</p>`); }
 }
 
 // ---------- 主畫面右上角的帳號鈕 ----------
