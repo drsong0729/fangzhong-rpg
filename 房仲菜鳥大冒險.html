@@ -556,6 +556,102 @@ body.photo #iWrap{display:none!important}
 .missions li.act{border-left:4px solid var(--neon)}
 .missions li.done{opacity:.7}
 .mbar{height:8px;background:rgba(255,255,255,.1)}.mbar i{display:block;height:100%;background:linear-gradient(90deg,#3fd6ff,#ffcf3a)}
+
+/* 更新日誌 */
+.mbox.changelog{width:min(680px,100%);gap:10px;background:#161b25}
+.clBody{overflow:auto;max-height:min(62dvh,560px);padding-right:6px;display:flex;flex-direction:column;gap:14px;scrollbar-width:thin}
+.clV{border:1px solid var(--line);background:rgba(255,255,255,.03)}
+.clV.new{border-color:#ffcf3a88;background:rgba(255,207,58,.06)}
+.clHead{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.clHead b{font-size:17px;letter-spacing:.03em}
+.clDate{font-family:var(--f-num);font-size:13px;font-weight:700;background:var(--red);color:#fff;padding:2px 8px;letter-spacing:.04em}
+.clNew{font-family:var(--f-num);font-size:12px;font-weight:900;color:#1b1a17;background:#ffcf3a;padding:1px 7px;margin-left:auto;letter-spacing:.08em}
+.clV ul{list-style:none;margin:0;padding:6px 14px 10px}
+.clV li{padding:8px 0;border-bottom:1px dashed rgba(255,255,255,.08)}
+.clV li:last-child{border-bottom:0}
+.clV li b{display:block;font-size:15px;color:#ffe08a;margin-bottom:2px}
+.clV li b::before{content:"";display:inline-block;width:6px;height:6px;background:var(--red);margin:0 8px 2px 0;vertical-align:middle}
+.clV li p{margin:0;font-size:14px;line-height:1.6;color:#d9dde5;padding-left:14px}
+.clFoot{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding-top:4px}
+.clChk{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--muted);cursor:pointer}
+.clChk input{width:18px;height:18px;accent-color:var(--red)}
+
+/* 創建角色 */
+#charScr{position:fixed;inset:0;z-index:30}
+#creDrag{position:absolute;inset:0;cursor:grab;touch-action:none}
+#crePanel{position:absolute;right:max(16px,3vw);top:50%;transform:translateY(-50%);width:min(420px,calc(100vw - 32px));max-width:none;max-height:calc(100dvh - 32px);overflow:auto;gap:10px;background:rgba(18,22,32,.94);border-top:4px solid var(--red);box-sizing:border-box}
+.creHead h2{margin:0;font-family:var(--f-sign);font-size:26px;letter-spacing:.06em}
+.creHead p{margin:4px 0 0;font-size:13px}
+.creName{display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--muted)}
+.creName input{font-size:17px}
+.creRow{display:grid;grid-template-columns:5.2em 1fr;align-items:center;gap:10px}
+.creRow>span{font-size:14px;color:var(--muted);font-weight:700}
+.creRow .segs.two{grid-template-columns:1fr 1fr}
+.creRow .seg{padding:7px 0;font-size:15px}
+.crePick{display:grid;grid-template-columns:40px 1fr 40px;align-items:center;border:1px solid var(--line);background:rgba(255,255,255,.03)}
+.crePick b{text-align:center;font-size:15px;display:flex;flex-direction:column;line-height:1.2;padding:4px 0}
+.crePick b small{font-family:var(--f-num);font-size:11px;color:var(--muted);font-weight:400}
+.creArr{background:transparent;border:0;color:#fff;font-size:15px;height:40px;cursor:pointer}
+.creArr:hover{background:rgba(255,255,255,.08)}
+.creSw{display:flex;flex-wrap:wrap;gap:6px}
+.creSw .sw{width:26px;height:26px;border-radius:50%;border:2px solid rgba(255,255,255,.25);background:var(--c);padding:0;cursor:pointer}
+.creSw .sw.on{border-color:#fff;box-shadow:0 0 0 2px var(--red)}
+.creBtns{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+@media (max-width:759px) and (orientation:portrait){
+  #crePanel{top:auto;bottom:0;right:0;left:0;transform:none;width:100%;max-height:56dvh;border-left:0;border-right:0;padding:12px 14px calc(12px + env(safe-area-inset-bottom))}
+  .creHead h2{font-size:20px}.creHead p{display:none}
+  .creRow{grid-template-columns:4.6em 1fr;gap:8px}
+  .creSw .sw{width:24px;height:24px}
+}
+@media (max-height:520px) and (orientation:landscape){#crePanel{width:min(380px,50vw);gap:7px;padding:10px 14px}.creHead p{display:none}.creHead h2{font-size:19px}.crePick b{font-size:13px}.creArr{height:32px}}
+
+/* 資產與生活 */
+.mbox.life{width:min(760px,100%)}
+.lifeTabs{display:flex;flex-wrap:wrap;gap:4px;border-bottom:1px solid var(--line);padding-bottom:6px}
+.lifeTabs .lt{background:transparent;border:1px solid var(--line);color:#cfd4dc;padding:6px 10px;font-size:14px;font-weight:700;cursor:pointer}
+.lifeTabs .lt.on{background:var(--red);border-color:var(--red);color:#fff}
+.lifeBody{display:flex;flex-direction:column;gap:8px}
+.lifeBody h4{margin:6px 0 0;font-size:15px}
+.lifeInfo{display:flex;justify-content:space-between;align-items:center;gap:12px;background:rgba(255,255,255,.04);border:1px solid var(--line);padding:10px 12px;flex-wrap:wrap}
+.lifeInfo b{font-size:16px}
+.up{color:#3fd68a}.down{color:#ff6a5a}
+.shop.spon li{display:flex;flex-direction:column;gap:6px}
+.sponBtns{display:flex;flex-wrap:wrap;gap:6px}
+#brName{width:9em;font-size:15px;padding:4px 6px}
+#homeScr{position:fixed;inset:0;z-index:30}
+#homeDrag{position:absolute;inset:0;cursor:grab;touch-action:none}
+.homeBar{position:absolute;left:50%;transform:translateX(-50%);bottom:max(18px,env(safe-area-inset-bottom));display:flex;align-items:center;gap:18px;background:rgba(18,22,32,.9);border:1px solid var(--line);border-top:3px solid var(--red);padding:10px 16px;max-width:calc(100vw - 32px)}
+.homeBar b{display:block;font-size:17px}.homeBar small{color:var(--muted);font-size:13px}
+
+/* 狂仲獎 */
+.mbox.kzBox{width:min(520px,100%);background:#120c0c;border-top-color:#d0141c;border:1px solid #c8a040}
+.kzInv{text-align:center;padding:8px 4px;background:radial-gradient(circle at 50% 0%,rgba(242,194,48,.18),transparent 70%)}
+.kzInvTop{font-family:var(--f-num);letter-spacing:.5em;color:#c8a040;font-size:13px}
+.kzInv h3{font-family:var(--f-sign);font-size:34px;color:#f2c230;margin:6px 0;text-shadow:0 2px 0 #6a3a00}
+.kzWk{color:#e8d8b0;font-family:var(--f-num);letter-spacing:.08em;margin:0 0 10px}
+.kzInv p{line-height:1.7}
+.kzMe{color:#ffcf3a}
+#awardScr{position:fixed;inset:0;z-index:30;pointer-events:none}
+#awardScr .awBtns{position:absolute;top:max(14px,env(safe-area-inset-top));right:max(14px,env(safe-area-inset-right));display:flex;gap:8px;pointer-events:auto}
+#awardScr .awBtns .btn.on{background:var(--red);color:#fff}
+#awFlash{position:absolute;inset:0;background:#fff;opacity:0}
+#awFlash.go{animation:awfl .22s ease-out}
+@keyframes awfl{0%{opacity:.75}100%{opacity:0}}
+#awBig{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);text-align:center;display:flex;flex-direction:column;gap:8px;animation:awin .8s ease-out;transition:opacity 1.2s}
+#awBig.fade{opacity:0}
+#awBig b{font-family:var(--f-sign);font-size:clamp(36px,7vw,78px);color:#f2c230;letter-spacing:.12em;text-shadow:0 4px 0 #5a2a00,0 0 30px rgba(242,194,48,.5)}
+#awBig small{font-size:16px;letter-spacing:.4em;color:#e8d8b0}
+#awBig span{font-size:clamp(15px,2.4vw,22px);color:#fff;letter-spacing:.1em;text-shadow:0 2px 6px #000}
+@keyframes awin{0%{opacity:0;transform:translate(-50%,-40%) scale(.92)}100%{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+#awCap{position:absolute;left:50%;bottom:max(26px,env(safe-area-inset-bottom));transform:translateX(-50%);min-width:min(520px,calc(100vw - 32px));max-width:calc(100vw - 32px);background:linear-gradient(90deg,rgba(120,8,12,.92),rgba(30,8,10,.92));border:2px solid #c8a040;padding:12px 22px;display:flex;align-items:center;gap:18px;justify-content:center;flex-wrap:wrap;animation:awcap .5s ease-out}
+#awCap.gold{border-color:#ffe08a;box-shadow:0 0 24px rgba(242,194,48,.55)}
+#awCap .awRank{font-weight:900;color:#f2c230;letter-spacing:.1em}
+#awCap b{font-size:clamp(22px,3.4vw,32px);color:#fff;letter-spacing:.06em}
+#awCap b em{font-style:normal;font-size:14px;background:#ffcf3a;color:#1b1a17;padding:2px 8px;margin-left:10px;vertical-align:middle}
+#awCap .awVal{font-family:var(--f-num);font-size:clamp(17px,2.6vw,24px);color:#ffe8a8;font-weight:700}
+@keyframes awcap{0%{opacity:0;transform:translate(-50%,20px)}100%{opacity:1;transform:translate(-50%,0)}}
+
+@media (max-width:600px) and (orientation:portrait){#btnRow #bLife{display:none}}
 </style>
 
 </head>
@@ -577,7 +673,7 @@ body.photo #iWrap{display:none!important}
       <button id="lvBox" aria-label="等級與技能"><span class="lvTag">Lv.<b id="lvNum">1</b><i id="spDot" hidden></i></span><span class="xpBar"><i id="xpFill"></i></span><span class="money">NT$ <b id="moneyNum">0</b></span></button>
     </div>
     <div id="hudTL">
-      <div id="btnRow"><button id="bMap">地圖 <kbd>M</kbd></button><button id="bRec">謄本紀錄 <kbd>L</kbd></button><button id="bBag">背包 <kbd>B</kbd></button><button id="bMenu">選單 <kbd>Esc</kbd></button><button id="bTask" hidden>任務 <b id="bTaskN"></b> <kbd>J</kbd></button></div>
+      <div id="btnRow"><button id="bMap">地圖 <kbd>M</kbd></button><button id="bRec">謄本紀錄 <kbd>L</kbd></button><button id="bBag">背包 <kbd>B</kbd></button><button id="bLife">資產 <kbd>P</kbd></button><button id="bMenu">選單 <kbd>Esc</kbd></button><button id="bTask" hidden>任務 <b id="bTaskN"></b> <kbd>J</kbd></button></div>
       <div id="nav" hidden><div id="navLbl">導航</div><div id="navAddr"></div><div id="navDist"></div><button id="navX">取消</button></div>
       <div id="qBox" class="open"><button id="qHead"><span>今日任務</span><span id="qCount">0/3</span></button><ul id="qList"></ul></div>
     </div>
@@ -607,6 +703,9 @@ body.photo #iWrap{display:none!important}
     <div class="foot"><span class="keyhint">WASD／方向鍵騎車 · E 互動 · M 地圖 · </span><span class="touchhint">左下搖桿騎車 · 點紅色按鈕互動 · </span>建議開啟聲音</div>
   </section>
 
+  <section id="awardScr" hidden><div id="awFlash"></div><div id="awBig" hidden></div><div id="awCap" hidden></div><div class="awBtns"><button class="btn ghost sm" id="awFast">快轉 ×2.5</button><button class="btn ghost sm" id="awSkip">跳過典禮</button></div></section>
+  <section id="homeScr" hidden><div id="homeDrag" aria-hidden="true"></div><div class="homeBar"><div><b id="homeTitle"></b><small id="homeSub"></small></div><button class="btn" id="homeBack">返回</button></div></section>
+  <section id="charScr" hidden><div id="creDrag" aria-hidden="true"></div><div id="crePanel" class="card"></div></section>
   <section id="nameScr" class="screen" hidden>
     <form class="card" id="nameForm" autocomplete="off">
       <h2>報到登記</h2>
@@ -648,7 +747,7 @@ body.photo #iWrap{display:none!important}
 
   <div id="mapScr" hidden>
     <div class="mapHead"><h3>溪虹市地圖</h3>
-      <div class="legend"><span><i style="background:#e3242b"></i>未調閱</span><span><i style="background:#ff9a2e"></i>已調閱</span><span><i style="background:#2fbf71"></i>已委託</span><span><i style="background:#8b5cf6"></i>導航目標</span><span><i style="background:#3fd6ff"></i>路線</span><span><i style="background:#1f9a4a;border-radius:2px"></i>便利商店</span><span><i style="background:#c8161d;box-shadow:0 0 0 2px #ffcf3a"></i>阿豪</span><span><i style="background:#e3242b;box-shadow:0 0 0 2px #ff7a00"></i>阿豪鎖定</span><span><i style="background:#5a5f6a"></i>被搶走</span><span><i style="background:#ff3b6b"></i>圖釘</span><span><i style="background:#e0782a"></i>高架捷運</span><span><i style="background:#1f6fd0"></i>地下捷運</span><span><i style="background:#3f8cf0;border-radius:2px"></i>派報住戶</span><span><i style="background:transparent;box-shadow:0 0 0 2px #2fd07a"></i>今日帶看</span><span><i style="background:transparent;box-shadow:0 0 0 2px #ffcf3a"></i>急件</span><span><i style="background:#b3121a;border-radius:2px;box-shadow:0 0 0 1px #ffcf3a"></i>汽機車行</span></div>
+      <div class="legend"><span><i style="background:#e3242b"></i>未調閱</span><span><i style="background:#ff9a2e"></i>已調閱</span><span><i style="background:#2fbf71"></i>已委託</span><span><i style="background:#8b5cf6"></i>導航目標</span><span><i style="background:#3fd6ff"></i>路線</span><span><i style="background:#1f9a4a;border-radius:2px"></i>便利商店</span><span><i style="background:#c8161d;box-shadow:0 0 0 2px #ffcf3a"></i>阿豪</span><span><i style="background:#e3242b;box-shadow:0 0 0 2px #ff7a00"></i>阿豪鎖定</span><span><i style="background:#5a5f6a"></i>被搶走</span><span><i style="background:#ff3b6b"></i>圖釘</span><span><i style="background:#e0782a"></i>高架捷運</span><span><i style="background:#1f6fd0"></i>地下捷運</span><span><i style="background:#3f8cf0;border-radius:2px"></i>派報住戶</span><span><i style="background:transparent;box-shadow:0 0 0 2px #2fd07a"></i>今日帶看</span><span><i style="background:transparent;box-shadow:0 0 0 2px #ffcf3a"></i>急件</span><span><i style="background:#b3121a;border-radius:2px;box-shadow:0 0 0 1px #ffcf3a"></i>汽機車行</span><span><i style="background:#d8a520"></i>我的投資</span></div>
       <div class="mapHint">點一下地圖任意位置放圖釘導航・再點圖釘可取消・拖曳移動地圖</div>
       <div class="mapTools"><button class="btn ghost sm" id="mapIn" aria-label="放大">＋</button><button class="btn ghost sm" id="mapOut" aria-label="縮小">－</button><button class="btn ghost sm" id="mapMe">回到我</button><button class="btn ghost sm" id="mapAll">全圖</button><button class="btn ghost sm" id="mapPinClr" hidden>清除圖釘</button><button class="btn sm" id="mapClose">關閉 <kbd>M</kbd></button></div></div>
     <canvas id="bigMap"></canvas>
@@ -2963,12 +3062,15 @@ function makePerson(o = {}) {
   if (suit) { box(0.175, 0.05, 0.205, '#f6f6f2', 0, -0.58, 0, armL); box(0.175, 0.05, 0.205, '#f6f6f2', 0, -0.58, 0, armR); }
   const head = new THREE.Group(); head.position.set(0, 1.78, 0); g.add(head);
   box(0.42, 0.44, 0.4, skin, 0, 0, 0, head);
-  box(0.06, 0.06, 0.02, '#1a1a1a', -0.1, 0.03, 0.205, head); box(0.06, 0.06, 0.02, '#1a1a1a', 0.1, 0.03, 0.205, head);
+  const look = o.look;
+  if (look) { const f = new THREE.Mesh(new THREE.PlaneGeometry(0.42, 0.44), faceMat(look)); f.position.z = 0.2015; head.add(f); }
+  else { box(0.06, 0.06, 0.02, '#1a1a1a', -0.1, 0.03, 0.205, head); box(0.06, 0.06, 0.02, '#1a1a1a', 0.1, 0.03, 0.205, head); }
   if (glasses) { box(0.36, 0.03, 0.02, '#222', 0, 0.06, 0.215, head); box(0.12, 0.1, 0.02, '#333', -0.1, 0.03, 0.212, head); box(0.12, 0.1, 0.02, '#333', 0.1, 0.03, 0.212, head); }
   if (helmet) { box(0.5, 0.3, 0.48, helmet, 0, 0.2, -0.01, head); box(0.5, 0.1, 0.1, '#222', 0, 0.08, 0.23, head); }
+  else if (look) { const hm = hairMesh(look); if (hm) { head.add(hm); g.userData.hair = hm; } }
   else if (!bald) { box(0.46, 0.14, 0.44, hair, 0, 0.24, -0.01, head); box(0.46, 0.3, 0.1, hair, 0, 0.05, -0.2, head); if (hairLong) box(0.46, 0.5, 0.12, hair, 0, -0.18, -0.22, head); }
   else box(0.44, 0.08, 0.42, '#bbb', 0, 0.22, -0.02, head);
-  g.userData = { legL, legR, armL, armR, head };
+  g.userData = Object.assign(g.userData || {}, { legL, legR, armL, armR, head });
   return g;
 }
 // 行人：身體合併成一個網格＋兩條腿，減少繪製次數
@@ -3032,13 +3134,224 @@ function makeRiderScooter() {
   const body = new THREE.Mesh(mergeGeometries(sc), MAT.col); body.position.y = -0.18; body.castShadow = true; g.add(body);
   const hl = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.16, 0.05), MAT.headlight); hl.position.set(0, 1.0, 0.7); g.add(hl);
   const tl = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.14, 0.05), MAT.taillight); tl.position.set(0, 0.66, -0.69); g.add(tl);
-  const p = makePerson(suitUp({ helmet: '#222428' }));
+  const p = makeMe({ helmet: '#222428' }); p.userData.extra = { helmet: '#222428' };
   const u = p.userData; p.position.set(0, 0.06, -0.25);
   u.legL.rotation.x = u.legR.rotation.x = -1.35; u.legL.position.y = u.legR.position.y = 0.9;
   u.armL.rotation.x = u.armR.rotation.x = -1.0; u.armL.rotation.z = 0.15; u.armR.rotation.z = -0.15;
   const pon = makePoncho('#e8c23a'); pon.position.y = -0.12; g.add(pon);
   g.add(p); g.userData.rider = p; g.userData.tail = tl; g.userData.poncho = pon;
   return g;
+}
+
+// ===================== 捏角色：外觀資料、臉部貼圖、髮型 =====================
+const LOOK_SKIN = [['白', '#f6dcc8'], ['黃', '#e8c09a'], ['黑', '#6e4228'], ['小麥色', '#c69060']];
+const LOOK_HAIRC = [['黑', '#17120e'], ['深棕', '#3a2416'], ['棕', '#6a4226'], ['栗紅', '#7a2e1e'], ['金', '#d8b04a'], ['白金', '#e8dcb8'], ['灰', '#8a8a8a'], ['白', '#ececec'], ['紅', '#c0302a'], ['藍', '#2a4ab0'], ['粉', '#e07aa8'], ['綠', '#2a8a5a']];
+const LOOK_EYEC = [['黑', '#141414'], ['深棕', '#4a2c1a'], ['琥珀', '#a8701e'], ['藍', '#2a6ad0'], ['綠', '#2a8a4a'], ['灰', '#7a8090'], ['紫', '#7a3ab0'], ['紅', '#c0303a']];
+const HAIR_M = ['平頭', '短髮', '旁分', '中分', '油頭', '刺蝟頭', '莫西干', '光頭', '捲髮', '爆炸頭', '飛機頭', '韓系瀏海', '狼尾', '男生丸子頭', '武士頭', '中長髮', '側剃短髮', '雷鬼辮', '紳士側分', '中長捲髮'];
+const HAIR_F = ['鮑伯頭', '長直髮', '高馬尾', '低馬尾', '雙馬尾', '包包頭', '丸子雙髻', '公主切', '大波浪', '精靈短髮', '齊瀏海長髮', '側馬尾', '麻花辮', '雙辮子', '中長捲髮', '斜瀏海鮑伯', '高盤髮', '外翻短髮', '羊毛捲', '長捲側分'];
+const EYE_M = ['豆豆眼', '圓眼', '細長眼', '瞇瞇眼', '銳利眼', '下垂眼', '濃眉大眼', '睏睏眼', '單眼皮', '炯炯有神'];
+const EYE_F = ['長睫毛', '大眼睛', '貓眼', '笑眼', '杏仁眼', '水汪汪', '下睫毛', '眼線眼', '細長眼', '星星眼'];
+const NOSE_N = ['無', '小點鼻', '小巧鼻', '三角鼻', '鷹勾鼻', '蒜頭鼻', '挺鼻', '朝天鼻', '紅鼻頭', '長鼻'];
+const MOUTH_N = ['一字嘴', '微笑', '露齒笑', '小圓嘴', '歪嘴笑', '嘟嘴', '開懷大笑', '抿嘴', '貓咪嘴', '紅唇'];
+const DECO_N = ['無', '八字鬍', '落腮鬍', '山羊鬍', '鬍渣', '臉頰刀疤', '眼角疤痕', '痘痘', '雀斑', '胎記', '美人痣', '腮紅', 'OK 繃', '眼鏡', '墨鏡'];
+const LOOK_DEF = { g: 'm', hair: 1, hc: 0, skin: 1, eye: 0, ec: 0, nose: 0, mouth: 0, deco: 0 };
+const lookOf = l => Object.assign({}, LOOK_DEF, l || {});
+// 存到雲端／排行榜用的短字串：m.1.0.1.0.0.0.0.0
+const lookCode = l => { l = lookOf(l); return [l.g, l.hair, l.hc, l.skin, l.eye, l.ec, l.nose, l.mouth, l.deco].join('.'); };
+function lookFromCode(s) {
+  const a = String(s || '').split('.'); if (a.length < 9) return lookOf(null);
+  const n = i => Math.max(0, parseInt(a[i], 10) || 0);
+  return lookOf({ g: a[0] === 'f' ? 'f' : 'm', hair: Math.min(19, n(1)), hc: Math.min(LOOK_HAIRC.length - 1, n(2)), skin: Math.min(3, n(3)), eye: Math.min(9, n(4)), ec: Math.min(LOOK_EYEC.length - 1, n(5)), nose: Math.min(9, n(6)), mouth: Math.min(9, n(7)), deco: Math.min(14, n(8)) });
+}
+const skinOf = l => LOOK_SKIN[lookOf(l).skin][1];
+const hairCOf = l => LOOK_HAIRC[lookOf(l).hc][1];
+
+// ---------- 臉：畫在頭部正面的一張 128×128 貼圖 ----------
+const FACE_TEX = new Map();
+function faceMat(l) {
+  l = lookOf(l); const key = [l.g, l.eye, l.ec, l.nose, l.mouth, l.deco, l.skin, l.hc].join('|');
+  if (FACE_TEX.has(key)) return FACE_TEX.get(key);
+  const c = cvs(128, 128), x = c.getContext('2d'), skin = LOOK_SKIN[l.skin][1], dk = shade(skin, 0.62), dk2 = shade(skin, 0.78), ec = LOOK_EYEC[l.ec][1], hc = LOOK_HAIRC[l.hc][1];
+  const R = (a, b, w, h, col) => { x.fillStyle = col; x.fillRect(Math.round(a), Math.round(b), Math.round(w), Math.round(h)); };
+  const C = (a, b, r, col) => { x.fillStyle = col; x.beginPath(); x.arc(a, b, r, 0, 7); x.fill(); };
+  const E = (a, b, rx, ry, col, rot = 0) => { x.fillStyle = col; x.beginPath(); x.ellipse(a, b, rx, ry, rot, 0, 7); x.fill(); };
+  const L = (pts, col, w = 2) => { x.strokeStyle = col; x.lineWidth = w; x.lineCap = 'round'; x.lineJoin = 'round'; x.beginPath(); pts.forEach(([a, b], i) => i ? x.lineTo(a, b) : x.moveTo(a, b)); x.stroke(); };
+  const A = (a, b, r, s0, s1, col, w = 2.5) => { x.strokeStyle = col; x.lineWidth = w; x.lineCap = 'round'; x.beginPath(); x.arc(a, b, r, s0, s1); x.stroke(); };
+  const EY = 55, ex = [34, 94];
+  // 眼睛（s = -1 左眼、+1 右眼；外側方向 = s）
+  const eyesM = [
+    (cx, s) => R(cx - 4, EY - 4, 8, 8, '#151515'),
+    (cx, s) => { C(cx, EY, 7, '#fff'); C(cx, EY, 4.5, ec); C(cx, EY, 2.2, '#000'); C(cx + 1.5, EY - 2, 1.2, '#fff'); },
+    (cx, s) => { R(cx - 8, EY - 3, 16, 6, '#fff'); R(cx - 3, EY - 3, 6, 6, ec); R(cx - 1, EY - 1, 2, 2, '#000'); L([[cx - 8, EY - 4], [cx + 8, EY - 4]], '#151515', 2); },
+    (cx, s) => A(cx, EY + 3, 7, Math.PI * 1.15, Math.PI * 1.85, '#151515', 3),
+    (cx, s) => { x.fillStyle = '#fff'; x.beginPath(); x.moveTo(cx - 8 * s, EY - 1); x.lineTo(cx + 8 * s, EY - 4); x.lineTo(cx + 7 * s, EY + 3); x.lineTo(cx - 7 * s, EY + 3); x.fill(); C(cx, EY, 3, ec); C(cx, EY, 1.4, '#000'); L([[cx - 9 * s, EY - 11], [cx + 9 * s, EY - 7]], hc, 3.5); },
+    (cx, s) => { E(cx, EY, 7, 5, '#fff', 0.25 * s); C(cx, EY + 1, 3.6, ec); C(cx, EY + 1, 1.6, '#000'); L([[cx - 8 * s, EY - 10], [cx + 8 * s, EY - 7]], hc, 2.5); },
+    (cx, s) => { R(cx - 9, EY - 13, 18, 5, hc); C(cx, EY, 6.5, '#fff'); C(cx, EY, 4, ec); C(cx, EY, 2, '#000'); C(cx + 1.5, EY - 1.5, 1, '#fff'); },
+    (cx, s) => { E(cx, EY + 2, 7, 4, '#fff'); C(cx, EY + 3, 3, ec); R(cx - 8, EY - 2, 16, 3, dk); },
+    (cx, s) => { R(cx - 7, EY - 2, 14, 5, '#fff'); R(cx - 2.5, EY - 2, 5, 5, ec); R(cx - 8, EY - 4, 16, 2.5, '#151515'); },
+    (cx, s) => { C(cx, EY, 7.5, '#fff'); C(cx, EY, 5.5, ec); C(cx, EY, 2.6, '#000'); C(cx + 2, EY - 2.5, 1.6, '#fff'); C(cx - 2, EY + 2.5, 0.9, '#fff'); L([[cx - 8, EY - 12], [cx + 8, EY - 12]], hc, 3); },
+  ];
+  const lash = (cx, s, n = 3) => { for (let i = 0; i < n; i++) L([[cx + s * (4 + i * 2.5), EY - 5 + i * 1.2], [cx + s * (7 + i * 3), EY - 10 + i * 2]], '#151515', 1.6); };
+  const eyesF = [
+    (cx, s) => { C(cx, EY, 6.5, '#fff'); C(cx, EY, 4.2, ec); C(cx, EY, 2, '#000'); C(cx + 1.5, EY - 2, 1.2, '#fff'); A(cx, EY, 6.8, Math.PI * 1.1, Math.PI * 1.9, '#151515', 2); lash(cx, s); },
+    (cx, s) => { E(cx, EY, 8.5, 9, '#fff'); C(cx, EY + 1, 6, ec); C(cx, EY + 1, 3, '#000'); C(cx + 2.5, EY - 2, 2, '#fff'); C(cx - 2, EY + 4, 1, '#fff'); A(cx, EY, 9, Math.PI * 1.1, Math.PI * 1.9, '#151515', 2.4); },
+    (cx, s) => { E(cx, EY, 8, 4.5, '#fff', -0.2 * s); C(cx, EY, 3.6, ec); C(cx, EY, 1.6, '#000'); L([[cx - 8 * s, EY - 3], [cx + 7 * s, EY - 5], [cx + 12 * s, EY - 9]], '#151515', 2.4); },
+    (cx, s) => { A(cx, EY + 3, 7, Math.PI * 1.15, Math.PI * 1.85, '#151515', 3); lash(cx, s, 2); },
+    (cx, s) => { E(cx, EY, 8, 5, '#fff'); C(cx, EY, 3.8, ec); C(cx, EY, 1.7, '#000'); C(cx + 1.4, EY - 1.4, 1, '#fff'); L([[cx - 8, EY - 2], [cx, EY - 5.5], [cx + 8, EY - 2]], '#151515', 1.8); },
+    (cx, s) => { E(cx, EY, 8, 8.5, '#fff'); C(cx, EY + 1, 6.8, ec); C(cx, EY + 1, 3, '#000'); C(cx + 2.5, EY - 2.5, 2.2, '#fff'); C(cx - 2.5, EY + 3, 1.3, '#fff'); C(cx + 3, EY + 3.5, 0.8, '#fff'); },
+    (cx, s) => { C(cx, EY, 6.5, '#fff'); C(cx, EY, 4.2, ec); C(cx, EY, 2, '#000'); for (let i = -1; i <= 1; i++) L([[cx + i * 3.5, EY + 6], [cx + i * 4.5, EY + 9.5]], '#151515', 1.3); A(cx, EY, 6.8, Math.PI * 1.1, Math.PI * 1.9, '#151515', 2); },
+    (cx, s) => { R(cx - 8, EY - 3, 16, 7, '#fff'); R(cx - 3, EY - 3, 6, 7, ec); R(cx - 1, EY - 1, 2, 2, '#000'); L([[cx - 9 * s, EY - 4], [cx + 9 * s, EY - 4], [cx + 12 * s, EY - 7]], '#151515', 3.2); },
+    (cx, s) => { R(cx - 8, EY - 1, 16, 4, '#fff'); R(cx - 2.5, EY - 1, 5, 4, ec); L([[cx - 8, EY - 2], [cx + 8, EY - 2], [cx + 10 * s, EY - 5]], '#151515', 2); },
+    (cx, s) => { C(cx, EY, 7.5, '#fff'); C(cx, EY, 5.5, ec); x.fillStyle = '#fff'; x.beginPath(); const sx = cx + 1, sy = EY - 1; x.moveTo(sx, sy - 4); x.lineTo(sx + 1.2, sy - 1.2); x.lineTo(sx + 4, sy); x.lineTo(sx + 1.2, sy + 1.2); x.lineTo(sx, sy + 4); x.lineTo(sx - 1.2, sy + 1.2); x.lineTo(sx - 4, sy); x.lineTo(sx - 1.2, sy - 1.2); x.fill(); lash(cx, s, 2); },
+  ];
+  const ey = (l.g === 'f' ? eyesF : eyesM)[l.eye] || eyesM[0];
+  ey(ex[0], -1); ey(ex[1], 1);
+  // 鼻子
+  const NY = 76;
+  [() => { },
+  () => { C(60, NY + 3, 1.6, dk); C(68, NY + 3, 1.6, dk); },
+  () => R(61, NY - 2, 6, 6, dk2),
+  () => { x.fillStyle = dk2; x.beginPath(); x.moveTo(64, NY - 9); x.lineTo(70, NY + 5); x.lineTo(58, NY + 5); x.fill(); },
+  () => L([[63, NY - 10], [68, NY + 3], [61, NY + 5]], dk, 2.4),
+  () => { E(64, NY + 1, 7, 5, dk2); C(60, NY + 3, 1.5, dk); C(68, NY + 3, 1.5, dk); },
+  () => { L([[64, NY - 12], [64, NY + 2]], dk2, 2.4); L([[60, NY + 4], [68, NY + 4]], dk, 2); },
+  () => { E(60, NY + 2, 2, 2.6, dk); E(68, NY + 2, 2, 2.6, dk); },
+  () => C(64, NY + 1, 5, '#d4554e'),
+  () => { R(61, NY - 14, 5, 18, dk2); R(59, NY + 3, 9, 3, dk); },
+  ][l.nose]();
+  // 嘴巴
+  const MY = 98, lip = '#b5534a', dkm = '#5a1e1e';
+  const MOUTHS = [() => R(56, MY - 1, 16, 3, dk),
+  () => A(64, MY - 9, 10, Math.PI * 0.25, Math.PI * 0.75, dk, 2.8),
+  () => { x.fillStyle = '#fff'; x.beginPath(); x.moveTo(53, MY - 3); x.lineTo(75, MY - 3); x.quadraticCurveTo(64, MY + 9, 53, MY - 3); x.fill(); x.strokeStyle = dkm; x.lineWidth = 1.6; x.stroke(); },
+  () => { C(64, MY, 3.6, dkm); },
+  () => L([[55, MY + 1], [66, MY + 1], [73, MY - 4]], dk, 2.6),
+  () => { E(64, MY, 4, 3.2, lip); E(64, MY, 1.6, 1, shade(lip, 0.6)); },
+  () => { x.fillStyle = dkm; x.beginPath(); x.moveTo(52, MY - 4); x.lineTo(76, MY - 4); x.quadraticCurveTo(64, MY + 12, 52, MY - 4); x.fill(); E(64, MY + 3.5, 5, 2.5, '#d86a6a'); R(55, MY - 4, 18, 2.2, '#fff'); },
+  () => A(64, MY + 8, 9, Math.PI * 1.25, Math.PI * 1.75, dk, 2.8),
+  () => { A(59, MY - 2, 5, Math.PI * 0.1, Math.PI * 0.9, dk, 2.4); A(69, MY - 2, 5, Math.PI * 0.1, Math.PI * 0.9, dk, 2.4); },
+  () => { E(64, MY - 1.5, 9, 2.6, '#c0303a'); E(64, MY + 2, 8, 2.8, '#d0404a'); R(55, MY, 18, 1, '#7a1a20'); },
+  ];
+  // 臉部裝飾
+  const dots = (pts, col, r) => pts.forEach(([a, b]) => C(a, b, r, col));
+  const DECOS = [() => { },
+  () => { x.fillStyle = hc; x.beginPath(); x.moveTo(64, MY - 9); x.quadraticCurveTo(52, MY - 10, 46, MY - 3); x.quadraticCurveTo(54, MY - 6, 64, MY - 5); x.quadraticCurveTo(74, MY - 6, 82, MY - 3); x.quadraticCurveTo(76, MY - 10, 64, MY - 9); x.fill(); },
+  () => { x.fillStyle = hc; x.beginPath(); x.moveTo(0, 62); x.lineTo(14, 62); x.lineTo(20, 88); x.quadraticCurveTo(64, 82, 108, 88); x.lineTo(114, 62); x.lineTo(128, 62); x.lineTo(128, 128); x.lineTo(0, 128); x.fill(); E(64, MY, 13, 7, skin); },
+  () => { R(58, MY + 6, 12, 18, hc); R(55, MY - 8, 18, 3, hc); },
+  () => { const rnd = mulberry32(7); for (let i = 0; i < 70; i++) { const a = 30 + rnd() * 68, b = 84 + rnd() * 34; if (Math.hypot(a - 64, b - MY) > 9) C(a, b, 0.9, shade(hc, 1.1)); } },
+  () => { L([[86, 74], [100, 90]], '#9a4a40', 2.6); for (let i = 0; i < 4; i++) L([[88 + i * 3.4, 80 + i * 3.4 - 3], [91 + i * 3.4, 80 + i * 3.4 - 6]], '#9a4a40', 1.4); },
+  () => { L([[96, 38], [92, 70]], '#9a4a40', 2.6); L([[91, 47], [98, 49]], '#9a4a40', 1.4); L([[90, 58], [97, 60]], '#9a4a40', 1.4); },
+  () => dots([[28, 80], [34, 86], [98, 78], [92, 88], [100, 90], [70, 40]], '#d0505a', 1.9),
+  () => dots([[26, 72], [30, 76], [35, 71], [40, 76], [24, 80], [88, 71], [92, 76], [98, 72], [102, 78], [94, 81], [56, 70], [72, 70]], shade(skin, 0.68), 1.2),
+  () => { E(98, 82, 9, 6, 'rgba(110,50,60,.55)', 0.4); E(104, 88, 4, 3, 'rgba(110,50,60,.45)'); },
+  () => C(80, 104, 1.8, '#2a1a14'),
+  () => { E(26, 78, 9, 5, 'rgba(240,110,130,.55)'); E(102, 78, 9, 5, 'rgba(240,110,130,.55)'); },
+  () => { x.save(); x.translate(96, 82); x.rotate(-0.5); R(-12, -5, 24, 10, '#e8c79a'); R(-4, -5, 8, 10, '#f3dcb8'); dots([[-9, -2], [-9, 2], [9, -2], [9, 2]], '#c8a578', 0.8); x.restore(); },
+  () => { x.strokeStyle = '#1e1e1e'; x.lineWidth = 2.4; x.strokeRect(20, EY - 10, 28, 20); x.strokeRect(80, EY - 10, 28, 20); L([[48, EY - 3], [80, EY - 3]], '#1e1e1e', 2.4); L([[20, EY - 6], [0, EY - 8]], '#1e1e1e', 2.4); L([[108, EY - 6], [128, EY - 8]], '#1e1e1e', 2.4); },
+  () => { R(18, EY - 10, 32, 19, '#111'); R(78, EY - 10, 32, 19, '#111'); R(48, EY - 6, 30, 3, '#111'); R(0, EY - 8, 18, 3, '#111'); R(110, EY - 8, 18, 3, '#111'); R(22, EY - 7, 8, 3, '#555'); R(82, EY - 7, 8, 3, '#555'); },
+  ];
+  // 落腮鬍、鬍渣畫在嘴巴底下，其他裝飾畫在最上層
+  const under = l.deco === 2 || l.deco === 4;
+  if (under) DECOS[l.deco](); MOUTHS[l.mouth](); if (!under) DECOS[l.deco]();
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 2;
+  const m = new THREE.MeshStandardMaterial({ map: t, transparent: false, alphaTest: 0.35, roughness: 0.8 });
+  FACE_TEX.set(key, m); return m;
+}
+
+// ---------- 髮型：小方塊拼出來，合併成一個網格 ----------
+function hb(w, h, d, x, y, z, col, rx = 0, rz = 0, ry = 0) {
+  const g = new THREE.BoxGeometry(w, h, d); if (rx) g.rotateX(rx); if (rz) g.rotateZ(rz); if (ry) g.rotateY(ry); g.translate(x, y, z); return addColor(g, col);
+}
+function hairGeos(l, col) {
+  l = lookOf(l); const P = [], b = (...a) => P.push(hb(...a.slice(0, 6), col, ...a.slice(6)));
+  const T = (t = 0.14, w = 0.46, d = 0.44) => b(w, t, d, 0, 0.19 + t / 2, -0.01);
+  const B = len => b(0.46, len, 0.08, 0, 0.24 - len / 2, -0.22);
+  const S = (len, z0 = -0.2, z1 = 0.1) => { for (const s of [-1, 1]) b(0.05, len, z1 - z0, s * 0.235, 0.24 - len / 2, (z0 + z1) / 2); };
+  const F = k => {
+    if (k === 'full') b(0.46, 0.1, 0.06, 0, 0.165, 0.215);
+    else if (k === 'short') b(0.46, 0.05, 0.05, 0, 0.195, 0.21);
+    else if (k === 'side') { b(0.3, 0.11, 0.06, -0.08, 0.16, 0.215, 0, -0.12); b(0.16, 0.05, 0.05, 0.15, 0.195, 0.21); }
+    else if (k === 'center') { for (const s of [-1, 1]) b(0.21, 0.09, 0.06, s * 0.12, 0.17, 0.215, 0, s * 0.25); }
+  };
+  const bumps = (n, y0, r = 0.12) => { for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) b(r, r, r, -0.19 + i * 0.38 / (n - 1), y0 + ((i + j) % 2) * 0.03, -0.2 + j * 0.38 / (n - 1)); };
+  const tail = (x, y, z, len, w = 0.14) => { b(0.1, 0.08, 0.1, x, y + 0.04, z); b(w, len, 0.12, x, y - len / 2, z - 0.02); };
+  const braid = (x, y, z, n) => { for (let i = 0; i < n; i++) b(0.12 - (i % 2) * 0.03, 0.09, 0.11 - (i % 2) * 0.02, x + (i % 2 ? 0.015 : -0.015), y - i * 0.085, z); b(0.08, 0.05, 0.08, x, y - n * 0.085, z); };
+  const st = l.hair;
+  if (l.g === 'f') {
+    [
+      () => { T(); B(0.48); S(0.44); F('full'); },
+      () => { T(); B(0.9); S(0.7); F('side'); },
+      () => { T(); B(0.3); F('short'); tail(0, 0.3, -0.27, 0.52); },
+      () => { T(); B(0.36); F('center'); tail(0, -0.12, -0.25, 0.48); },
+      () => { T(); B(0.3); F('full'); for (const s of [-1, 1]) tail(s * 0.27, 0.12, -0.08, 0.56, 0.12); },
+      () => { T(); B(0.32); F('short'); b(0.24, 0.2, 0.24, 0, 0.42, -0.12); },
+      () => { T(); B(0.3); F('full'); for (const s of [-1, 1]) b(0.16, 0.16, 0.16, s * 0.18, 0.38, -0.05); },
+      () => { T(); B(0.9); F('full'); S(0.72, -0.2, 0.0); for (const s of [-1, 1]) b(0.06, 0.3, 0.12, s * 0.235, 0.06, 0.1); },
+      () => { T(0.15); B(0.85); S(0.66); F('side'); for (let i = 0; i < 5; i++) b(0.5, 0.08, 0.1, (i % 2 ? 0.02 : -0.02), 0.05 - i * 0.14, -0.25); },
+      () => { T(0.12); B(0.24); F('side'); S(0.16); },
+      () => { T(); B(0.86); S(0.7); F('full'); },
+      () => { T(); B(0.3); F('side'); tail(0.27, 0.1, -0.06, 0.52); },
+      () => { T(); B(0.34); F('center'); braid(0, -0.1, -0.25, 7); },
+      () => { T(); B(0.3); F('center'); for (const s of [-1, 1]) braid(s * 0.25, -0.05, 0.06, 6); },
+      () => { T(0.15); B(0.6); S(0.5); F('short'); for (let i = 0; i < 4; i++) b(0.14, 0.14, 0.14, -0.2 + i * 0.13, -0.32, -0.22); },
+      () => { T(); B(0.45); S(0.42); F('side'); },
+      () => { T(0.15); B(0.28); F('center'); b(0.3, 0.22, 0.26, 0, 0.42, -0.08); },
+      () => { T(); B(0.52); S(0.42); F('center'); for (const s of [-1, 1]) b(0.08, 0.06, 0.32, s * 0.27, -0.2, -0.05); b(0.5, 0.06, 0.08, 0, -0.29, -0.26); },
+      () => { bumps(4, 0.26, 0.15); for (let i = 0; i < 4; i++) for (let j = 0; j < 3; j++) b(0.14, 0.14, 0.12, -0.2 + i * 0.133, 0.12 - j * 0.15, -0.23); for (const s of [-1, 1]) b(0.08, 0.3, 0.3, s * 0.24, 0.06, -0.05); },
+      () => { T(0.15); B(0.85); S(0.7); F('side'); for (let i = 0; i < 4; i++) b(0.15, 0.15, 0.15, -0.2 + i * 0.13, -0.6, -0.22); for (const s of [-1, 1]) b(0.12, 0.14, 0.14, s * 0.25, -0.45, 0.0); },
+    ][st]();
+  } else {
+    [
+      () => { T(0.05); B(0.2); },
+      () => { T(); B(0.3); },
+      () => { T(); B(0.3); F('side'); },
+      () => { T(0.15); B(0.3); F('center'); S(0.2); },
+      () => { T(0.12); B(0.32); b(0.44, 0.07, 0.12, 0, 0.33, 0.12, -0.3); },
+      () => { T(0.1); B(0.28); for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) b(0.08, 0.17, 0.08, -0.14 + i * 0.14, 0.33, -0.14 + j * 0.13, (j - 1) * 0.35, (1 - i) * 0.35); },
+      () => { T(0.03, 0.44, 0.42); b(0.11, 0.18, 0.46, 0, 0.32, -0.02); b(0.1, 0.14, 0.08, 0, 0.16, -0.24); },
+      () => { },
+      () => { T(0.12); B(0.3); bumps(3, 0.3, 0.13); },
+      () => { b(0.64, 0.44, 0.6, 0, 0.3, -0.04); },
+      () => { T(0.12); B(0.3); b(0.4, 0.16, 0.2, 0, 0.36, 0.1, -0.25); },
+      () => { T(); B(0.32); F('full'); S(0.22); },
+      () => { T(); B(0.62); F('short'); S(0.2); },
+      () => { T(0.13); B(0.3); b(0.17, 0.15, 0.15, 0, 0.32, -0.22); },
+      () => { T(0.12); B(0.26); b(0.12, 0.17, 0.12, 0, 0.42, -0.04); b(0.16, 0.04, 0.16, 0, 0.34, -0.04); },
+      () => { T(); B(0.5); S(0.42); F('side'); },
+      () => { T(0.13, 0.38, 0.44); B(0.18); b(0.4, 0.06, 0.1, 0, 0.3, 0.14, -0.2); },
+      () => { T(0.12); for (let i = 0; i < 7; i++) b(0.06, 0.55, 0.06, -0.2 + i * 0.066, 0.0, -0.23); for (const s of [-1, 1]) for (let k = 0; k < 3; k++) b(0.06, 0.45, 0.06, s * 0.24, 0.02, -0.15 + k * 0.1); },
+      () => { T(); B(0.3); F('short'); b(0.18, 0.06, 0.42, -0.13, 0.34, -0.01); },
+      () => { T(0.14); B(0.45); S(0.36); bumps(3, 0.3, 0.13); for (let i = 0; i < 4; i++) b(0.13, 0.13, 0.13, -0.2 + i * 0.13, -0.2, -0.22); },
+    ][st]();
+  }
+  return P;
+}
+function hairMesh(l) {
+  l = lookOf(l); const P = hairGeos(l, hairCOf(l)); if (!P.length) return null;
+  const m = new THREE.Mesh(mergeGeometries(P), MAT.col); m.castShadow = true; P.forEach(g => g.dispose()); return m;
+}
+// 主角穿的日勝制服：女生是西裝外套＋窄裙
+const playerStyle = (l, extra = {}) => { l = lookOf(l); return { ...suitUp({ ...extra, look: l, skin: skinOf(l) }), skirt: l.g === 'f' }; };
+// 目前這一局主角的外觀
+const myLook = () => lookOf(G && G.look);
+const makeMe = (extra = {}) => makePerson(playerStyle(myLook(), extra));
+
+// 換了造型：把場景裡所有「主角」的模型換成新的（保留姿勢、位置、雨傘等配件）
+function swapPerson(old) {
+  if (!old || !old.parent) return old;
+  const ex = old.userData.extra || {}, nw = makeMe(ex); nw.userData.extra = ex;
+  nw.position.copy(old.position); nw.rotation.copy(old.rotation); nw.scale.copy(old.scale); nw.visible = old.visible;
+  for (const k of ['legL', 'legR', 'armL', 'armR', 'head']) { const a = old.userData[k], b = nw.userData[k]; if (a && b) { b.position.copy(a.position); b.rotation.copy(a.rotation); } }
+  if (old.userData.umb) { nw.add(old.userData.umb); nw.userData.umb = old.userData.umb; }
+  const par = old.parent; par.add(nw); par.remove(old);
+  return nw;
+}
+function refreshPlayerLooks() {
+  if (WALKER) WALKER = swapPerson(WALKER);
+  if (OFF.me) OFF.me = swapPerson(OFF.me);
+  const seen = new Set();
+  const fix = g => { if (!g || seen.has(g)) return; seen.add(g); if (g.userData.rider) g.userData.rider = swapPerson(g.userData.rider); };
+  fix(PLAYER.mesh); fix(SCOOTER_MESH0); Object.values(VEH_MESH).forEach(fix);
 }
 
 // ===================== 交通：號誌、車輛、行人、對話泡泡 =====================
@@ -4048,7 +4361,7 @@ function buildOffice() {
   atDesk(6, suitUp({ hair: '#aaa', glasses: true }), 'wang');
   const amy = seatP(makePerson(suitUp({ hairLong: true, hair: '#3a2a1a' })), -5.25, 6.95, Math.PI / 2);
   OFF.npcs.push({ key: 'amy', m: amy, x: -2.9, z: 6.95 }); OFF.coll.push({ x0: -5.9, x1: -4.0, z0: 5.75, z1: 8.6 });
-  const me = makePerson(suitUp({})); S.add(me); OFF.me = me;
+  const me = makeMe(); S.add(me); OFF.me = me;
 }
 function makeWhiteboard() {
   const c = cvs(840, 480), x = c.getContext('2d'); x.fillStyle = '#fbfbf8'; x.fillRect(0, 0, 840, 480); x.strokeStyle = '#aaa'; x.lineWidth = 12; x.strokeRect(0, 0, 840, 480);
@@ -4129,7 +4442,7 @@ function saveGame(silent, slot) {
 }
 function loadGame(n) {
   try { const d = slotRead(n); if (!d) return false; G = d; G.slot = n; const ost = d.ost; delete G.ost; const hadAU = d.apUsed != null; ensureState(); if (!hadAU) G.apUsed = Math.max(0, apMax() - G.ap); OWN = genOwners(G.seed, G.genV || 1); OWN.forEach((o, i) => { if (ost[i]) o.st = ost[i]; }); decorateOwners(); G.tut = -1;   // 新手教學關卡已移除
-    tutSetupOwner(); G.today = G.today || { inv: 0, talk: 0, sign: 0 }; G.race = null; setupSaleSigns(); return true; }
+    tutSetupOwner(); G.today = G.today || { inv: 0, talk: 0, sign: 0 }; G.race = null; setupSaleSigns(); refreshPlayerLooks(); return true; }
   catch (e) { return false; }
 }
 function saveInfo(d) { return d ? `${d.name} · Lv.${d.lv || 1} · 第 ${d.day} 天 · 委託 ${d.comm}/6` : ''; }
@@ -4189,8 +4502,9 @@ function toTitle() {
   ['hud', 'battle', 'dlg', 'modal', 'mapScr', 'ending', 'nameScr', 'credits'].forEach(i => show(i, false)); show('title', true);
   refreshTitleLoad();
   renderPass.scene = scene; playMusic('title');
+  if (CHANGELOG_ON && !toTitle.cl) { toTitle.cl = true; setTimeout(() => { if (MODE === 'title' && !ui.modalOpen) openChangelog(); }, 600); }
 }
-$('tNew').onclick = () => { audioInit(); sfx('confirm'); show('title', false); show('nameScr', true); MODE = 'name'; $('nameIn').value = ''; setTimeout(() => $('nameIn').focus(), 50); };
+$('tNew').onclick = () => { audioInit(); sfx('confirm'); openCreator('new'); };
 function refreshTitleLoad() { const n = slotCount(); $('tLoad').disabled = false; $('tLoadSub').textContent = n ? `${n} / ${SLOT_N} 個存檔` : '十個存檔欄位'; }
 function startFromSlot(n) { if (!loadGame(n)) { toast('存檔讀取失敗'); return; } show('title', false); fadeTo(() => enterCity(true)); }
 $('tLoad').onclick = () => { audioInit(); sfx('confirm'); openSlots('load'); };
@@ -4633,7 +4947,7 @@ function finishTalk() {
   if (bt.role === 'stranger') { if (bt.last === 2) { G.contacts++; toast('對方收下了你的名片（人脈 +1，回電機率小幅提升）'); } bt.cb.onDone && bt.cb.onDone(); return; }
   if (bt.role === 'owner') {
     if (win) {
-      o.st.signed = true; G.comm++; G.today.sign++; refreshSign(o); sfx('sign');
+      o.st.signed = true; G.comm++; G.today.sign++; refreshSign(o); sfx('sign'); kzAdd(1, 0);
       if (G.target && G.target.oid === o.id) { G.target = null; show('nav', false); }
       if (G.meet && G.meet.oid === o.id) G.meet = null;
       choice('委託簽成！', `<div class="bigwin">+1</div><p>${ownerName(o)}在委託書上簽下名字。</p><p class="quote">「好吧，年輕人，我就給你一次機會。別讓我失望。」</p><p class="dim">${addrOf(BLD[o.bid])} 的「售」牌換成了日勝專任。目前委託：${G.comm} / 6　簽約獎金 NT$3,000</p>`, [{ label: '太好了', fn: () => { const nx = () => { if (G.comm >= 6 && !G.goalShown) goalReached(); else afterAction(); }; if (tutTalkEnd(true, o) || G.comm === 1) tutFirstSign(nx); else nx(); } }], 'win');
@@ -4669,7 +4983,7 @@ function endDay() {
   // 開發信回電判定
   if (G.call == null) {
     const cands = OWN.filter(o => (o.st.letter || o.st.dm) && !o.st.signed && !o.st.lost && o.appear <= G.day);
-    for (const o of shuffle(cands)) { const p = (o.st.letter ? (o.st.guardLetter ? 0.04 : 0.02) + G.contacts * 0.002 + G.skills.network * 0.01 + G.perm.card * 0.01 : 0.012) + famOwner(o) * 0.0004; if (Math.random() < p) { G.call = o.id; break; } }
+    for (const o of shuffle(cands)) { const p = ((o.st.letter ? (o.st.guardLetter ? 0.04 : 0.02) + G.contacts * 0.002 + G.skills.network * 0.01 + G.perm.card * 0.01 : 0.012) + famOwner(o) * 0.0004) * lifeCallMul(); if (Math.random() < p) { G.call = o.id; break; } }
   }
   sfx('chime');
   G.safeStreak = !G.redRun && G.dayKm > 0.5 ? (G.safeStreak || 0) + 1 : 0;
@@ -4835,11 +5149,13 @@ function openMenu() {
     ${MODE === 'city' ? '<button class="btn" id="mOffice">返回公司</button><button class="btn ghost" id="mReset">車子卡住了：重置到最近馬路（R）</button>' : ''}
     ${MODE === 'city' || (MODE === 'office' && G.midOffice) ? '<button class="btn" id="mEnd">結束今天</button>' : ''}
     <button class="btn ghost" id="mBag">背包</button>
+    <button class="btn ghost" id="mLife">資產與生活</button>
     <button class="btn ghost" id="mSk">技能${G.sp ? `（${G.sp} 點可用）` : ''}</button>
     <button class="btn ghost" id="mAch">成就</button>
+    <button class="btn ghost" id="mLook">改變角色造型</button>
     <button class="btn ghost" id="mSet">設定</button>
     <button class="btn ghost fsBtn" id="mFs">${fsLabel()} </button>
-    <div class="help"><b>操作</b>　拖曳畫面轉視角 · 滾輪拉近 · V 切換視角 · 按住 C 看後方 · W/↑ 加速 · S/↓ 煞車 · A D/← → 轉向 · 空白鍵 喇叭 · E 互動 · M 地圖 · L 謄本紀錄 · R 車子卡住時重置到最近馬路 · J 任務 · B 背包 · K 技能<br><b>手機</b>　左半邊按住出現搖桿 · 右半邊拖曳轉視角 · 右下圓鍵互動</div>
+    <div class="help"><b>操作</b>　拖曳畫面轉視角 · 滾輪拉近 · V 切換視角 · 按住 C 看後方 · W/↑ 加速 · S/↓ 煞車 · A D/← → 轉向 · 空白鍵 喇叭 · E 互動 · M 地圖 · L 謄本紀錄 · R 車子卡住時重置到最近馬路 · J 任務 · P 資產與生活 · B 背包 · K 技能<br><b>手機</b>　左半邊按住出現搖桿 · 右半邊拖曳轉視角 · 右下圓鍵互動</div>
     <button class="btn ghost" id="mTitle">回主畫面</button></div>`);
   $('mResume').onclick = () => { sfx('click'); closeModal(); };
   $('mSave').onclick = () => openSlots('save', () => openMenu());
@@ -4847,7 +5163,9 @@ function openMenu() {
   if ($('mOffice')) $('mOffice').onclick = () => { closeModalSoft(); backToOffice(); };
   if ($('mReset')) $('mReset').onclick = () => { closeModal(); resetVehicle(); };
   $('mSet').onclick = () => openSettings(() => openMenu());
+  $('mLook').onclick = () => { sfx('click'); openCreator('edit'); };
   $('mBag').onclick = () => openBag();
+  $('mLife').onclick = () => openLife();
   $('mSk').onclick = () => openSkills(() => openMenu());
   $('mAch').onclick = () => openAch(() => openMenu());
   $('mFs').onclick = toggleFullscreen;
@@ -4973,6 +5291,7 @@ function drawMap(x, W, H, cx, cz, sc, big) {
     if (rad >= 6) { x.fillStyle = '#fff'; x.font = `900 ${rad * 1.2}px ${FONT_SANS}`; x.fillText(o.st.signed ? '✓' : o.st.lost ? '✕' : '售', mx, mz + 0.5); }
   }
   for (const L of [MRT_E, MRT_U]) for (const st of L.stations) { const mx = X(st.x), mz = Z(st.z); if (!inV(mx, mz)) continue; const r = big ? Math.max(7, Math.min(11, 3 * sc)) : 6; x.fillStyle = L === MRT_E ? '#e0782a' : '#1f6fd0'; x.strokeStyle = '#fff'; x.lineWidth = 2; x.beginPath(); x.arc(mx, mz, r, 0, 7); x.fill(); x.stroke(); x.fillStyle = '#fff'; x.font = `900 ${r * 1.1}px ${FONT_SANS}`; if (big) { x.fillText('M', mx, mz + 0.5); if (sc > BM.fit * 1.6) { x.font = `800 ${Math.round(11 * Math.min(devicePixelRatio, 2))}px ${FONT_SANS}`; x.fillStyle = '#fff'; x.fillText(st.name + '站', mx, mz + r + 10 * Math.min(devicePixelRatio, 2)); } } else miniUpright(x, mx, mz, () => x.fillText('M', 0, 0.5)); }
+  if (G && G.invest) for (const v of G.invest) { const b = BLD[v.bid], mx = X(b.fx), mz = Z(b.fz); if (!inV(mx, mz)) continue; const r = big ? Math.max(6, Math.min(9, 2.4 * sc)) : 5; x.fillStyle = '#d8a520'; x.beginPath(); x.moveTo(mx, mz - r * 1.2); x.lineTo(mx + r, mz - r * 0.1); x.lineTo(mx + r * 0.75, mz - r * 0.1); x.lineTo(mx + r * 0.75, mz + r); x.lineTo(mx - r * 0.75, mz + r); x.lineTo(mx - r * 0.75, mz - r * 0.1); x.lineTo(mx - r, mz - r * 0.1); x.closePath(); x.fill(); x.strokeStyle = '#fff'; x.lineWidth = 1.5; x.stroke(); }
   for (const b of DEALERS) { const mx = X(b.fx), mz = Z(b.fz); if (!inV(mx, mz)) continue; const r = big ? Math.max(7, Math.min(10, 2.6 * sc)) : 6; x.fillStyle = '#b3121a'; x.fillRect(mx - r, mz - r, r * 2, r * 2); x.strokeStyle = '#ffcf3a'; x.lineWidth = 2; x.strokeRect(mx - r, mz - r, r * 2, r * 2); x.fillStyle = '#fff'; x.font = `900 ${r * 1.2}px ${FONT_SANS}`; if (big) x.fillText('車', mx, mz + 0.5); else miniUpright(x, mx, mz, () => x.fillText('車', 0, 0.5)); }
   for (const b of STORES) { const mx = X(b.fx), mz = Z(b.fz); if (!inV(mx, mz)) continue; const r = big ? Math.max(5, Math.min(8, 2.2 * sc)) : 4.5; x.fillStyle = '#1f9a4a'; x.fillRect(mx - r, mz - r, r * 2, r * 2); x.strokeStyle = '#fff'; x.lineWidth = 1.5; x.strokeRect(mx - r, mz - r, r * 2, r * 2); }
   if (G.rival && RIVAL_MESH) { let rx = X(G.rival.x), rz = Z(G.rival.z); if (!big) [rx, rz] = miniEdge(W, rx, rz, 10); x.fillStyle = '#c8161d'; x.beginPath(); x.arc(rx, rz, big ? 8 : 6, 0, 7); x.fill(); x.strokeStyle = '#ffcf3a'; x.lineWidth = 2; x.stroke(); x.fillStyle = '#fff'; x.font = `900 ${big ? 10 : 8}px ${FONT_SANS}`; if (big) x.fillText('豪', rx, rz + 0.5); else miniUpright(x, rx, rz, () => x.fillText('豪', 0, 0.5)); }
@@ -5049,9 +5368,9 @@ addEventListener('keydown', e => {
   if (PHOTO && MODE === 'city') { if (k === ' ' || k === 'enter') { e.preventDefault(); photoShutter(); } else if (k === 'escape') endPhoto(); else if (k === 'z' || k === '-' || k === 'q') photoZoom(6); else if (k === 'x' || k === '=' || k === '+') photoZoom(-6); if (['arrowup', 'arrowdown', 'arrowleft', 'arrowright', ' '].includes(k)) e.preventDefault(); return; }
   if ((MODE === 'city' || MODE === 'office') && k === 't') { e.preventDefault(); openCheat(); return; }
   if (MODE === 'city') {
-    if (k === 'j') openMissions(); else if (k === 'm') openMap(); else if (k === 'l') openRecords(); else if (k === 'r' && !e.repeat) resetVehicle(); else if (k === 'b') openBag(); else if (k === 'k') openSkills(); else if (k === 'escape') openMenu();
+    if (k === 'j') openMissions(); else if (k === 'm') openMap(); else if (k === 'l') openRecords(); else if (k === 'r' && !e.repeat) resetVehicle(); else if (k === 'b') openBag(); else if (k === 'p') openLife(); else if (k === 'k') openSkills(); else if (k === 'escape') openMenu();
     else if (k === 'e' || k === 'enter') { e.preventDefault(); doAction(); } else if (k === 'f') toggleRide(); else if (k === 'v' && !e.repeat) cycleView(); else if (k === ' ') { e.preventDefault(); if (PLAYER.ride) sfx('horn'); }
-  } else if (MODE === 'office') { if (k === 'escape') openMenu(); else if (k === 'b') openBag(); else if (k === 'k') openSkills(); else if (k === 'e' || k === 'enter') { e.preventDefault(); doAction(); } }
+  } else if (MODE === 'office') { if (k === 'escape') openMenu(); else if (k === 'b') openBag(); else if (k === 'p') openLife(); else if (k === 'j') openMissions(); else if (k === 'k') openSkills(); else if (k === 'e' || k === 'enter') { e.preventDefault(); doAction(); } }
   if (['arrowup', 'arrowdown', 'arrowleft', 'arrowright', ' '].includes(k)) e.preventDefault();
 });
 addEventListener('keyup', e => { KEY[keyOf(e)] = false; if (e.key) KEY[e.key.toLowerCase()] = false; });
@@ -5394,6 +5713,9 @@ function loop() {
   updateCop(dt);
   if (MODE === 'title' || MODE === 'name' || MODE === 'credits' || MODE === 'boot' || MODE === 'ending') { updateTitle(dt); updateWorld(dt, t); }
   else if (MODE === 'office') updateOffice(dt);
+  else if (MODE === 'create') updateCreator(dt);
+  else if (MODE === 'home') updateHomeView(dt);
+  else if (MODE === 'award') updateAward(dt);
   else if (MODE === 'city' || MODE === 'talk') { updateCity(dt); updateWorld(dt, t); }
   skyMesh.position.copy(camera.position);
   if (TALKNPC) { const u = TALKNPC.userData; u.armR.rotation.x = Math.sin(t * 3) * 0.15 - 0.2; u.head.rotation.y = Math.sin(t * 0.8) * 0.15; }
@@ -5428,7 +5750,7 @@ async function warmScene(S, lampsOn) {
 }
 async function warmShaders() {
   const t0 = performance.now();
-  try { await warmScene(OFF.scene); for (const lamps of [false, true]) await warmScene(scene, lamps); } catch (e) { console.warn('warm', e); }
+  try { initCreatorScene(); const cm = makePerson(playerStyle(lookOf(null))); CRE.scene.add(cm); await warmScene(CRE.scene); CRE.scene.remove(cm); await warmScene(OFF.scene); for (const lamps of [false, true]) await warmScene(scene, lamps); } catch (e) { console.warn('warm', e); }
   warmShaders.ms = Math.round(performance.now() - t0);
 }
 function resize() {
@@ -5451,7 +5773,7 @@ async function boot() {
   const om = new THREE.MeshStandardMaterial({ map: texFrom(signC, false), emissive: 0xffffff, emissiveIntensity: 0.5 }); om.emissiveMap = om.map;
   OFFICE_SIGN = new THREE.Mesh(new THREE.PlaneGeometry(Math.min(OFFICE.w - 0.4, 10), 1.5), om); OFFICE_SIGN.position.set(OFFICE.fx + OFFICE.n.x * 0.1, OFFICE.y + 4.8, OFFICE.fz + OFFICE.n.z * 0.1); OFFICE_SIGN.rotation.y = OFFICE.ry; scene.add(OFFICE_SIGN);
   PLAYER.mesh = makeRiderScooter(); PLAYER.mesh.rotation.order = 'YXZ'; scene.add(PLAYER.mesh);
-  WALKER = makePerson(suitUp({})); const wu = makeUmbrella('#114f9c'); wu.position.set(0.38, -0.25, 0.25); WALKER.add(wu); WALKER.userData.umb = wu; scene.add(WALKER);
+  WALKER = makeMe(); const wu = makeUmbrella('#114f9c'); wu.position.set(0.38, -0.25, 0.25); WALKER.add(wu); WALKER.userData.umb = wu; scene.add(WALKER);
   PARKED = new THREE.Group(); { const sc = []; scooterGeos(0, 0, 0, '#e9e4d6', sc); const m = new THREE.Mesh(mergeGeometries(sc), MAT.col); m.position.y = -0.18; m.castShadow = true; PARKED.add(m); }
   { const c = cvs(320, 96), x = c.getContext('2d'); x.fillStyle = 'rgba(17,79,156,.95)'; x.fillRect(0, 0, 320, 72); x.beginPath(); x.moveTo(140, 72); x.lineTo(160, 94); x.lineTo(180, 72); x.fill(); x.fillStyle = '#fff'; x.font = `900 40px ${FONT_SANS}`; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('你的機車', 160, 38);
     PARK_TAG = new THREE.Sprite(new THREE.SpriteMaterial({ map: texFrom(c, false), depthTest: false, transparent: true })); PARK_TAG.scale.set(1.25, 0.375, 1); PARK_TAG.position.y = 2.45; PARK_TAG.renderOrder = 6; PARKED.add(PARK_TAG); }
@@ -5468,7 +5790,7 @@ async function boot() {
   $('bootMsg').textContent = '正在準備畫面……'; await new Promise(r => setTimeout(r, 30));
   await warmShaders();
   $('boot').hidden = true; toTitle(); loop();
-  window.__fz = { MRT_EXITS, UNDER_EXITS, MRT_E, INFRA, makeVehMesh, makeHeavyMesh, makeMotoMesh, makePed, ACT: () => ACT, findAction, tutOwner, talk, BTg: () => BT, fillVars, AU, FROZEN: () => FROZEN, LAMPS, setupLampLights, BM, COPV: () => COPV, copWitness, KEY, updateCity, loop, playerHitsStatic, collideCity, pBox, OFF, makePerson, suitUp, scene, NODES, EDGES, FACES, LINES, H, CHUNKS, updateChunks, STREAM, nearestEdge, computeRoute, updateEvents, edgesNear, projectOnEdge, CORNERS, spawnPed, spawnVehicle, CAM, toggleRide, PARK, startPlayerChase, COP: () => COP, onNpcRedRun, EVENTS, rivalDayStart, openShop, openSkills, openAch, openBag, addXP, obbMTV, vBox, renderer, CORNER_BLD, PARKS, OFFICE: () => OFFICE, MRT_U, EXPWY, UNDERPASS, TSTAT, updateSignals, updateVehicles, updatePeds, PAUSE: () => PAUSE, BUB, say, camera, VEH, PEDS, TLC, BLD, OWN: () => OWN, G: () => G, POOLS, MODE: () => MODE, PLAYER, investigate, setTarget, visitTarget, endDay, ending, goalReached, OP, unstickPlayer, eP, STUCK, antiStuck, simStep: (dt, t) => { updateCop(dt); updateCity(dt); updateWorld(dt, t); }, obbMTV, acctTest: { set: u => { USER = u; renderAccount(); }, sync: () => cloudSync(), cloud: () => CLOUD, err: () => CLOUD_ERR }, openSlots, slotRead, PORTAL: () => PORTAL, startDM, offerDM, updateDM, startRace, careerDayStart, newBuyer, startShowing, negotiate, closeDeal, startPhoto, photoShutter, endPhoto, scorePhoto, PHOTO: () => PHOTO, liKey, famOf, addFam, gainIntel, ownerBattle, syncBuyers, buyerAt, RV: () => RV, enterOffice, enterCity, morningLines, answer, BUYER_MESH, DM_SPR, rivalAttempt, DEALERS, openDealer, switchVehicle, VEHS, vehSpec, curVeh, openMissions, missionCheck, MISSIONS, openUserList, exportUsers, updateTaskBtn, warmMs: () => warmShaders.ms, DYN, dynRes, resetVehicle };
+  window.__fz = { MRT_EXITS, UNDER_EXITS, MRT_E, INFRA, makeVehMesh, makeHeavyMesh, makeMotoMesh, makePed, ACT: () => ACT, findAction, tutOwner, talk, BTg: () => BT, fillVars, AU, FROZEN: () => FROZEN, LAMPS, setupLampLights, BM, COPV: () => COPV, copWitness, KEY, updateCity, loop, playerHitsStatic, collideCity, pBox, OFF, makePerson, suitUp, scene, NODES, EDGES, FACES, LINES, H, CHUNKS, updateChunks, STREAM, nearestEdge, computeRoute, updateEvents, edgesNear, projectOnEdge, CORNERS, spawnPed, spawnVehicle, CAM, toggleRide, PARK, startPlayerChase, COP: () => COP, onNpcRedRun, EVENTS, rivalDayStart, openShop, openSkills, openAch, openBag, addXP, obbMTV, vBox, renderer, CORNER_BLD, PARKS, OFFICE: () => OFFICE, MRT_U, EXPWY, UNDERPASS, TSTAT, updateSignals, updateVehicles, updatePeds, PAUSE: () => PAUSE, BUB, say, camera, VEH, PEDS, TLC, BLD, OWN: () => OWN, G: () => G, POOLS, MODE: () => MODE, PLAYER, investigate, setTarget, visitTarget, endDay, ending, goalReached, OP, unstickPlayer, eP, STUCK, antiStuck, simStep: (dt, t) => { updateCop(dt); updateCity(dt); updateWorld(dt, t); }, obbMTV, acctTest: { set: u => { USER = u; renderAccount(); }, sync: () => cloudSync(), cloud: () => CLOUD, err: () => CLOUD_ERR }, openSlots, slotRead, PORTAL: () => PORTAL, startDM, offerDM, updateDM, startRace, careerDayStart, newBuyer, startShowing, negotiate, closeDeal, startPhoto, photoShutter, endPhoto, scorePhoto, PHOTO: () => PHOTO, liKey, famOf, addFam, gainIntel, ownerBattle, syncBuyers, buyerAt, RV: () => RV, enterOffice, enterCity, morningLines, answer, BUYER_MESH, DM_SPR, rivalAttempt, DEALERS, openDealer, switchVehicle, VEHS, vehSpec, curVeh, openMissions, missionCheck, MISSIONS, openUserList, exportUsers, updateTaskBtn, warmMs: () => warmShaders.ms, DYN, dynRes, resetVehicle, openChangelog, openCreator, CRE, refreshPlayerLooks, lookCode, lookFromCode, makePerson, playerStyle, lookOf, camera, openLife, lifeDayStart, openHomeView, closeHomeView, licenseExam, impression, homeAP, startAward, kzAdd, kzLocal, kzCheck, kzResults, weekStartMs, wkId, lastWk, thisWk, KZW, endAward, myPid };
 }
 
 // ===================== 交通建設：高架捷運、地下捷運、高架快速道路、行人地下道 =====================
@@ -5688,6 +6010,8 @@ const SKILLS = [
 const SHOP = [
   { k: 'drink', name: '手搖飲', price: 60, desc: '交涉管理員、鄰居或應門的人時使用：對方戒心 -20' },
   { k: 'gift', name: '伴手禮', price: 350, desc: '交涉屋主時使用：屋主戒心 -15' },
+  { k: 'gift2', name: '高級禮盒', price: 3000, desc: '交涉屋主時使用：屋主戒心 -28' },
+  { k: 'gift3', name: '水果禮籃', price: 8000, desc: '交涉屋主時使用：屋主戒心 -40，難搞的屋主也會軟化' },
   { k: 'ref', name: '實價登錄表', price: 220, desc: '交涉中使用：劃掉一個錯誤選項' },
   { k: 'coffee', name: '罐裝咖啡', price: 45, desc: '隨時使用：體力 +15（每天最多 2 罐）' },
   { k: 'card', name: '燙金名片', price: 800, perm: 1, desc: '永久：開發信回電機率 +1%' },
@@ -5747,10 +6071,10 @@ function ensureState() {
   if (!c.alleys) c.alleys = []; if (!c.chatWho) c.chatWho = {};
   d('garage', ['scooter']); d('veh', 'scooter');
   d('redRun', false); d('dayKm', 0); d('evT', 50); d('rival', null); d('lost', 0); d('rivalNews', null);
-  careerEnsure();
+  careerEnsure(); lifeEnsure();
 }
 function decorateOwners() { OWN.forEach(o => { o.per = PERS_KEYS[Math.floor(mulberry32(G.seed + o.id * 131)() * PERS_KEYS.length)]; const s = o.st; if (s.intel == null) s.intel = 0; if (s.perKnown == null) s.perKnown = false; if (s.lost == null) s.lost = false; careerDecorate(o); }); }
-const apMax = () => 100 + (G.skills ? G.skills.stamina * 10 : 0);
+const apMax = () => 100 + (G.skills ? G.skills.stamina * 10 : 0) + homeAP();
 const invCost = () => 10 - (G.skills ? G.skills.legs * 2 : 0);
 const TALK_COST = 20;
 const maxSpeed = () => { const S = vehSpec(); return S.speed * (1 + (G && G.skills ? G.skills.rider * 0.08 : 0) + (G && G.perm && curVeh() === 'scooter' ? G.perm.moto * 0.1 : 0)) * (G && G.weather && G.weather.w === 'rain' ? (S.car ? 0.92 : 0.85) : 1); };
@@ -5761,7 +6085,7 @@ function emit(type, d = {}) { if (!G || !G.cnt) return; questProgress(type, d); 
 // ---------- 經驗與等級 ----------
 const xpNeed = lv => 60 + lv * 50;
 function addXP(n) {
-  if (!G) return; G.xp += n; floatText('+' + n + ' XP', 'xp');
+  if (!G) return; n = Math.round(n * (1 + homeXP() / 100)); G.xp += n; floatText('+' + n + ' XP', 'xp');
   while (G.xp >= xpNeed(G.lv)) { G.xp -= xpNeed(G.lv); G.lv++; G.sp++; sfx('levelup'); toast(`升級！Lv.${G.lv}，獲得 1 個技能點`, 'star'); }
   renderLv(); checkAch();
 }
@@ -5849,7 +6173,7 @@ function strikeWrong(tag) {
 function renderBattleItems() {
   const box = $('bItems'); if (!BT) { box.innerHTML = ''; return; }
   const can = [];
-  if (BT.role === 'owner') can.push(['gift', '伴手禮', '戒心 -15']);
+  if (BT.role === 'owner') { can.push(['gift', '伴手禮', '戒心 -15']); if (G.inv.gift2) can.push(['gift2', '高級禮盒', '戒心 -28']); if (G.inv.gift3) can.push(['gift3', '水果禮籃', '戒心 -40']); }
   if (BT.role === 'guard' || BT.role === 'neighbor' || BT.role === 'clue') can.push(['drink', '手搖飲', '戒心 -20']);
   if (BT.role !== 'stranger') can.push(['ref', '實價登錄表', '劃掉錯誤選項']);
   careerBattleItems(can);
@@ -5859,7 +6183,7 @@ function renderBattleItems() {
 function useBattleItem(k) {
   if (!BT || !G.inv[k] || BT.usedItems[k]) return;
   if (k === 'ref') { if ($('bOpts').hidden || !strikeWrong('實價登錄表')) return sfx('deny'); }
-  else { BT.res = Math.max(1, BT.res - (k === 'gift' ? 15 : 20)); setBars(); shake('enemy'); toast(k === 'gift' ? `送上伴手禮，${BT.name}的語氣緩和了一些` : `遞上一杯手搖飲，${BT.name}笑了一下`); }
+  else { BT.res = Math.max(1, BT.res - ({ gift: 15, gift2: 28, gift3: 40 }[k] || 20)); setBars(); shake('enemy'); toast(k === 'gift3' ? `送上一整籃水果，${BT.name}笑得合不攏嘴` : k === 'gift2' ? `送上高級禮盒，${BT.name}的態度明顯軟化` : k === 'gift' ? `送上伴手禮，${BT.name}的語氣緩和了一些` : `遞上一杯手搖飲，${BT.name}笑了一下`); }
   G.inv[k]--; BT.usedItems[k] = true; sfx('good'); renderBattleItems();
 }
 function battleAnswered(q) { if (q === 0) BT.miss++; if (q === 2) { emit('q2'); addXP(6); } if (BT.perBonus) $('bCoach').insertAdjacentHTML('beforeend', ' <b class="q2">情報加成</b>'); renderBattleItems(); }
@@ -6297,10 +6621,12 @@ function careerBattleSetup() {
     if (o.st.urgent) { cut += 15; notes.push('屋主急著賣 -15'); }
     if (o.st.referral) { cut += 20; notes.push('老客戶轉介紹 -20'); }
     if (BT.cb.race) { cut += 12; notes.push('搶先阿豪一步 -12'); }
+    const lc = lifeOwnerCut(); if (lc) { cut += lc; notes.push(`${[G.license ? '經紀人證照' : '', adOn('board') || adOn('mrt') ? '廣告' : ''].filter(Boolean).join('＋')} -${lc}`); }
     BT.tabooRound = ri(2, 4, Math.random); BT.hobUsed = false;
   } else if (BT.role === 'guard' || BT.role === 'neighbor' || BT.role === 'clue') {
     const f = Math.round(famOwner(o) * 0.25); if (f) { cut += f; notes.push(`社區熟悉度 -${f}`); }
   }
+  if (BT.role !== 'stranger') { const im = impression(); if (im) { cut += im; notes.push(`第一印象 -${im}`); } }
   if (cut) { BT.res = BT.res0 = Math.max(30, BT.res - cut); setBars && $('bRes') && setBars(); }
   const extra = careerIntelLine(o);
   if (BT.role === 'owner' || notes.length) { const t = [$('bIntel').textContent, BT.role === 'owner' ? extra : '', notes.length ? '戒心加成：' + notes.join('、') : ''].filter(Boolean).join('　'); $('bIntel').textContent = t; $('bIntel').hidden = !t; }
@@ -6345,6 +6671,7 @@ function careerBattleFinished(bt, win) {
 
 // ---------- 急件 ----------
 function careerDayStart() {
+  lifeDayStart(null);
   // 急件到期：沒簽下來就被別家接走
   for (const o of OWN) if (o.st.urgent && o.st.urgent.until < G.day) { o.st.urgent = null; if (!o.st.signed && !o.st.lost) { o.st.lost = true; G.lost++; G.urgentNews = addrOf(BLD[o.bid]); if (G.target && G.target.oid === o.id) G.target = null; } refreshSign(o); }
   if (G.race) G.race = null;
@@ -6361,11 +6688,12 @@ function careerDayStart() {
   for (const o of shuffle(OWN.filter(o => o.st.signed && !o.st.sold && (o.st.signDay || 0) < G.day))) {
     if (n >= 2 || G.buyers.some(b => b.oid === o.id)) continue;
     const stars = photoStars(o.st.photo);
-    if (Math.random() < 0.3 + stars * 0.09 + (G.skills.ads || 0) * 0.08) { n++; G.buyers.push(newBuyer(o)); G.buyerNew.push(o.id); }
+    if (Math.random() < 0.3 + stars * 0.09 + (G.skills.ads || 0) * 0.08 + lifeBuyerBonus()) { n++; G.buyers.push(newBuyer(o)); G.buyerNew.push(o.id); }
   }
 }
 function careerMorning(L) {
   const S = 'Simon 店長';
+  if (G.lifeMsg) { L.push({ name: S, text: G.lifeMsg }); G.lifeMsg = null; }
   if (G.urgentNews) { L.push({ name: S, text: `${G.urgentNews}那個急件，屋主等不到人，已經給別家賣了。下次動作要快。` }); G.urgentNews = null; }
   if (G.buyerMissed) { L.push({ name: S, text: `昨天約好的買方${G.buyerMissed}說等不到你，去看別家了。帶看要準時啊！` }); G.buyerMissed = null; }
   if (G.urgentNew != null) { const o = OWN[G.urgentNew], b = BLD[o.bid]; L.push({ name: S, text: `剛剛有位${ownerName(o)}打來公司，說${o.st.urgent.why}，房子在${addrOf(b)}。` }, { name: S, text: '他今明兩天都會在房子那邊，你先過去跟他談！急件簽下來獎金加倍，我已經幫你設好導航了。' }); }
@@ -6487,8 +6815,8 @@ function negNext(o, by) {
 function closeDeal(o, by, D) {
   by.st = 'done'; o.st.sold = true; o.st.dealPrice = D; G.deals++; G.dealAmt += D; G.cnt.deal++; refreshSign(o); syncBuyers();
   // 服務費 6% → 業績分成 80% → 其中 72% 是業務實際拿到的錢
-  const fee = Math.round(D * 10000 * 0.06), share = Math.round(fee * 0.8), bonus = Math.round(share * 0.72 / 100) * 100;
-  addMoney(bonus); addXP(220); sfx('sign'); emit('deal'); closeModalSoft(); G.perf = (G.perf || 0) + fee;
+  const fee = Math.round(D * 10000 * 0.06), share = Math.round(fee * 0.8), bonus = Math.round(share * 0.72 * (G.license ? 1.05 : 1) / 100) * 100;
+  addMoney(bonus); addXP(220); sfx('sign'); emit('deal'); closeModalSoft(); G.perf = (G.perf || 0) + fee; kzAdd(0, fee);
   // 客戶經營：成交的買方介紹想賣房的親友
   if (G.skills.referral && Math.random() < G.skills.referral * 0.2 && G.call == null) { const c = activeOwners().filter(x => !x.st.signed && !x.st.lost && !x.st.urgent); if (c.length) { const r = pk(c, Math.random); r.st.referral = true; G.call = r.id; setTimeout(() => { toast(`${by.name}說要介紹想賣房的親友給你，等一下會打電話來`, 'phone'); if (MODE === 'city') setTimeout(phoneCall, 4000); }, 2500); } }
   choice('成交！', `<div class="bigwin">成交</div><p>${addrOf(BLD[o.bid])}以 <b>${fmtWan(D)}</b> 成交（開價 ${fmtWan(o.price)}）。</p><p class="quote">${by.name}：「謝謝你，我們終於有自己的家了！」</p><ul class="stats two"><li><span>公司服務費（6%）</span><b>NT$${fmt(fee)}</b></li><li><span>業績分成（80%）</span><b>NT$${fmt(share)}</b></li><li><span>實際入帳（分成的 72%）</span><b>NT$${fmt(bonus)}</b></li><li><span>本月成交</span><b>${G.deals} 件</b></li></ul>`, [{ label: '太好了', fn: afterAction }], 'win wide');
@@ -6930,7 +7258,7 @@ function makeConvertible(withDriver, B = '#1f5fd8', DK = '#163f94') {
   const tl = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.12, 0.05), MAT.taillight); tl.position.set(0, 0.78, -2.26); g.add(tl);
   g.userData.tail = tl; g.userData.poncho = new THREE.Group(); g.add(g.userData.poncho); g.userData.poncho.visible = false;
   if (withDriver) {
-    const p = makePerson(suitUp({})), u = p.userData; p.position.set(0.42, 0.22, -0.2);
+    const p = makeMe(), u = p.userData; p.position.set(0.42, 0.22, -0.2);
     u.legL.rotation.x = u.legR.rotation.x = -1.45; u.armL.rotation.x = u.armR.rotation.x = -1.1; g.add(p); g.userData.rider = p;
   }
   return g;
@@ -6949,7 +7277,7 @@ function makePlayerHeavy(withRider) {
   const hl = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.14, 0.05), MAT.headlight); hl.position.set(0, 1.12, 0.81); g.add(hl);
   const tl = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.08, 0.04), MAT.taillight); tl.position.set(0, 1.0, -1.21); g.add(tl); g.userData.tail = tl;
   const pon = withRider ? makePoncho('#114f9c') : new THREE.Group(); g.add(pon); g.userData.poncho = pon; pon.visible = false;
-  if (withRider) { const p = makePerson(suitUp({})), u = p.userData; p.position.set(0, 0.62, -0.2); p.rotation.x = 0.25; u.legL.rotation.x = u.legR.rotation.x = -1.2; u.armL.rotation.x = u.armR.rotation.x = -1.25; g.add(p); g.userData.rider = p; }
+  if (withRider) { const p = makeMe({ helmet: '#1a1a1e' }), u = p.userData; p.userData.extra = { helmet: '#1a1a1e' }; p.position.set(0, 0.62, -0.2); p.rotation.x = 0.25; u.legL.rotation.x = u.legR.rotation.x = -1.2; u.armL.rotation.x = u.armR.rotation.x = -1.25; g.add(p); g.userData.rider = p; }
   return g;
 }
 // 小車（國民車）
@@ -7054,6 +7382,383 @@ function switchVehicle(k, dealer) {
 function garageHtml() {
   return `<div class="garage"><b>我的車庫</b>${G.garage.map(k => `<button class="btn sm ${curVeh() === k ? '' : 'ghost'}" data-g="${k}" ${curVeh() === k ? 'disabled' : ''}>${VEHS[k].name}${curVeh() === k ? '（使用中）' : ''}</button>`).join('')}${G.garage.length < 2 ? '<span class="dim">地圖上的「車」是汽機車行，可以買重機和汽車。</span>' : ''}</div>`;
 }
+
+// ===================== 創建角色畫面（新遊戲／選單「改變角色造型」） =====================
+const CRE = { scene: null, model: null, look: null, mode: 'new', yaw: 0.35, drag: null, face: false, prev: null, t: 0 };
+function initCreatorScene() {
+  const S = new THREE.Scene(); S.background = new THREE.Color('#1d2433');
+  S.add(new THREE.HemisphereLight(0xeaf2ff, 0x3a3440, 1.15));
+  const d = new THREE.DirectionalLight(0xfff4e0, 1.6); d.position.set(2.5, 5, 4); S.add(d);
+  const r = new THREE.DirectionalLight(0x9ab8ff, 0.6); r.position.set(-3, 2.5, -3); S.add(r);
+  const floor = new THREE.Mesh(new THREE.CylinderGeometry(1.1, 1.2, 0.12, 40), new THREE.MeshStandardMaterial({ color: '#2b3448', roughness: 0.6 })); floor.position.y = -0.06; S.add(floor);
+  const ring = new THREE.Mesh(new THREE.TorusGeometry(1.12, 0.025, 6, 48), new THREE.MeshBasicMaterial({ color: '#c8161d' })); ring.rotation.x = Math.PI / 2; ring.position.y = 0.01; S.add(ring);
+  CRE.scene = S;
+}
+function creBuild() {
+  if (CRE.model) { CRE.scene.remove(CRE.model); CRE.model.traverse(o => { if (o.isMesh && o.geometry) o.geometry.dispose(); }); }
+  const m = makePerson(playerStyle(CRE.look)); m.rotation.y = CRE.yaw; CRE.scene.add(m); CRE.model = m;
+  creSync();
+}
+const CRE_ROWS = [
+  ['hair', '髮型', () => CRE.look.g === 'f' ? HAIR_F : HAIR_M],
+  ['eye', '眼睛', () => CRE.look.g === 'f' ? EYE_F : EYE_M],
+  ['nose', '鼻子', () => NOSE_N],
+  ['mouth', '嘴巴', () => MOUTH_N],
+  ['deco', '臉部裝飾', () => DECO_N],
+];
+const CRE_SW = [['hc', '髮色', LOOK_HAIRC], ['skin', '膚色', LOOK_SKIN], ['ec', '瞳孔顏色', LOOK_EYEC]];
+function creHtml() {
+  const L = CRE.look;
+  return `<div class="creHead"><h2>${CRE.mode === 'edit' ? '改變角色造型' : '創建角色'}</h2><p class="dim">拖曳左邊的人物可以轉身查看。</p></div>
+  ${CRE.mode === 'new' ? `<label class="creName"><span>名字</span><input id="creName" maxlength="8" placeholder="輸入主角名字（最多 8 個字）" aria-label="主角名字" value="${escA(CRE.name || '')}"></label><div class="err" id="creErr" hidden>請先輸入名字。</div>` : ''}
+  <div class="creRow"><span>性別</span><div class="segs two" role="group" aria-label="性別"><button class="seg ${L.g === 'm' ? 'on' : ''}" data-g="m" aria-pressed="${L.g === 'm'}">男生</button><button class="seg ${L.g === 'f' ? 'on' : ''}" data-g="f" aria-pressed="${L.g === 'f'}">女生</button></div></div>
+  ${CRE_ROWS.map(([k, lbl, list]) => `<div class="creRow"><span>${lbl}</span><div class="crePick"><button class="creArr" data-k="${k}" data-d="-1" aria-label="上一個${lbl}">◀</button><b id="cre_${k}">${list()[L[k]]}<small>${L[k] + 1} / ${list().length}</small></b><button class="creArr" data-k="${k}" data-d="1" aria-label="下一個${lbl}">▶</button></div></div>`).join('')}
+  ${CRE_SW.map(([k, lbl, pal]) => `<div class="creRow"><span>${lbl}</span><div class="creSw" role="group" aria-label="${lbl}">${pal.map(([n, c], i) => `<button class="sw ${L[k] === i ? 'on' : ''}" data-s="${k}" data-i="${i}" style="--c:${c}" title="${n}" aria-label="${lbl}：${n}" aria-pressed="${L[k] === i}"></button>`).join('')}</div></div>`).join('')}
+  <div class="creBtns"><button class="btn ghost" id="creRand">隨機</button><button class="btn ghost" id="creFace">${CRE.face ? '看全身' : '看臉部'}</button></div>
+  <div class="creBtns"><button class="btn" id="creOk">${CRE.mode === 'edit' ? '儲存造型' : '開始上班'}</button><button class="btn ghost" id="creBack">${CRE.mode === 'edit' ? '取消' : '返回'}</button></div>`;
+}
+function creRender() {
+  const P = $('crePanel'), sc = P.scrollTop; P.innerHTML = creHtml(); P.scrollTop = sc;
+  const nm = $('creName'); if (nm) { nm.oninput = () => { CRE.name = nm.value; }; nm.onkeydown = e => { if (e.key === 'Enter' && !e.isComposing) { e.preventDefault(); creDone(); } }; }
+  P.querySelectorAll('[data-g]').forEach(b => b.onclick = () => { if (CRE.look.g === b.dataset.g) return; CRE.look.g = b.dataset.g; CRE.look.hair = Math.min(CRE.look.hair, 19); sfx('click'); creBuild(); creRender(); });
+  P.querySelectorAll('.creArr').forEach(b => b.onclick = () => { const k = b.dataset.k, n = CRE_ROWS.find(r => r[0] === k)[2]().length; CRE.look[k] = (CRE.look[k] + +b.dataset.d + n) % n; sfx('click'); creBuild(); creRender(); });
+  P.querySelectorAll('[data-s]').forEach(b => b.onclick = () => { CRE.look[b.dataset.s] = +b.dataset.i; sfx('click'); creBuild(); creRender(); });
+  $('creRand').onclick = () => { const r = n => Math.floor(Math.random() * n); CRE.look = { g: CRE.look.g, hair: r(20), hc: r(6), skin: r(4), eye: r(10), ec: r(3), nose: r(10), mouth: r(10), deco: Math.random() < 0.45 ? 0 : r(15) }; sfx('confirm'); creBuild(); creRender(); };
+  $('creFace').onclick = () => { CRE.face = !CRE.face; sfx('click'); creRender(); };
+  $('creOk').onclick = creDone;
+  $('creBack').onclick = creCancel;
+}
+function creSync() { }
+function openCreator(mode) {
+  if (!CRE.scene) initCreatorScene();
+  CRE.mode = mode; CRE.look = lookOf(mode === 'edit' && G ? G.look : null); CRE.name = ''; CRE.face = false; CRE.yaw = 0.35;
+  CRE.prev = { mode: MODE, scene: renderPass.scene, pause: PAUSE, cam: camera.position.clone(), quat: camera.quaternion.clone(), hud: !$('hud').hidden };
+  if (mode === 'edit') { closeModalSoft(); show('hud', false); }
+  else show('title', false);
+  MODE = 'create'; PAUSE = true; renderPass.scene = CRE.scene;
+  creBuild(); creRender(); show('charScr', true); CRE.snap = true;
+  if (mode === 'new') setTimeout(() => { const n = $('creName'); if (n) n.focus(); }, 60);
+}
+function creLeave() {
+  show('charScr', false); $('crePanel').innerHTML = ''; camera.clearViewOffset(); camera.updateProjectionMatrix();
+  if (CRE.model) { CRE.scene.remove(CRE.model); CRE.model = null; }
+}
+function creCancel() {
+  sfx('cancel');
+  if (CRE.mode === 'edit') { const p = CRE.prev; creLeave(); MODE = p.mode; renderPass.scene = p.scene; PAUSE = p.pause; camera.position.copy(p.cam); camera.quaternion.copy(p.quat); show('hud', p.hud); openMenu(); return; }
+  creLeave(); toTitle();
+}
+function creDone() {
+  if (CRE.mode === 'edit') {
+    const p = CRE.prev; G.look = lookOf(CRE.look); creLeave(); MODE = p.mode; renderPass.scene = p.scene; PAUSE = false; camera.position.copy(p.cam); camera.quaternion.copy(p.quat); show('hud', p.hud);
+    refreshPlayerLooks(); saveGame(true); sfx('confirm'); toast('新造型完成！'); if (MODE === 'city') afterAction(); return;
+  }
+  const n = (CRE.name || '').trim(); if (!n) { const e = $('creErr'); if (e) e.hidden = false; sfx('deny'); const i = $('creName'); if (i) i.focus(); return; }
+  sfx('confirm'); releaseIME();
+  const look = lookOf(CRE.look);
+  const go = slot => { creLeave(); newGame(n.slice(0, 8)); G.look = look; G.slot = slot; refreshPlayerLooks(); fadeTo(() => enterOffice(true)); };
+  const e0 = firstEmptySlot(); if (e0) go(e0); else openSlots('new', null, go);
+}
+function updateCreator(dt) {
+  if (!CRE.model) return;
+  CRE.t += dt;
+  if (!CRE.drag) CRE.yaw += dt * 0.35;
+  CRE.model.rotation.y = CRE.yaw;
+  const u = CRE.model.userData; if (u.armL) { u.armL.rotation.x = Math.sin(CRE.t * 1.6) * 0.06; u.armR.rotation.x = -Math.sin(CRE.t * 1.6) * 0.06; u.head.rotation.y = Math.sin(CRE.t * 0.7) * 0.12; }
+  // 鏡頭：面板佔掉的區域用 viewOffset 讓人物移到空出來的那一邊
+  const W = innerWidth, Hh = innerHeight, panel = $('crePanel'), portrait = W < 760 && Hh > W;
+  const pw = portrait ? 0 : panel.offsetWidth + 24, ph = portrait ? panel.offsetHeight : 0;
+  camera.setViewOffset(W, Hh, pw / 2, ph / 2, W, Hh);
+  const tgt = CRE.face ? new THREE.Vector3(0, 1.78, 0) : new THREE.Vector3(0, 1.05, 0);
+  const dist = CRE.face ? (portrait ? 2.0 : 1.7) : (portrait ? 4.6 : 3.7);
+  const want = new THREE.Vector3(0, tgt.y + (CRE.face ? 0.05 : 0.35), dist);
+  if (CRE.snap) { camera.position.copy(want); CRE.snap = false; } else camera.position.lerp(want, Math.min(1, dt * 6)); camera.lookAt(tgt); camera.updateProjectionMatrix();
+}
+{
+  const z = $('creDrag');
+  z.addEventListener('pointerdown', e => { CRE.drag = { x: e.clientX, y0: CRE.yaw, id: e.pointerId }; try { z.setPointerCapture(e.pointerId); } catch (_) { } });
+  z.addEventListener('pointermove', e => { if (CRE.drag && e.pointerId === CRE.drag.id) CRE.yaw = CRE.drag.y0 + (e.clientX - CRE.drag.x) * 0.012; });
+  const up = e => { if (CRE.drag && e.pointerId === CRE.drag.id) CRE.drag = null; };
+  z.addEventListener('pointerup', up); z.addEventListener('pointercancel', up);
+  z.addEventListener('wheel', e => { CRE.face = e.deltaY < 0; creRender(); }, { passive: true });
+}
+
+// ===================== 資產與生活：投資買房、自己的家、分店、廣告、進修、服裝、社區贊助 =====================
+const WAN = 10000;
+const HOME_TIERS = [
+  { name: '租屋小套房', price: 0, ap: 0, slots: 3, size: [5, 4] },
+  { name: '小套房', price: 3000000, ap: 5, slots: 5, size: [6, 5] },
+  { name: '兩房公寓', price: 9000000, ap: 10, slots: 8, size: [8, 6] },
+  { name: '三房電梯大樓', price: 18000000, ap: 15, slots: 11, size: [10, 7] },
+  { name: '透天別墅', price: 35000000, ap: 20, slots: 14, size: [12, 8] },
+  { name: '景觀豪宅', price: 80000000, ap: 30, slots: 18, size: [14, 10] },
+];
+// 家具：ap = 每天體力上限、xp = 經驗加成（%）；沒有加成的是純收藏
+const FURN = [
+  { k: 'plant', name: '大型盆栽', price: 3000, desc: '綠意盎然，心情好一點。', col: '#2f7a3a', w: 0.6, d: 0.6, h: 1.2 },
+  { k: 'sofa', name: '真皮沙發', price: 30000, desc: '下班癱在上面最舒服。', col: '#6a3a2a', w: 2.2, d: 0.9, h: 0.8 },
+  { k: 'rug', name: '手工地毯', price: 40000, desc: '踩起來軟綿綿。', col: '#a8402e', w: 2.6, d: 1.8, h: 0.03 },
+  { k: 'coffee', name: '義式咖啡機', price: 18000, ap: 3, desc: '每天體力上限 +3。', col: '#2a2a2e', w: 0.5, d: 0.4, h: 0.5, top: true },
+  { k: 'bed', name: '獨立筒床墊', price: 45000, ap: 3, desc: '睡得好，每天體力上限 +3。', col: '#e8e2d6', w: 1.8, d: 2.1, h: 0.5 },
+  { k: 'shelf', name: '實木書櫃', price: 25000, xp: 3, desc: '多讀書，獲得經驗 +3%。', col: '#7a5230', w: 1.4, d: 0.4, h: 2.0 },
+  { k: 'tv', name: '75 吋電視', price: 60000, desc: '週末追劇專用。', col: '#111', w: 1.7, d: 0.15, h: 1.0, wall: true },
+  { k: 'game', name: '遊戲主機', price: 25000, desc: '偶爾放鬆一下。', col: '#f2f2f2', w: 0.4, d: 0.3, h: 0.1, top: true },
+  { k: 'gym', name: '健身器材', price: 90000, ap: 3, desc: '鍛鍊體力，每天體力上限 +3。', col: '#3a3a40', w: 1.8, d: 0.8, h: 1.4 },
+  { k: 'fish', name: '大型水族箱', price: 70000, desc: '招財的魚缸。', col: '#3a8ac8', w: 1.5, d: 0.5, h: 1.0 },
+  { k: 'lamp', name: '水晶吊燈', price: 150000, desc: '一進門就閃閃發亮。', col: '#f2e6b0', w: 0.9, d: 0.9, h: 0.5, ceil: true },
+  { k: 'massage', name: '按摩椅', price: 120000, ap: 5, desc: '每天體力上限 +5。', col: '#4a2a1a', w: 0.9, d: 1.4, h: 1.2 },
+  { k: 'wine', name: '恆溫酒櫃', price: 250000, desc: '招待客戶有面子。', col: '#2a1a1a', w: 0.8, d: 0.6, h: 1.8 },
+  { k: 'proj', name: '家庭劇院', price: 180000, desc: '大螢幕看電影。', col: '#1a1a2a', w: 2.4, d: 0.1, h: 1.4, wall: true },
+  { k: 'piano', name: '平台鋼琴', price: 600000, desc: '氣質加分。', col: '#0e0e10', w: 1.5, d: 1.9, h: 1.0 },
+  { k: 'art', name: '名家畫作', price: 800000, desc: '客廳的鎮宅之寶。', col: '#c8a040', w: 1.6, d: 0.06, h: 1.1, wall: true },
+  { k: 'trophy', name: '獎盃展示櫃', price: 200000, desc: '擺放你的狂仲獎獎盃。', col: '#5a3a20', w: 1.2, d: 0.5, h: 1.9 },
+  { k: 'study', name: '書房辦公桌', price: 60000, xp: 4, desc: '在家也能整理物件資料，經驗 +4%。', col: '#5a4030', w: 1.6, d: 0.8, h: 0.78 },
+];
+const ADS = [
+  { k: 'web', name: '房屋網站精選刊登', price: 30000, days: 3, desc: '委託物件的買方詢問機率 +25%。' },
+  { k: 'sns', name: '社群媒體廣告', price: 50000, days: 3, desc: '開發信、DM 的屋主回電機率 ×1.6。' },
+  { k: 'board', name: '社區看板', price: 80000, days: 5, desc: '跟屋主交涉時，屋主戒心 -8。' },
+  { k: 'mrt', name: '捷運站燈箱', price: 250000, days: 7, desc: '買方詢問 +15%、屋主回電 ×1.3、屋主戒心 -5。' },
+];
+const OUTFIT = [
+  { k: 'shoes', name: '質感皮鞋', price: 30000, imp: 2, desc: '第一印象 +2' },
+  { k: 'bag', name: '真皮公事包', price: 50000, imp: 3, desc: '第一印象 +3' },
+  { k: 'pen', name: '頂級鋼筆', price: 80000, imp: 2, desc: '簽約時帥氣掏出來，第一印象 +2' },
+  { k: 'suit', name: '訂製西裝', price: 120000, imp: 5, desc: '量身訂做，第一印象 +5' },
+  { k: 'watch', name: '名錶', price: 350000, imp: 6, desc: '低調又有質感，第一印象 +6' },
+];
+const SPONSOR = [
+  { k: 'event', name: '里民活動', price: 50000, fam: 25, near: 0, desc: '贊助里民聯誼活動，該里熟悉度 +25。' },
+  { k: 'moon', name: '中秋烤肉', price: 120000, fam: 40, near: 10, desc: '該里熟悉度 +40，相鄰的里 +10。' },
+  { k: 'temple', name: '廟會', price: 200000, fam: 50, near: 15, desc: '該里熟悉度 +50，相鄰的里 +15。' },
+];
+const LICENSE_FEE = 200000;
+const LICENSE_Q = [
+  ['買方簽「斡旋金」後，如果屋主不接受價格，斡旋金會怎麼處理？', ['全額退還給買方', '沒收一半', '直接轉為房屋訂金'], 0],
+  ['不動產交易完成後，買賣雙方的成交價格會登錄在哪裡讓大家查詢？', ['實價登錄', '戶政事務所', '稅捐處'], 0],
+  ['仲介在帶看前應該提供買方哪一份文件，說明房屋現況與重要資訊？', ['不動產說明書', '土地使用分區證明', '房屋稅單'], 0],
+  ['「履約保證」主要是保障什麼？', ['買賣雙方的價金交付安全', '房屋十年不漏水', '仲介一定拿得到服務費'], 0],
+  ['調閱「建物登記謄本」可以知道什麼？', ['所有權人與建物面積', '屋主的電話', '屋主的存款'], 0],
+  ['屋主簽「專任委託」代表什麼？', ['委託期間只交給一家仲介銷售', '可以同時給很多家賣', '屋主不能自己降價'], 0],
+  ['房屋曾發生非自然身故，仲介應該怎麼做？', ['依法查證並書面告知買方', '買方沒問就不用說', '降價賣掉就好'], 0],
+  ['辦理不動產過戶、登記的專業人員是？', ['地政士', '估價師', '建築師'], 0],
+];
+
+function lifeEnsure() {
+  const d = (k, v) => { if (G[k] === undefined || G[k] === null) G[k] = v; };
+  d('invest', []); d('mkt', { idx: 1, hist: [1], news: null, list: [], listDay: 0 });
+  d('home', { tier: 0, furn: [] }); d('branch', null); d('ads', {}); d('course', 0); d('license', false);
+  d('outfit', []); d('salonUntil', 0); d('sponsor', {}); d('rentTotal', 0);
+}
+const adOn = k => G && G.ads && (G.ads[k] || 0) >= G.day;
+const homeAP = () => G && G.home ? HOME_TIERS[G.home.tier].ap + G.home.furn.reduce((s, k) => s + ((FURN.find(f => f.k === k) || {}).ap || 0), 0) : 0;
+const homeXP = () => G && G.home ? G.home.furn.reduce((s, k) => s + ((FURN.find(f => f.k === k) || {}).xp || 0), 0) : 0;
+const impression = () => G ? (G.outfit || []).reduce((s, k) => s + ((OUTFIT.find(o => o.k === k) || {}).imp || 0), 0) + ((G.salonUntil || 0) >= G.day ? 4 : 0) : 0;
+// 給其他系統用的加成
+const lifeBuyerBonus = () => (adOn('web') ? 0.25 : 0) + (adOn('mrt') ? 0.15 : 0);
+const lifeCallMul = () => (adOn('sns') ? 1.6 : 1) * (adOn('mrt') ? 1.3 : 1);
+const lifeOwnerCut = () => (adOn('board') ? 8 : 0) + (adOn('mrt') ? 5 : 0) + (G && G.license ? 10 : 0);
+
+// ---------- 投資市場 ----------
+function investCands() {
+  const busy = new Set(OWN.map(o => o.bid)); (G.invest || []).forEach(v => busy.add(v.bid));
+  return BLD.filter(b => !b.store && !b.dealer && b !== OFFICE && !busy.has(b.id) && Math.hypot(b.fx, b.fz) < 900);
+}
+const bidOf = b => b.id;
+function refreshMarket(force) {
+  const M = G.mkt; if (!force && M.list.length && G.day - M.listDay < 5) return;
+  const R = mulberry32((G.seed || 1) * 7 + G.day * 131), C = investCands(), out = [];
+  for (let i = 0; i < 8 && C.length; i++) {
+    const b = C.splice(Math.floor(R() * C.length), 1)[0], floors = b.floors || 3;
+    const base = (600 + R() * 2400) * (b.type === 'tower' ? 1.25 : 1) * (Math.abs(b.fx) + Math.abs(b.fz) < 500 ? 1.2 : 1);
+    const price = Math.round(base * M.idx) * WAN;
+    out.push({ bid: bidOf(b), price, yield: 0.0009 + R() * 0.0006, kind: b.type === 'tower' ? '電梯大樓' : b.type === 'apt' ? '公寓' : '透天' });
+  }
+  M.list = out; M.listDay = G.day;
+}
+const MKT_NEWS = [[0.035, '捷運新路線動工，沿線房價看漲'], [0.025, '科技大廠進駐溪虹，買氣大增'], [-0.03, '央行升息，房市降溫'], [-0.025, '政府祭出打炒房新措施'], [0.02, '首購優惠貸款加碼，年輕人進場'], [-0.02, '建商推案量大增，價格鬆動']];
+function marketTick() {
+  const M = G.mkt; let ch = 0.0015 + (Math.random() - 0.5) * 0.022; M.news = null;
+  if (Math.random() < 0.14) { const n = pk(MKT_NEWS, Math.random); ch += n[0]; M.news = n[1]; }
+  M.idx = clamp(M.idx * (1 + ch), 0.7, 1.8); M.hist.push(+M.idx.toFixed(4)); if (M.hist.length > 40) M.hist.shift();
+}
+const invValue = v => Math.round(v.price * G.mkt.idx / v.idx0 / 1000) * 1000;
+const rentOf = v => Math.round(v.price * v.yield / 100) * 100;
+
+// ---------- 每天早上結算（在 careerDayStart 之後呼叫） ----------
+function lifeDayStart(L) {
+  lifeEnsure(); marketTick(); refreshMarket();
+  const S = 'Simon 店長', lines = [];
+  if (G.invest.length) { const r = G.invest.reduce((s, v) => s + rentOf(v), 0); G.money += r; G.rentTotal += r; lines.push(`房客把昨天的租金匯進來了，共 NT$${fmt(r)}。`); }
+  if (G.branch) {
+    const B = G.branch, rev = Math.round((40000 + B.agents * 25000) * (B.reno ? 1.2 : 1) * (0.6 + Math.random() * 0.8) / 100) * 100, cost = 15000 + B.agents * 12000, net = rev - cost;
+    G.money += net; B.total = (B.total || 0) + net; B.last = net;
+    lines.push(`${B.name}昨天營收 NT$${fmt(rev)}，扣掉店租和薪水${net >= 0 ? `淨賺 NT$${fmt(net)}` : `虧了 NT$${fmt(-net)}`}。`);
+  }
+  if (G.mkt.news) lines.push(`看到新聞了嗎？「${G.mkt.news}」，${G.invest.length ? '你手上的投資物件價格也會跟著變動。' : '有在投資房地產的話要留意。'}`);
+  for (const k in G.ads) if (G.ads[k] === G.day - 1) lines.push(`你投放的「${(ADS.find(a => a.k === k) || {}).name}」昨天到期了，需要的話記得續約。`);
+  G.lifeMsg = lines.length ? lines.join('') : null; if (L && G.lifeMsg) { L.push({ name: S, text: G.lifeMsg }); G.lifeMsg = null; }
+  renderLv && renderLv();
+}
+
+// ---------- 介面：資產與生活 ----------
+const LIFE_TABS = [['inv', '投資買房'], ['home', '我的家'], ['branch', '分店'], ['ads', '廣告'], ['study', '進修'], ['look', '服裝'], ['spon', '社區贊助']];
+let LIFE_TAB = 'inv', LIFE_ASK = '';
+function lifeTotal() { return G.invest.reduce((s, v) => s + invValue(v), 0) + (G.home.tier ? Math.round(HOME_TIERS[G.home.tier].price * G.mkt.idx) : 0); }
+function openLife(tab) {
+  if (!G || (MODE !== 'city' && MODE !== 'office')) return;
+  lifeEnsure(); refreshMarket(); if (tab) LIFE_TAB = tab; sfx('click');
+  const head = `<h3>資產與生活 <small>錢包 NT$${fmt(G.money)} · 不動產 NT$${fmt(lifeTotal())}</small></h3>
+    <div class="lifeTabs" role="tablist">${LIFE_TABS.map(([k, n]) => `<button class="lt ${LIFE_TAB === k ? 'on' : ''}" data-t="${k}" role="tab" aria-selected="${LIFE_TAB === k}">${n}</button>`).join('')}</div>`;
+  openModal(`${head}<div class="lifeBody">${lifeTabHtml()}</div><div class="mbtns"><button class="btn ghost" id="lfBack">關閉</button></div>`, 'wide life');
+  $('lfBack').onclick = () => { sfx('cancel'); LIFE_ASK = ''; closeModal(); };
+  $('mbox').querySelectorAll('.lt').forEach(b => b.onclick = () => { LIFE_TAB = b.dataset.t; LIFE_ASK = ''; openLife(); });
+  wireLife();
+}
+const btnBuy = (id, price, label, extra = '') => `<button class="btn sm${LIFE_ASK === id ? ' warn' : ''}" data-b="${id}" ${G.money < price ? 'disabled' : ''} ${extra}>${LIFE_ASK === id ? '確定？' : (label || 'NT$' + fmt(price))}</button>`;
+function lifeTabHtml() {
+  const M = G.mkt, d = (M.hist.length > 1 ? M.idx / M.hist[M.hist.length - 2] - 1 : 0);
+  if (LIFE_TAB === 'inv') {
+    const spark = (() => { const h = M.hist, lo = Math.min(...h), hi = Math.max(...h), w = 160, hh = 34; const pts = h.map((v, i) => `${(i / Math.max(1, h.length - 1) * w).toFixed(1)},${(hh - (v - lo) / Math.max(0.0001, hi - lo) * (hh - 4) - 2).toFixed(1)}`).join(' '); return `<svg width="${w}" height="${hh}" viewBox="0 0 ${w} ${hh}" aria-hidden="true"><polyline points="${pts}" fill="none" stroke="${d >= 0 ? '#3fd68a' : '#ff6a5a'}" stroke-width="2"/></svg>`; })();
+    const mine = G.invest.map((v, i) => { const b = BLD[v.bid], val = invValue(v), pl = val - v.price; return `<li><div class="shT"><b>${addrOf(b)}</b><span>${v.kind}</span></div><p>買進 NT$${fmt(v.price)} · 現值 <b class="${pl >= 0 ? 'up' : 'down'}">NT$${fmt(val)}（${pl >= 0 ? '+' : ''}${fmt(pl)}）</b><br>每天租金 NT$${fmt(rentOf(v))}</p>${btnBuy('sell' + i, 0, `賣出（實拿 NT$${fmt(Math.round(val * 0.97))}）`)}</li>`; }).join('');
+    const mkt = M.list.map((v, i) => { const b = BLD[v.bid]; return `<li><div class="shT"><b>${addrOf(b)}</b><span>${v.kind}</span></div><p>每天租金約 NT$${fmt(rentOf(v))}（每月約 ${(v.yield * 30 * 100).toFixed(1)}%）</p>${btnBuy('buy' + i, v.price, '', G.invest.length >= 5 ? 'disabled' : '')}</li>`; }).join('');
+    return `<div class="lifeInfo"><div><b>溪虹房價指數 ${(M.idx * 100).toFixed(1)}</b> <span class="${d >= 0 ? 'up' : 'down'}">${d >= 0 ? '▲' : '▼'} ${(Math.abs(d) * 100).toFixed(2)}%</span><br><small class="dim">${M.news ? '今日新聞：' + M.news : '房價每天都會小幅波動；買下來的房子每天收租，看準時機也能賣掉賺價差（賣出要付 3% 的稅費）。'}</small></div>${spark}</div>
+      ${G.invest.length ? `<h4>我的投資（${G.invest.length} / 5）　累計租金 NT$${fmt(G.rentTotal)}</h4><ul class="shop">${mine}</ul>` : ''}
+      <h4>市場上的物件 <small class="dim">每 5 天更新一批</small></h4><ul class="shop">${mkt || '<li>目前沒有物件。</li>'}</ul>`;
+  }
+  if (LIFE_TAB === 'home') {
+    const H = G.home, T = HOME_TIERS[H.tier], nxt = HOME_TIERS[H.tier + 1];
+    const furn = FURN.map(f => { const own = H.furn.includes(f.k); return `<li class="${own ? 'cur' : ''}"><div class="shT"><b>${f.name}</b><span>${own ? '已擺放' : ''}</span></div><p>${f.desc}</p>${own ? '<button class="btn sm" disabled>已擁有</button>' : btnBuy('f_' + f.k, f.price, '', H.furn.length >= T.slots ? 'disabled' : '')}</li>`; }).join('');
+    return `<div class="lifeInfo"><div><b>${T.name}</b>　家具 ${H.furn.length} / ${T.slots} 件<br><small class="dim">住得好、睡得飽：每天體力上限 +${homeAP()}${homeXP() ? `，經驗 +${homeXP()}%` : ''}</small></div><button class="btn sm" id="homeView">參觀我的家</button></div>
+      ${nxt ? `<ul class="shop"><li><div class="shT"><b>換屋：${nxt.name}</b><span>家具上限 ${nxt.slots} 件</span></div><p>體力上限 +${nxt.ap}${H.tier ? `；舊家會依目前房價賣出（約 NT$${fmt(Math.round(T.price * G.mkt.idx * 0.97))}）` : ''}</p>${btnBuy('up', nxt.price - (H.tier ? Math.round(T.price * G.mkt.idx * 0.97) : 0), `NT$${fmt(nxt.price)}${H.tier ? '（補差價）' : ''}`)}</li></ul>` : '<p class="dim">你已經住進最頂級的豪宅了！</p>'}
+      <h4>家具與裝潢</h4><ul class="shop">${furn}</ul>`;
+  }
+  if (LIFE_TAB === 'branch') {
+    const B = G.branch;
+    if (!B) return `<div class="lifeInfo"><div><b>開一間自己的分店</b><br><small class="dim">開店之後每天都有店務營收，也要付店租和業務的薪水；請越多業務，營收越高。</small></div></div>
+      <ul class="shop"><li><div class="shT"><b>開設分店</b><span>創業金</span></div><p>分店名稱：<input id="brName" maxlength="8" value="溪虹二店" aria-label="分店名稱"></p>${btnBuy('open', 15000000)}</li></ul>`;
+    return `<div class="lifeInfo"><div><b>日勝房屋 ${escA(B.name)}</b>　店長：${escA(G.name)}<br><small class="dim">業務 ${B.agents} 人${B.reno ? ' · 已重新裝潢（營收 +20%）' : ''} · 昨天 ${B.last == null ? '—' : (B.last >= 0 ? '+' : '-') + 'NT$' + fmt(Math.abs(B.last))} · 累計 ${B.total >= 0 ? '+' : '-'}NT$${fmt(Math.abs(B.total || 0))}</small></div></div>
+      <ul class="shop"><li><div class="shT"><b>招募業務</b><span>${B.agents} / 6 人</span></div><p>每人每天約多 NT$25,000 營收，薪水 NT$12,000。招募與培訓費 NT$500,000。</p>${B.agents >= 6 ? '<button class="btn sm" disabled>已滿</button>' : btnBuy('hire', 500000)}</li>
+      <li><div class="shT"><b>店面重新裝潢</b><span>${B.reno ? '已完成' : ''}</span></div><p>門面更體面，營收 +20%。</p>${B.reno ? '<button class="btn sm" disabled>已完成</button>' : btnBuy('reno', 3000000)}</li></ul>
+      <p class="dim">每天店租 NT$15,000，生意好壞每天不一樣，偶爾也會虧錢。</p>`;
+  }
+  if (LIFE_TAB === 'ads') {
+    return `<div class="lifeInfo"><div><b>廣告預算</b><br><small class="dim">廣告期間效果立即生效，到期前可以續約延長。</small></div></div><ul class="shop">${ADS.map(a => { const on = adOn(a.k); return `<li class="${on ? 'cur' : ''}"><div class="shT"><b>${a.name}</b><span>${on ? `投放中，到第 ${G.ads[a.k]} 天` : `${a.days} 天`}</span></div><p>${a.desc}</p>${btnBuy('ad_' + a.k, a.price, on ? `續約 NT$${fmt(a.price)}` : '')}</li>`; }).join('')}</ul>`;
+  }
+  if (LIFE_TAB === 'study') {
+    const cp = 50000 * Math.pow(2, G.course);
+    return `<ul class="shop"><li><div class="shT"><b>業務技巧進修班</b><span>已上 ${G.course} 期</span></div><p>上完一期課程獲得 1 個技能點。每多上一期，學費就加倍。</p>${btnBuy('course', cp)}</li>
+      <li class="${G.license ? 'cur' : ''}"><div class="shT"><b>不動產經紀人證照</b><span>${G.license ? '已取得' : 'Lv.5 以上可報考'}</span></div><p>報名後立刻考試（3 題答對 2 題就通過）。取得證照後：跟屋主交涉時戒心 -10，成交入帳 +5%。</p>${G.license ? '<button class="btn sm" disabled>已取得</button>' : btnBuy('exam', LICENSE_FEE, `報名 NT$${fmt(LICENSE_FEE)}`, G.lv < 5 ? 'disabled' : '')}</li></ul>`;
+  }
+  if (LIFE_TAB === 'look') {
+    const salon = (G.salonUntil || 0) >= G.day;
+    return `<div class="lifeInfo"><div><b>第一印象 +${impression()}</b><br><small class="dim">跟屋主、管理員交涉時，對方的戒心會一開始就降低這麼多。</small></div><button class="btn sm" id="lookEdit">改變角色造型</button></div>
+      <ul class="shop">${OUTFIT.map(o => { const own = G.outfit.includes(o.k); return `<li class="${own ? 'cur' : ''}"><div class="shT"><b>${o.name}</b><span>${own ? '已擁有' : ''}</span></div><p>${o.desc}</p>${own ? '<button class="btn sm" disabled>已擁有</button>' : btnBuy('o_' + o.k, o.price)}</li>`; }).join('')}
+      <li class="${salon ? 'cur' : ''}"><div class="shT"><b>髮廊造型</b><span>${salon ? `維持到第 ${G.salonUntil} 天` : '3 天'}</span></div><p>整理一下門面，3 天內第一印象 +4。</p>${btnBuy('salon', 3000)}</li></ul>`;
+  }
+  if (LIFE_TAB === 'spon') {
+    const here = MODE === 'city' ? liKey(PLAYER.x, PLAYER.z) : null;
+    const lis = [...new Set(OWN.map(o => liOf(BLD[o.bid])))].sort((a, b) => (b === here) - (a === here) || famOf(b) - famOf(a)).slice(0, 12);
+    return `<div class="lifeInfo"><div><b>社區贊助</b><br><small class="dim">贊助地方活動，讓整個里的人都認識你；同一個里 3 天內只能贊助一次。</small></div></div>
+      <ul class="shop spon">${lis.map(k => { const cd = (G.sponsor[k] || -99) + 3 > G.day; return `<li><div class="shT"><b>${liName(k)}${k === here ? '（你在這裡）' : ''}</b><span>熟悉度 ${starStr(famStars(famOf(k)))}</span></div><div class="sponBtns">${SPONSOR.map(s => `<button class="btn sm${LIFE_ASK === `sp_${s.k}_${k}` ? ' warn' : ''}" data-b="sp_${s.k}_${k}" ${cd || G.money < s.price ? 'disabled' : ''} title="${s.desc}">${LIFE_ASK === `sp_${s.k}_${k}` ? '確定？' : `${s.name} NT$${fmt(s.price)}`}</button>`).join('')}</div>${cd ? `<small class="dim">第 ${G.sponsor[k] + 3} 天後可以再贊助</small>` : ''}</li>`; }).join('')}</ul>
+      <p class="dim">${SPONSOR.map(s => `${s.name}：${s.desc}`).join('　')}</p>`;
+  }
+  return '';
+}
+function lifePay(n) { if (G.money < n) { sfx('deny'); return false; } G.money -= n; floatText('-NT$' + fmt(n), 'cost'); sfx('coin'); G.cnt.buy++; renderLv(); return true; }
+function wireLife() {
+  const hv = $('homeView'); if (hv) hv.onclick = () => openHomeView();
+  const le = $('lookEdit'); if (le) le.onclick = () => openCreator('edit');
+  $('mbox').querySelectorAll('[data-b]').forEach(b => b.onclick = () => {
+    const id = b.dataset.b;
+    if (LIFE_ASK !== id) { LIFE_ASK = id; sfx('click'); openLife(); return; }
+    LIFE_ASK = ''; lifeAct(id); openLife();
+  });
+}
+function lifeAct(id) {
+  const M = G.mkt;
+  if (id.startsWith('buy')) { const v = M.list[+id.slice(3)]; if (!v || G.invest.length >= 5 || !lifePay(v.price)) return; G.invest.push({ ...v, idx0: M.idx, day: G.day }); M.list.splice(+id.slice(3), 1); toast(`買下${addrOf(BLD[v.bid])}，明天開始收租！`, 'star'); }
+  else if (id.startsWith('sell')) { const i = +id.slice(4), v = G.invest[i]; if (!v) return; const got = Math.round(invValue(v) * 0.97); G.invest.splice(i, 1); addMoney(got); toast(`賣掉${addrOf(BLD[v.bid])}，${got >= v.price ? `賺了 NT$${fmt(got - v.price)}` : `賠了 NT$${fmt(v.price - got)}`}`, got >= v.price ? 'star' : ''); }
+  else if (id === 'up') { const H = G.home, T = HOME_TIERS[H.tier], nxt = HOME_TIERS[H.tier + 1]; const cost = nxt.price - (H.tier ? Math.round(T.price * M.idx * 0.97) : 0); if (!lifePay(Math.max(0, cost))) return; H.tier++; toast(`搬進${nxt.name}了！每天體力上限 +${nxt.ap}`, 'star'); }
+  else if (id.startsWith('f_')) { const f = FURN.find(x => x.k === id.slice(2)), H = G.home; if (!f || H.furn.includes(f.k) || H.furn.length >= HOME_TIERS[H.tier].slots || !lifePay(f.price)) return; H.furn.push(f.k); toast(`${f.name}送到家了`); }
+  else if (id === 'open') { const nm = (($('brName') || {}).value || '溪虹二店').trim().slice(0, 8) || '溪虹二店'; if (!lifePay(15000000)) return; G.branch = { name: nm, agents: 1, reno: false, total: 0, last: null, day: G.day }; toast(`日勝房屋 ${nm} 開幕了！你是店長了`, 'star'); sfx('win'); }
+  else if (id === 'hire') { const B = G.branch; if (!B || B.agents >= 6 || !lifePay(500000)) return; B.agents++; toast(`新業務報到！分店現在有 ${B.agents} 位業務`); }
+  else if (id === 'reno') { const B = G.branch; if (!B || B.reno || !lifePay(3000000)) return; B.reno = true; toast('分店裝潢完成，營收 +20%'); }
+  else if (id.startsWith('ad_')) { const a = ADS.find(x => x.k === id.slice(3)); if (!a || !lifePay(a.price)) return; G.ads[a.k] = Math.max(G.ads[a.k] || 0, G.day - 1) + a.days; toast(`「${a.name}」投放到第 ${G.ads[a.k]} 天`); }
+  else if (id === 'course') { const cp = 50000 * Math.pow(2, G.course); if (!lifePay(cp)) return; G.course++; G.sp++; toast('上完一期進修班，獲得 1 個技能點！', 'star'); }
+  else if (id === 'exam') { if (G.lv < 5 || G.license || !lifePay(LICENSE_FEE)) return; setTimeout(licenseExam, 50); }
+  else if (id.startsWith('o_')) { const o = OUTFIT.find(x => x.k === id.slice(2)); if (!o || G.outfit.includes(o.k) || !lifePay(o.price)) return; G.outfit.push(o.k); toast(`${o.name}入手，第一印象 +${o.imp}`); }
+  else if (id === 'salon') { if (!lifePay(3000)) return; G.salonUntil = G.day + 2; toast('造型完成，3 天內第一印象 +4'); }
+  else if (id.startsWith('sp_')) {
+    const [, sk, lk] = id.split('_'), s = SPONSOR.find(x => x.k === sk), k = +lk; if (!s || (G.sponsor[k] || -99) + 3 > G.day || !lifePay(s.price)) return;
+    G.sponsor[k] = G.day; addFam(k, s.fam);
+    if (s.near) { const n = LI_N; [k - 1, k + 1, k - n, k + n].filter(j => j >= 0 && j < n * n && Math.abs((j % n) - (k % n)) <= 1).forEach(j => addFam(j, s.near)); }
+    toast(`贊助了${liName(k)}的${s.name}，大家都記住你了！`, 'star'); sfx('quest');
+  }
+  saveGame(true);
+}
+// 證照考試：3 題選擇題，答對 2 題通過
+function licenseExam() {
+  const qs = shuffle(LICENSE_Q.slice()).slice(0, 3); let i = 0, ok = 0;
+  const ask = () => {
+    if (i >= qs.length) { const pass = ok >= 2; if (pass) { G.license = true; saveGame(true); } choice(pass ? '恭喜通過！' : '差一點點', pass ? `<p>答對 ${ok} 題，你正式成為<b>不動產經紀人</b>！</p><p class="dim">跟屋主交涉時戒心 -10，成交入帳 +5%。</p>` : `<p>答對 ${ok} 題，沒有通過。回去多讀書，下次再來報名吧。</p>`, [{ label: '確定', fn: () => openLife('study') }], pass ? 'win' : ''); sfx(pass ? 'win' : 'deny'); return; }
+    const [q, opts, a] = qs[i], order = shuffle(opts.map((t, j) => [t, j]));
+    choice(`證照考試 第 ${i + 1} / 3 題`, `<p>${q}</p>`, order.map(([t, j]) => ({ label: t, cls: 'ghost', fn: () => { if (j === a) { ok++; sfx('good'); } else sfx('bad'); i++; setTimeout(ask, 60); } })));
+  };
+  ask();
+}
+
+// ---------- 參觀我的家（3D） ----------
+const HOMEV = { scene: null, prev: null, yaw: 0.6, drag: null, t: 0 }, TROPHY_TMP = [];
+function openHomeView() {
+  closeModalSoft();
+  const T = HOME_TIERS[G.home.tier], [W, D] = T.size, S = new THREE.Scene(); S.background = new THREE.Color('#141821');
+  S.add(new THREE.HemisphereLight(0xfff6e8, 0x4a4038, 1.2)); const sun = new THREE.DirectionalLight(0xfff0d8, 1.5); sun.position.set(4, 8, 6); S.add(sun);
+  const floorC = ['#9a7a58', '#b08a60', '#c8a878', '#d8d2c8', '#e6e0d6', '#f0ece4'][G.home.tier], wallC = ['#d8d0c4', '#e6e0d4', '#ece6dc', '#f2eee6', '#f4f0ea', '#f8f6f2'][G.home.tier];
+  const P = [], b = (w, h, d, x, y, z, c) => P.push(cbox(w, h, d, x, y, z, c));
+  b(W, 0.1, D, 0, -0.05, 0, floorC); b(W, 3, 0.15, 0, 1.5, -D / 2, wallC); b(0.15, 3, D, -W / 2, 1.5, 0, shade(wallC, 0.9)); b(W, 0.12, 0.16, 0, 0.06, D / 2, shade(floorC, 0.8)); b(0.16, 0.12, D, W / 2, 0.06, 0, shade(floorC, 0.8));   // 娃娃屋剖面：只蓋後面和左邊的牆
+  b(W * 0.4, 1.4, 0.05, W * 0.15, 1.7, -D / 2 + 0.09, '#a8d4f0'); b(W * 0.4 + 0.12, 0.08, 0.1, W * 0.15, 0.98, -D / 2 + 0.1, '#eee');   // 窗
+  if (G.home.tier >= 4) b(W * 0.3, 2.2, 0.05, -W * 0.2, 1.4, -D / 2 + 0.09, '#a8d4f0');
+  // 家具依序擺在牆邊的格位
+  const spots = [], nb = Math.max(3, Math.floor((W - 1.2) / 1.9)), nl = Math.max(2, Math.floor((D - 1.6) / 1.9));
+  for (let i = 0; i < nb; i++) spots.push([-W / 2 + 1.2 + i * (W - 2) / Math.max(1, nb - 1), -D / 2 + 0.75, 0]);
+  for (let i = 0; i < nl; i++) spots.push([-W / 2 + 0.75, -D / 2 + 2.2 + i * (D - 3) / Math.max(1, nl - 1), Math.PI / 2]);
+  for (let i = 0; i < 12; i++) spots.push([W / 2 - 1.4 - (i % 3) * 2.1, D / 2 - 1.3 - Math.floor(i / 3) * 1.9, Math.PI]);
+  let si = 0, cx = 0;
+  for (const k of G.home.furn) {
+    const f = FURN.find(x => x.k === k); if (!f) continue;
+    if (f.ceil) { b(f.w, f.h, f.d, 0, 2.6, 0, f.col); b(0.04, 0.4, 0.04, 0, 2.9, 0, '#ddd'); continue; }
+    if (f.k === 'rug') { b(f.w, f.h, f.d, cx * 0.2, 0.02, 0.6, f.col); continue; }
+    const wl = f.wall ? spots.filter(q => q[2] !== Math.PI) : spots, [x, z, ry] = f.wall ? wl[(si++) % wl.length] : spots[si++ % spots.length], g = new THREE.BoxGeometry(f.w, f.h, f.d); g.rotateY(ry); g.translate(x, (f.wall ? 1.4 : f.top ? 0.75 : 0) + f.h / 2, z); P.push(addColor(g, f.col));
+    if (f.top) { const t = new THREE.BoxGeometry(0.8, 0.75, 0.5); t.rotateY(ry); t.translate(x, 0.375, z); P.push(addColor(t, '#6a4a30')); }
+    if (f.k === 'trophy') { const n = Math.min(4, myTrophies().length); for (let j = 0; j < n; j++) { const tr = trophyMesh(); tr.scale.setScalar(0.6); const o = (j - (n - 1) / 2) * 0.28; tr.position.set(x + Math.cos(ry) * o, 1.9, z - Math.sin(ry) * o); TROPHY_TMP.push(tr); } }
+  }
+  const room = new THREE.Mesh(mergeGeometries(P), MAT.col); S.add(room); TROPHY_TMP.splice(0).forEach(t => S.add(t));
+  const me = makeMe(); me.position.set(0.4, 0, 0.9); me.rotation.y = 0.4; S.add(me);
+  HOMEV.scene = S; HOMEV.me = me; HOMEV.size = [W, D];
+  HOMEV.prev = { mode: MODE, scene: renderPass.scene, cam: camera.position.clone(), quat: camera.quaternion.clone(), hud: !$('hud').hidden };
+  MODE = 'home'; PAUSE = true; renderPass.scene = S; show('hud', false); show('homeScr', true);
+  $('homeTitle').textContent = `${G.name}的家 · ${T.name}`; $('homeSub').textContent = `家具 ${G.home.furn.length} / ${T.slots} 件 · 每天體力上限 +${homeAP()}`;
+}
+function closeHomeView() {
+  const p = HOMEV.prev; show('homeScr', false); MODE = p.mode; renderPass.scene = p.scene; camera.position.copy(p.cam); camera.quaternion.copy(p.quat); show('hud', p.hud); PAUSE = false;
+  HOMEV.scene.traverse(o => { if (o.isMesh && o.geometry) o.geometry.dispose(); }); HOMEV.scene = null; openLife('home');
+}
+function updateHomeView(dt) {
+  if (!HOMEV.scene) return; HOMEV.t += dt; if (!HOMEV.drag) HOMEV.yaw += (0.75 + Math.sin(HOMEV.t * 0.25) * 0.35 - HOMEV.yaw) * Math.min(1, dt * 0.8); HOMEV.yaw = clamp(HOMEV.yaw, 0.2, 1.35);
+  const [W, D] = HOMEV.size, r = Math.max(W, D) * 0.95 + 2;
+  camera.position.set(Math.sin(HOMEV.yaw) * r, 4.2 + Math.max(W, D) * 0.25, Math.cos(HOMEV.yaw) * r); camera.lookAt(0, 0.8, 0);
+  const u = HOMEV.me.userData; if (u.armR) { u.armR.rotation.x = -0.3 + Math.sin(HOMEV.t * 2) * 0.4; u.head.rotation.y = Math.sin(HOMEV.t * 0.6) * 0.3; }
+}
+{
+  const z = $('homeDrag');
+  z.addEventListener('pointerdown', e => { HOMEV.drag = { x: e.clientX, y0: HOMEV.yaw, id: e.pointerId }; try { z.setPointerCapture(e.pointerId); } catch (_) { } });
+  z.addEventListener('pointermove', e => { if (HOMEV.drag && e.pointerId === HOMEV.drag.id) HOMEV.yaw = HOMEV.drag.y0 - (e.clientX - HOMEV.drag.x) * 0.01; });
+  const up = e => { if (HOMEV.drag && e.pointerId === HOMEV.drag.id) HOMEV.drag = null; };
+  z.addEventListener('pointerup', up); z.addEventListener('pointercancel', up);
+  $('homeBack').onclick = () => { sfx('cancel'); closeHomeView(); };
+}
+$('bLife').onclick = () => openLife();
 
 // ===================== 挑戰任務：簽滿 6 件委託後開放 =====================
 const fullCards = () => OWN.filter(o => o.st.perKnown && o.st.jobK && o.st.hobK && o.st.tabK).length;
@@ -7389,6 +8094,322 @@ $('tAcct').onclick = () => { audioInit(); if (USER) { openSlots('load'); } else 
 renderAccount();
 // 上次登入過：背景還原登入狀態
 try { if (localStorage.getItem(ACCT_FLAG)) fbInit().catch(() => { }); } catch (e) { }
+
+// ===================== 狂仲獎：每週一 00:00（台北時間）結算上一週所有玩家的委託件數與業績 =====================
+// 雲端：Firestore kz/{週一日期}/p/{玩家代號} = { name, look, comm, perf, ts }（不需登入，跟排行榜一樣）
+const KZ_LOCAL = 'fzrpg3d.kz.week', KZ_SEEN = 'fzrpg3d.kz.seen', PID_KEY = 'fzrpg3d.pid';
+const TPE = 8 * 3600e3, DAY_MS = 864e5;
+function weekStartMs(ts = Date.now()) { const d = new Date(ts + TPE), back = (d.getUTCDay() + 6) % 7; return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()) - back * DAY_MS - TPE; }
+const wkId = ms => new Date(ms + TPE).toISOString().slice(0, 10);
+const thisWk = () => wkId(weekStartMs());
+const lastWk = () => wkId(weekStartMs() - 7 * DAY_MS);
+function myPid() { let p = ''; try { p = localStorage.getItem(PID_KEY) || ''; if (!p) { p = 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8); localStorage.setItem(PID_KEY, p); } } catch (e) { p = 'p_tmp'; } return p; }
+function kzLocal() { let w = null; try { w = JSON.parse(localStorage.getItem(KZ_LOCAL) || 'null'); } catch (e) { } const wk = thisWk(); if (!w || w.wk !== wk) w = { wk, comm: 0, perf: 0 }; return w; }
+const KZ_URL = path => `https://firestore.googleapis.com/v1/projects/${FIREBASE.projectId}/databases/(default)/documents/${path}?key=${FIREBASE.apiKey}`;
+// 簽下委託／成交時累計到本週（用過密技的那一局不列入）
+function kzAdd(comm, perf) {
+  if (!G || usedCheat()) return;
+  const w = kzLocal(); w.comm += comm || 0; w.perf += Math.round(perf || 0); w.name = String(G.name || '菜鳥').slice(0, 12); w.look = lookCode(G.look);
+  try { localStorage.setItem(KZ_LOCAL, JSON.stringify(w)); } catch (e) { }
+  clearTimeout(kzAdd.t); kzAdd.t = setTimeout(kzUpload, 4000);
+}
+async function kzUpload() {
+  const w = kzLocal(); if (!w.comm && !w.perf) return;
+  const f = { name: { stringValue: w.name || '菜鳥' }, look: { stringValue: w.look || lookCode(null) }, comm: { integerValue: String(w.comm) }, perf: { integerValue: String(w.perf) }, ts: { integerValue: String(Date.now()) } };
+  const mask = Object.keys(f).map(k => 'updateMask.fieldPaths=' + k).join('&');
+  try { await fetch(KZ_URL(`kz/${w.wk}/p/${myPid()}`) + '&' + mask, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ fields: f }) }); } catch (e) { }
+}
+async function kzTop(wk, field) {
+  const q = { structuredQuery: { from: [{ collectionId: 'p' }], where: { fieldFilter: { field: { fieldPath: field }, op: 'GREATER_THAN', value: { integerValue: '0' } } }, orderBy: [{ field: { fieldPath: field }, direction: 'DESCENDING' }], limit: 5 } };
+  const r = await fetch(KZ_URL(`kz/${wk}`).replace('?key=', ':runQuery?key='), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(q) });
+  if (!r.ok) throw new Error('HTTP ' + r.status);
+  const j = await r.json();
+  return (Array.isArray(j) ? j : []).filter(x => x.document).map(x => { const F = x.document.fields || {}, s = k => (F[k] || {}).stringValue || '', n = k => +((F[k] || {}).integerValue || 0); return { pid: x.document.name.split('/').pop(), name: s('name') || '菜鳥', look: s('look'), v: n(field) }; });
+}
+let KZ_DATA = null;
+async function kzResults(wk) {
+  if (KZ_DATA && KZ_DATA.wk === wk) return KZ_DATA;
+  const [comm, perf] = await Promise.all([kzTop(wk, 'comm'), kzTop(wk, 'perf')]);
+  return KZ_DATA = { wk, comm, perf };
+}
+// ---------- 邀請函：每週一之後第一次進遊戲（主畫面或遊戲中）跳出一次 ----------
+async function kzCheck() {
+  const wk = lastWk(); let seen = ''; try { seen = localStorage.getItem(KZ_SEEN) || ''; } catch (e) { }
+  if (seen === wk || kzCheck.busy || Date.now() < (kzCheck.next || 0)) return;
+  const idle = (MODE === 'title' || MODE === 'city' || MODE === 'office') && !ui.modalOpen && !BT && !DLG && !PHOTO;
+  if (!idle) return;
+  kzCheck.busy = true;
+  try {
+    const R = await kzResults(wk);
+    if (!R.comm.length && !R.perf.length) { try { localStorage.setItem(KZ_SEEN, wk); } catch (e) { } return; }
+    const idle2 = (MODE === 'title' || MODE === 'city' || MODE === 'office') && !ui.modalOpen && !BT && !DLG && !PHOTO; if (!idle2) return;
+    kzInvite(R);
+  } catch (e) { kzCheck.next = Date.now() + 10 * 60e3; } finally { kzCheck.busy = false; }
+}
+function kzInvite(R) {
+  const mine = myPid(), me = [...R.comm, ...R.perf].some(x => x.pid === mine);
+  const d0 = new Date(Date.parse(R.wk + 'T00:00:00+08:00') + TPE), d1 = new Date(d0.getTime() + 6 * DAY_MS), md = d => `${d.getUTCMonth() + 1}/${d.getUTCDate()}`;
+  sfx('quest');
+  openModal(`<div class="kzInv"><div class="kzInvTop">INVITATION</div><h3>狂仲獎頒獎典禮</h3><p class="kzWk">${md(d0)}（一）～ ${md(d1)}（日）</p>
+    <p>上週的「委託獎」與「業績獎」結果出爐了！誠摯邀請你出席本週的狂仲獎頒獎典禮，一起為頂尖業務喝采。${me ? '<br><b class="kzMe">恭喜！你也在得獎名單中，請準備上台領獎。</b>' : ''}</p></div>
+    <div class="mbtns"><button class="btn" id="kzGo">出席典禮</button><button class="btn ghost" id="kzNo">這次不參加</button></div>`, 'kzBox');
+  const done = () => { try { localStorage.setItem(KZ_SEEN, R.wk); const T = myTrophies(); [['comm', '委託獎'], ['perf', '業績獎']].forEach(([k, n]) => R[k].forEach((x, i) => { if (x.pid === mine && !T.some(t => t.wk === R.wk && t.cat === n)) T.push({ wk: R.wk, cat: n, rank: i + 1 }); })); localStorage.setItem(KZ_TROPHY, JSON.stringify(T)); } catch (e) { } };
+  $('kzGo').onclick = () => { done(); closeModalSoft(); startAward(R); };
+  $('kzNo').onclick = () => { done(); sfx('cancel'); closeModalSoft(); if (MODE === 'city') afterAction(); };
+}
+setInterval(() => { kzCheck(); }, 30000);
+setTimeout(() => { kzCheck(); kzUpload(); }, 8000);
+const KZ_TROPHY = 'fzrpg3d.kz.trophies';
+const myTrophies = () => { try { return JSON.parse(localStorage.getItem(KZ_TROPHY) || '[]'); } catch (e) { return []; } };
+
+// ---------- 典禮場景 ----------
+const KZW = { scene: null, prev: null, t: 0, q: [], cur: null, speed: 1, flashes: [], cam: null };
+function trophyMesh() {
+  const g = new THREE.Group(), gold = new THREE.MeshStandardMaterial({ color: '#f2c230', metalness: 0.55, roughness: 0.28, emissive: '#6a4a00', emissiveIntensity: 0.35 });
+  const cup = new THREE.Mesh(new THREE.CylinderGeometry(0.17, 0.08, 0.26, 16), gold); cup.position.y = 0.36;
+  const rim = new THREE.Mesh(new THREE.TorusGeometry(0.17, 0.018, 6, 20), gold); rim.rotation.x = Math.PI / 2; rim.position.y = 0.49;
+  const h1 = new THREE.Mesh(new THREE.TorusGeometry(0.07, 0.015, 6, 12, Math.PI), gold); h1.position.set(0.18, 0.38, 0); h1.rotation.z = -Math.PI / 2;
+  const h2 = h1.clone(); h2.position.x = -0.18; h2.rotation.z = Math.PI / 2;
+  const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.04, 0.14, 8), gold); stem.position.y = 0.17;
+  const base = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.1, 0.2), new THREE.MeshStandardMaterial({ color: '#2a1a10', roughness: 0.5 })); base.position.y = 0.05;
+  const plate = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.05, 0.01), gold); plate.position.set(0, 0.05, 0.101);
+  g.add(cup, rim, h1, h2, stem, base, plate); return g;
+}
+function buildAwardScene() {
+  const S = new THREE.Scene(); S.background = new THREE.Color('#07080c'); S.fog = new THREE.Fog('#07080c', 30, 70);
+  S.add(new THREE.HemisphereLight(0x8090b0, 0x201810, 0.55));
+  const key = new THREE.DirectionalLight(0xfff0d8, 1.4); key.position.set(2, 12, 14); key.target.position.set(0, 1, -2); S.add(key, key.target);
+  const spot = new THREE.SpotLight(0xfff4dc, 110, 30, 0.42, 0.55, 1.4); spot.position.set(0, 13, 4); spot.target.position.set(0, 1.3, -1); S.add(spot, spot.target);
+  const P = [], b = (w, h, d, x, y, z, c, ry = 0) => P.push(cbox(w, h, d, x, y, z, c, ry));
+  // 禮堂：地板、牆、天花板
+  b(46, 0.2, 52, 0, -0.1, 12, '#2a1c18'); b(46, 16, 0.4, 0, 8, -9.5, '#1a1418'); b(0.4, 16, 52, -23, 8, 12, '#221a1c'); b(0.4, 16, 52, 23, 8, 12, '#221a1c'); b(46, 0.4, 52, 0, 16, 12, '#141016'); b(46, 16, 0.4, 0, 8, 38, '#1a1418');
+  // 舞台
+  b(22, 1.3, 8, 0, 0.65, -4.5, '#4a2a1c'); b(22.2, 0.08, 8.2, 0, 1.34, -4.5, '#6a3a24'); b(22.4, 0.25, 0.3, 0, 1.2, -0.45, '#c8a040');
+  for (const s of [-1, 1]) { b(1.6, 0.35, 1.4, s * 11.6, 0.18, -0.9, '#3a2218'); b(1.6, 0.35, 1.0, s * 11.6, 0.53, -1.6, '#3a2218'); b(1.6, 0.35, 0.8, s * 11.6, 0.88, -2.2, '#3a2218'); }
+  // 金色台框
+  for (const s of [-1, 1]) b(1.1, 11, 1.1, s * 11.5, 5.5, -8.4, '#b88a2a');
+  b(24.2, 1.2, 1.1, 0, 11.4, -8.4, '#b88a2a');
+  // 講台
+  b(1.2, 1.25, 0.7, -7.2, 1.95, -2.4, '#5a3220'); b(1.4, 0.1, 0.9, -7.2, 2.62, -2.45, '#c8a040');
+  // 頒獎桌（放備用獎盃）
+  b(2.4, 0.9, 0.8, 4.6, 1.75, -5.6, '#7a1418'); b(2.6, 0.06, 1.0, 4.6, 2.22, -5.6, '#c8a040');
+  const room = new THREE.Mesh(mergeGeometries(P), MAT.col); room.receiveShadow = true; S.add(room);
+  // 紅色布幕（直條皺褶）
+  const cc = cvs(512, 512), cx = cc.getContext('2d');
+  for (let i = 0; i < 512; i += 2) { const k = 0.55 + 0.45 * Math.pow(Math.abs(Math.sin(i / 512 * Math.PI * 14)), 0.7); cx.fillStyle = `rgb(${Math.round(150 * k + 20)},${Math.round(12 * k)},${Math.round(22 * k)})`; cx.fillRect(i, 0, 2, 512); }
+  const g2 = cx.createLinearGradient(0, 0, 0, 512); g2.addColorStop(0, 'rgba(0,0,0,.35)'); g2.addColorStop(0.3, 'rgba(0,0,0,0)'); g2.addColorStop(1, 'rgba(0,0,0,.25)'); cx.fillStyle = g2; cx.fillRect(0, 0, 512, 512);
+  const ct = texFrom(cc, false); ct.wrapS = THREE.RepeatWrapping; ct.repeat.set(2, 1);
+  const curtain = new THREE.Mesh(new THREE.PlaneGeometry(22.4, 10.6), new THREE.MeshStandardMaterial({ map: ct, roughness: 0.85 })); curtain.position.set(0, 6.6, -7.9); S.add(curtain);
+  for (const s of [-1, 1]) { const sc = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 10.6), new THREE.MeshStandardMaterial({ map: ct, roughness: 0.85 })); sc.position.set(s * 9.6, 6.6, -7.6); S.add(sc); }
+  const val = new THREE.Mesh(new THREE.PlaneGeometry(22.4, 1.3), new THREE.MeshStandardMaterial({ map: ct, roughness: 0.85, color: '#ddd' })); val.position.set(0, 10.6, -7.7); S.add(val);
+  // 紅布條＋金字
+  const bc = cvs(2048, 256), bx = bc.getContext('2d');
+  const bg = bx.createLinearGradient(0, 0, 0, 256); bg.addColorStop(0, '#9a0e14'); bg.addColorStop(0.5, '#d0141c'); bg.addColorStop(1, '#8a0c12'); bx.fillStyle = bg; bx.fillRect(0, 0, 2048, 256);
+  bx.fillStyle = '#f2c230'; bx.fillRect(0, 10, 2048, 6); bx.fillRect(0, 240, 2048, 6);
+  bx.font = `900 170px ${FONT_SERIF}`; bx.textAlign = 'center'; bx.textBaseline = 'middle';
+  const gg = bx.createLinearGradient(0, 40, 0, 220); gg.addColorStop(0, '#fff2b0'); gg.addColorStop(0.45, '#f2c230'); gg.addColorStop(1, '#b07a10');
+  bx.shadowColor = 'rgba(0,0,0,.55)'; bx.shadowOffsetY = 6; bx.shadowBlur = 8; bx.fillStyle = gg; bx.fillText('狂 仲 獎 頒 獎 典 禮', 1024, 134);
+  const banner = new THREE.Mesh(new THREE.PlaneGeometry(15, 1.9), new THREE.MeshStandardMaterial({ map: texFrom(bc, false), emissive: '#ffffff', emissiveMap: texFrom(bc, false), emissiveIntensity: 0.35, roughness: 0.6 }));
+  banner.position.set(0, 9.0, -7.75); S.add(banner);
+  // 千人觀眾席：座椅、身體、頭各一個 InstancedMesh（三次繪製就畫完一千人）
+  const seats = [], N_ROW = 25, PER = 40;
+  for (let r = 0; r < N_ROW; r++) { const R = 9 + r * 1.05, yy = r * 0.34; for (let i = 0; i < PER; i++) { const off = i - (PER - 1) / 2, a = (off + Math.sign(off) * 0.9) * (1.0 / R) * (1 + r * 0.004); seats.push([Math.sin(a) * R, yy, -4 + Math.cos(a) * R, a]); } }   // 中間留一條走道
+  const n = seats.length, m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler(), one = new THREE.Vector3(1, 1, 1), pos = new THREE.Vector3();
+  const seatG = mergeGeometries([cbox(0.7, 0.45, 0.6, 0, 0.22, 0, '#fff'), cbox(0.7, 0.8, 0.12, 0, 0.6, 0.3, '#fff')]);
+  const bodyG = mergeGeometries([cbox(0.5, 0.62, 0.32, 0, 0.78, 0.08, '#fff'), cbox(0.44, 0.2, 0.5, 0, 0.5, -0.12, '#fff')]);
+  const headG = cbox(0.34, 0.36, 0.34, 0, 1.28, 0.06, '#fff');
+  const mkI = (g, col) => { const im = new THREE.InstancedMesh(g, new THREE.MeshStandardMaterial({ color: '#fff', vertexColors: true, roughness: 0.85 }), n); im.instanceColor = new THREE.InstancedBufferAttribute(new Float32Array(n * 3), 3); return im; };
+  const seatI = mkI(seatG), bodyI = mkI(bodyG), headI = mkI(headG), c = new THREE.Color(), R0 = mulberry32(2026);
+  const shirts = ['#1b2a4c', '#2a2a2e', '#f2f2ee', '#7a2a2a', '#3a5a8a', '#5a5a5a', '#c8b48a', '#2a5a4a', '#8a6a9a'], heads = ['#17120e', '#2a1c14', '#3a2a1c', '#6a6a6a', '#1a1410'];
+  seats.forEach(([x, y, z, ry], i) => {
+    m4.compose(pos.set(x, y, z), q.setFromEuler(e.set(0, ry, 0)), one); seatI.setMatrixAt(i, m4); bodyI.setMatrixAt(i, m4); headI.setMatrixAt(i, m4);
+    seatI.setColorAt(i, c.set('#8a1418')); bodyI.setColorAt(i, c.set(shirts[Math.floor(R0() * shirts.length)])); headI.setColorAt(i, c.set(heads[Math.floor(R0() * heads.length)]));
+  });
+  // 觀眾席的高度是一排一排往上的階梯
+  const steps = []; for (let r = 0; r < N_ROW; r++) steps.push(cbox(46, 0.34, 1.05, 0, r * 0.34 - 0.17, -4 + 9 + r * 1.05, '#24181a'));
+  S.add(new THREE.Mesh(mergeGeometries(steps), MAT.col), seatI, bodyI, headI);
+  KZW.audience = seats;
+  // 天花板燈
+  const lampG = new THREE.InstancedMesh(new THREE.BoxGeometry(0.6, 0.1, 0.6), new THREE.MeshBasicMaterial({ color: '#ffe9b8' }), 48);
+  for (let i = 0; i < 48; i++) { m4.makeTranslation(-18 + (i % 8) * 5.2, 15.7, 2 + Math.floor(i / 8) * 6); lampG.setMatrixAt(i, m4); } S.add(lampG);
+  // 舞台光束（半透明圓錐，不是真的光源）
+  const beamM = new THREE.MeshBasicMaterial({ color: '#fff3d0', transparent: true, opacity: 0.07, depthWrite: false, side: THREE.DoubleSide });
+  for (const s of [-1, 0, 1]) { const be = new THREE.Mesh(new THREE.ConeGeometry(2.4, 12, 24, 1, true), beamM); be.position.set(s * 5, 7.3, -2.5); be.rotation.z = s * -0.25; S.add(be); }
+  // 閃光燈小光點（觀眾席前排）
+  const fc = cvs(64, 64), fx = fc.getContext('2d'), fg = fx.createRadialGradient(32, 32, 0, 32, 32, 32); fg.addColorStop(0, 'rgba(255,255,255,1)'); fg.addColorStop(0.25, 'rgba(255,255,255,.9)'); fg.addColorStop(1, 'rgba(255,255,255,0)'); fx.fillStyle = fg; fx.fillRect(0, 0, 64, 64);
+  const flashM = new THREE.SpriteMaterial({ map: texFrom(fc, false), transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending });
+  const front = seats.filter(q => q[2] < 9.6 && Math.abs(q[0]) < 9);
+  KZW.flashes = []; for (let i = 0; i < 22; i++) { const sp = new THREE.Sprite(flashM.clone()); const q = front[Math.floor(R0() * front.length)]; sp.position.set(q[0], q[1] + 1.75, q[2] - 0.2); sp.scale.set(0.45, 0.45, 1); S.add(sp); KZW.flashes.push(sp); }
+  // 頒獎人（Simon 店長）
+  const pr = makePerson(suitUp({ glasses: true, hair: '#444' })); pr.position.set(-0.75, 1.38, -1.6); S.add(pr); KZW.presenter = pr;
+  // 頒獎桌上的獎盃
+  for (let i = 0; i < 4; i++) { const t = trophyMesh(); t.position.set(3.8 + i * 0.55, 2.25, -5.6); t.scale.setScalar(0.8); S.add(t); }
+  KZW.scene = S;
+}
+const KZW_CAM = new THREE.Vector3(0, 3.9, 11), KZW_LOOK = new THREE.Vector3(0, 3.0, -2.2);
+function startAward(R) {
+  if (!KZW.scene) buildAwardScene();
+  KZW.prev = { mode: MODE, scene: renderPass.scene, cam: camera.position.clone(), quat: camera.quaternion.clone(), hud: !$('hud').hidden, title: !$('title').hidden, music: AU.trackName };
+  show('hud', false); show('title', false);
+  MODE = 'award'; PAUSE = true; renderPass.scene = KZW.scene; KZW.t = 0; KZW.speed = 1;
+  const fmtV = (k, v) => k === 'comm' ? `委託 ${v} 件` : `業績 NT$${fmt(v)}`;
+  KZW.q = [{ type: 'intro', dur: 7.5 }];
+  for (const [k, title] of [['comm', '委託獎'], ['perf', '業績獎']]) {
+    const L = R[k]; if (!L.length) continue;
+    KZW.q.push({ type: 'head', dur: 2.6, title, sub: k === 'comm' ? '上週簽下最多委託的業務' : '上週服務費業績最高的業務' });
+    for (let i = L.length - 1; i >= 0; i--) KZW.q.push({ type: 'win', dur: 12.8, cat: title, rank: i + 1, name: L[i].name, look: L[i].look, val: fmtV(k, L[i].v), me: L[i].pid === myPid() });
+  }
+  KZW.q.push({ type: 'end', dur: 3.5 });
+  KZW.cur = null; nextAwardStep();
+  show('awardScr', true); $('awSkip').onclick = () => { sfx('cancel'); endAward(); }; $('awFast').onclick = () => { KZW.speed = KZW.speed > 1 ? 1 : 2.5; $('awFast').classList.toggle('on', KZW.speed > 1); $('awFast').textContent = KZW.speed > 1 ? '正常速度' : '快轉 ×2.5'; };
+  $('awFast').classList.remove('on'); $('awFast').textContent = '快轉 ×2.5';
+  playMusic('ending');
+}
+function nextAwardStep() {
+  if (KZW.cur && KZW.cur.winner) { KZW.scene.remove(KZW.cur.winner); KZW.cur.winner.traverse(o => { if (o.isMesh && o.geometry) o.geometry.dispose(); }); }
+  if (KZW.cur && KZW.cur.trophy && KZW.cur.trophy.parent) KZW.cur.trophy.parent.remove(KZW.cur.trophy);
+  const s = KZW.q.shift(); if (!s) { endAward(); return; }
+  s.t = 0; KZW.cur = s;
+  const cap = $('awCap'), big = $('awBig');
+  cap.hidden = true; big.hidden = true;
+  if (s.type === 'intro') { big.innerHTML = `<small>日勝國際不動產</small><b>狂仲獎頒獎典禮</b><span>${KZ_DATA ? KZ_DATA.wk.replace(/-/g, '/') + ' 起的一週' : ''}</span>`; big.hidden = false; applause(4, 0.5); }
+  if (s.type === 'head') { big.innerHTML = `<b>${s.title}</b><span>${s.sub}</span>`; big.hidden = false; fanfare(); }
+  if (s.type === 'end') { big.innerHTML = '<b>典禮圓滿結束</b><span>下週一見，繼續衝業績吧！</span>'; big.hidden = false; applause(3, 0.45); }
+  if (s.type === 'win') {
+    const w = makePerson(playerStyle(lookFromCode(s.look))); w.position.set(10.5, 1.38, -1.0); w.rotation.y = -Math.PI / 2; KZW.scene.add(w); s.winner = w;
+    const t = trophyMesh(); const pu = KZW.presenter.userData; pu.armR.add(t); t.position.set(0.02, -0.7, 0.12); t.rotation.x = 1.2; s.trophy = t;
+    cap.innerHTML = `<span class="awRank">${s.cat}　第 ${s.rank} 名</span><b>${escH(s.name)}${s.me ? '<em>就是你！</em>' : ''}</b><span class="awVal">${s.val}</span>`; cap.hidden = false; cap.classList.toggle('gold', s.rank === 1);
+    applause(3.2, 0.32);
+  }
+}
+const ease = x => x < 0 ? 0 : x > 1 ? 1 : x * x * (3 - 2 * x);
+function walkPose(p, ph, on) { const u = p.userData, a = on ? Math.sin(ph) * 0.55 : 0; u.legL.rotation.x = a; u.legR.rotation.x = -a; if (!u.lockL) u.armL.rotation.x = -a * 0.8; if (!u.lockR) u.armR.rotation.x = a * 0.8; }
+function updateAward(dt) {
+  if (!KZW.cur) return; dt *= KZW.speed; const s = KZW.cur; s.t += dt; KZW.t += dt;
+  const P = KZW.presenter, pu = P.userData;
+  // 鏡頭
+  if (s.type === 'intro') {
+    const k = ease(s.t / 6.5), a = new THREE.Vector3(-14, 13, 34), m = new THREE.Vector3(8, 9, 22);
+    const p1 = a.clone().lerp(m, k), p2 = m.clone().lerp(KZW_CAM, k); camera.position.copy(p1.lerp(p2, k));
+    camera.lookAt(new THREE.Vector3(0, 6, 8).lerp(KZW_LOOK, ease((s.t - 1) / 5.5)));
+    if (s.t > 2.5) $('awBig').classList.add('fade');
+  } else { camera.position.lerp(KZW_CAM, Math.min(1, dt * 3)); camera.lookAt(KZW_LOOK); }
+  camera.updateProjectionMatrix();
+  // 觀眾閃光燈
+  const flashing = s.type === 'win' && s.t > 5.0 && s.t < 8.0;
+  for (const f of KZW.flashes) { f.material.opacity = flashing && Math.random() < 0.09 * KZW.speed ? 1 : Math.max(0, f.material.opacity - dt * 7); }
+  if (flashing && Math.random() < 0.18 * KZW.speed) { shutter(); KZW.fa = 0.7; }
+  KZW.fa = Math.max(0, (KZW.fa || 0) - dt * 5); $('awFlash').style.opacity = KZW.fa.toFixed(2);
+  // 頒獎人待機
+  pu.armR.rotation.x = -1.15; pu.lockR = true; P.rotation.y = Math.PI / 2;
+  if (s.type !== 'win') { pu.armR.rotation.x = -0.15; if (s.t > s.dur) nextAwardStep(); return; }
+  const w = s.winner, wu = w.userData, T = s.t;
+  if (T < 3.0) { const k = T / 3.0; w.position.x = 10.5 - (10.5 - 0.75) * Math.min(1, k * 1.05); w.position.z = -1.0 - 0.6 * k; w.rotation.y = -Math.PI / 2; walkPose(w, T * 7.5, true); }
+  else if (T < 3.6) { walkPose(w, 0, false); w.rotation.y = -Math.PI / 2; }
+  if (T >= 3.0 && T < 9.4) { wu.legL.rotation.x = wu.legR.rotation.x = 0; w.position.x = 0.75; w.position.z = -1.6; }
+  else if (T < 4.4) {   // 交接獎盃：從頒獎人的右手移到得獎者的左手
+    wu.lockL = true; wu.armL.rotation.x = -1.15;
+    if (s.trophy.parent !== wu.armL && T > 4.0) { wu.armL.add(s.trophy); s.trophy.position.set(-0.02, -0.7, 0.12); s.trophy.rotation.x = 1.2; sfx('good'); }
+  } else if (T < 5.0) { const k = ease((T - 4.4) / 0.6); w.rotation.y = -Math.PI / 2 * (1 - k); P.rotation.y = Math.PI / 2 * (1 - k); wu.armL.rotation.x = -1.15 - k * 1.7; pu.armR.rotation.x = -1.15 + k * 1.0; }
+  else if (T < 8.0) { w.rotation.y = 0; P.rotation.y = 0; wu.armL.rotation.x = -2.85 + Math.sin(T * 3) * 0.06; pu.armR.rotation.x = -0.15; if (!s.cheer) { s.cheer = true; applause(3.2, 0.6); sfx('win'); } }
+  else if (T < 9.4) {   // 握手
+    const k = ease((T - 8.0) / 0.4); w.rotation.y = -Math.PI / 2 * k; P.rotation.y = Math.PI / 2 * k; wu.armL.rotation.x = -2.85 + k * 1.7;
+    wu.lockR = true; wu.armR.rotation.x = -1.2 + Math.sin(T * 14) * 0.12 * k; pu.armR.rotation.x = -1.2 + Math.sin(T * 14) * 0.12 * k;
+  } else if (T < 12.8) {   // 從左側走下台（從頒獎人前面經過）
+    wu.lockR = false; pu.armR.rotation.x = -0.15; P.rotation.y = Math.PI / 2 * (1 - ease((T - 9.4) / 0.6));
+    const k = (T - 9.4) / 3.4; w.rotation.y = -Math.PI / 2; w.position.z = -1.6 + Math.sin(Math.min(1, k * 2.2) * Math.PI) * 0.9; w.position.x = 0.75 - (0.75 + 11) * k; walkPose(w, T * 7.5, true);
+  }
+  if (T > s.dur) nextAwardStep();
+}
+function endAward() {
+  const p = KZW.prev; if (!p) return;
+  if (KZW.cur && KZW.cur.winner) KZW.scene.remove(KZW.cur.winner);
+  if (KZW.cur && KZW.cur.trophy && KZW.cur.trophy.parent) KZW.cur.trophy.parent.remove(KZW.cur.trophy);
+  KZW.q = []; KZW.cur = null; KZW.fa = 0; $('awFlash').style.opacity = 0; show('awardScr', false);
+  MODE = p.mode; renderPass.scene = p.scene; camera.position.copy(p.cam); camera.quaternion.copy(p.quat); show('hud', p.hud); if (p.title) show('title', true);
+  PAUSE = false; KZW.prev = null; playMusic(p.music || 'title');
+  if (G && G.cnt) { G.cnt.kzSeen = (G.cnt.kzSeen || 0) + 1; }
+  if (MODE === 'city') afterAction();
+  toast('狂仲獎典禮結束，下週一見！');
+}
+// 音效：掌聲、快門、開場號角
+function applause(sec, vol) {
+  const C = AU.ctx; if (!C) return; const t0 = C.currentTime, n = Math.round(sec * 70);
+  for (let i = 0; i < n; i++) { const t = t0 + Math.random() * sec, fade = 1 - Math.max(0, (t - t0) / sec - 0.6) * 2.2; noise(t, 0.035 + Math.random() * 0.03, { vol: vol * 0.16 * Math.max(0.1, fade) * (0.5 + Math.random() * 0.5), f: 900 + Math.random() * 1800, type: 'bandpass', q: 1.2, dest: AU.sfx }); }
+}
+function shutter() { const C = AU.ctx; if (!C) return; const t = C.currentTime; noise(t, 0.03, { vol: 0.12, f: 5200, type: 'bandpass', q: 2, dest: AU.sfx }); noise(t + 0.05, 0.04, { vol: 0.08, f: 3400, type: 'bandpass', q: 2, dest: AU.sfx }); }
+function fanfare() { const C = AU.ctx; if (!C) return; const t = C.currentTime; [[67, 0], [72, 0.16], [76, 0.32], [79, 0.48], [84, 0.72]].forEach(([m, d]) => tone(t + d, m, d === 0.72 ? 0.7 : 0.16, { type: 'sawtooth', vol: 0.05, cut: 2600, dest: AU.sfx })); }
+
+// ===================== 更新日誌：進入主畫面時顯示（勾「不再顯示」後，要等下一次更新才會再跳出） =====================
+const CHANGELOG_ON = true;   // Ryan 已確認內容（10/20）
+const CHANGELOG = [
+  {
+    v: '2026-10-20b', date: '10/20 晚上', title: '捏角色、狂仲獎、花錢的新去處', items: [
+      ['創建角色', '開始新遊戲時可以自己捏角色：性別、髮型與髮色、膚色、眼睛與瞳孔顏色、鼻子、嘴巴、臉部裝飾都能挑。已經有存檔的玩家，在「選單 → 改變角色造型」就能重新捏。'],
+      ['狂仲獎頒獎典禮', '每週一 00:00 結算上一週所有玩家的「委託件數」與「業績」，兩個獎項各取前 5 名。週一之後進遊戲會收到邀請，可以進場觀看頒獎典禮，得獎者會以自己捏的角色上台領獎。'],
+      ['資產與生活（P 鍵）', '畫面上方新增「資產」按鈕（手機直式在「選單」裡），下面這些花錢的新玩法都在這裡。'],
+      ['投資買房', '用賺來的錢買下地圖上的房子當房東，每天收租；房價會隨景氣起伏，看準時機也能轉賣賺價差。'],
+      ['自己的家', '從套房一路換到豪宅，還能添購家具裝潢、參觀自己的家；住得越好，每天體力上限越高。'],
+      ['開分店', '存到一筆創業金就能開自己的分店，每天有店務收入，也要負擔店租與人事。'],
+      ['廣告預算', '在房屋網站、社群媒體、社區看板和捷運燈箱投放廣告，期間內買方詢問和屋主回電都會變多。'],
+      ['高級伴手禮', '便利商店和家蓁那邊新增高級禮盒、水果禮籃，送給難搞的屋主效果更好。'],
+      ['進修課程與證照', '花錢上課換技能點，考到不動產經紀人證照還有額外加成。'],
+      ['服裝儀容', '西裝、名錶、髮型都能升級，給屋主更好的第一印象。'],
+      ['社區贊助', '贊助里民活動、廟會、中秋烤肉，讓整個里對你更熟悉。'],
+    ]
+  },
+  {
+    v: '2026-10-20', date: '10/20', title: '汽機車行、挑戰任務與順暢度大幅提升', items: [
+      ['車輛重置（R 鍵）', '車子卡住時按 R，就會把車子放回最近馬路的車道上；走路時按 R 會把停著的車移到身邊的路邊。手機版在「選單」裡也有重置按鈕。原本的「謄本紀錄」改成 L 鍵。'],
+      ['飛馳汽機車行', '地圖上的紅色「車」就是汽機車行，可以買重型機車、小車、普通轎車和跑車，每台的速度、加速和車身大小都不一樣。開汽車下雨不用穿雨衣；買過的車可以在背包的「我的車庫」隨時切換。'],
+      ['挑戰任務', '簽滿 6 件委託後，「選單」旁的「任務」按鈕就會亮起（按 J 也能打開），可以挑戰百萬經紀人、開發之神、千萬身家等目標，最多同時接 3 個，完成可領獎金和稱號。'],
+      ['五項銷售技能', '新增帶看話術、議價斡旋、行銷文案、攝影美學、客戶經營。技能頁分成「開發技能」和「銷售技能」兩區。'],
+      ['遊戲更順暢', '預先準備好畫面特效，街區改成分段載入，遠處的小細節不再繪製；畫面一卡就自動暫時降低解析度（可在設定中關閉），整體卡頓明顯減少。'],
+      ['機車卡住問題修正', '騎車撞到車或頂到停著的車時，會自動從旁邊繞過或幫你移到旁邊，不會再卡死在路中間。'],
+      ['急件與謄本紀錄', '急件的屋主一定會在物件現場等你；謄本紀錄中已完成的會排到最後並可收起，距離改成實際騎車的路程。'],
+    ]
+  },
+  {
+    v: '2026-10-10', date: '10/10', title: '雲端存檔與遊戲設定', items: [
+      ['十個存檔欄位', '「載入遊戲」裡有十個存檔欄位，可以同時保留好幾局不同的進度。'],
+      ['綁定 Google 帳號', '綁定後存檔會同步到雲端，換手機或電腦也能接著玩。綁定前會先顯示個人資料蒐集同意書。'],
+      ['警察追捕開關', '可以在設定中選擇闖紅燈時會不會被警察追。'],
+      ['謄本紀錄排序', '謄本紀錄依調閱時間由近到遠排列，卡片上會顯示你目前離物件與戶籍地有多遠。'],
+      ['返回公司', '公司門口有傳送點可以直接進公司，選單裡也有「返回公司」可以一鍵回去。'],
+      ['業績分成調整', '成交的服務費先分 80% 給你，再從中拿 72% 做為實際入帳。'],
+    ]
+  },
+  {
+    v: '2026-10-09', date: '10/09', title: '主畫面更新', items: [
+      ['歡迎加入日勝房屋', '主畫面新增「104 人力銀行」與「LINE 官方帳號」按鈕，想了解日勝房屋的工作機會可以直接點進去。'],
+    ]
+  },
+  {
+    v: '2026-10-05', date: '10/05–10/06', title: '3D 版正式上線', items: [
+      ['全新 3D 城市', '房仲菜鳥大冒險改版為 3D：可以騎機車在溪虹市裡跑業務，有紅綠燈、車流、行人與天氣變化。'],
+      ['排行榜', '比誰用最少的天數簽滿 6 件委託。'],
+      ['帶看到成交', '簽下委託後可以帶買方看屋、幫雙方議價，一路做到成交。'],
+      ['派報與熟悉度', '到社區發 DM 提高里民對你的熟悉度，屋主會更願意回電。'],
+      ['情報卡、急件、搶件賽', '收集屋主的個性、工作、興趣與地雷情報；限時急件與跟同事阿豪的搶件賽讓節奏更刺激。'],
+      ['屋況拍照', '幫委託物件拍照，照片越漂亮，網路廣告效果越好。'],
+      ['視角切換', '按 V 切換近一點、第一人稱、遠一點三種視角；按住 C 可以看正後方。'],
+      ['輸入法自動切換', '取好名字進入遊戲後會自動切成英文輸入，按 WASD 不會再打出注音。'],
+    ]
+  },
+];
+const CL_KEY = 'fzrpg3d.changelog.seen';
+function changelogHtml() {
+  return CHANGELOG.map((u, i) => `<section class="clV${i === 0 ? ' new' : ''}"><div class="clHead"><span class="clDate">${u.date}</span><b>${u.title}</b>${i === 0 ? '<span class="clNew">NEW</span>' : ''}</div>
+    <ul>${u.items.map(([t, d]) => `<li><b>${t}</b><p>${d}</p></li>`).join('')}</ul></section>`).join('');
+}
+function openChangelog(force) {
+  let seen = ''; try { seen = localStorage.getItem(CL_KEY) || ''; } catch (e) { }
+  if (!force && seen === CHANGELOG[0].v) return false;
+  openModal(`<h3>更新日誌 <small>房仲菜鳥大冒險</small></h3><div class="clBody">${changelogHtml()}</div>
+    <div class="clFoot"><label class="clChk"><input type="checkbox" id="clNo" ${seen === CHANGELOG[0].v ? 'checked' : ''}> 不再顯示（有新的更新時會再通知你）</label><button class="btn" id="clClose">關閉</button></div>`, 'wide changelog');
+  $('clClose').onclick = () => { sfx('click'); try { if ($('clNo').checked) localStorage.setItem(CL_KEY, CHANGELOG[0].v); else localStorage.removeItem(CL_KEY); } catch (e) { } closeModalSoft(); };
+  return true;
+}
 
 boot();
 
