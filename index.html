@@ -192,6 +192,8 @@ body.touch #dlg .dlgNext{display:none}
 .mbtns.col .btn{align-items:center}
 .mbox.wide{width:min(720px,100%)}
 .recs .rD{font-size:12.5px;color:var(--cyan);margin-top:2px}
+.recs li.done{opacity:.6}
+#rDone{align-self:flex-start}
 .mbox.win{border-top-color:var(--green)}
 .bigwin{font-family:var(--f-num);font-size:72px;font-weight:700;color:var(--green);line-height:1}
 .stats{list-style:none;padding:0;margin:8px 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px}
@@ -3363,6 +3365,7 @@ function updateVehicles(dt) {
       if ((sig(bw.ph) === 'g' && bw.t > 0.6) || bw.t > 50) { v.h = bw.h2; motoBoxRelease(v); v.boxGo = 8; }
     }
     if (v.boxGo > 0) v.boxGo -= dt;
+    if (v.hitCD > 0) v.hitCD -= dt;
     if (v.stopT > 0) { v.stopT -= dt; vmax = 0; }
     if (v.pullT > 0) { v.pullT -= dt; vmax = 0; }
     if (v.park > 0) { v.park -= dt; vmax = 0; if (v.park <= 0 && v.rival) rivalParkDone(); }
@@ -3649,13 +3652,40 @@ function dynamicCollisions(dt) {
     if (Math.abs(v.x - p.x) + Math.abs(v.z - p.z) > (v.hl || 2.5) + (v.hw || 1) + 4) continue;
     const mtv = obbMTV(pBox(), vBox(v));
     if (mtv) {
-      p.x += mtv.x; p.z += mtv.z;
+      // 被車推開；如果會被推進牆壁或電線桿就不推（避免卡死在裡面）
+      const ox = p.x, oz = p.z; p.x += mtv.x; p.z += mtv.z;
+      if (PLAYER.ride ? playerHitsStatic(p.x, p.z, p.h) : collideCity(p.x, p.z, 0.28)) { p.x = ox; p.z = oz; }
       if (PLAYER.ride && Math.abs(p.v) > 3 && bumpCD <= 0) { bumpCD = 1.5; sfx('crash'); toast(v.moto ? '擦撞機車！騎慢一點。' : '撞到車子了！小心駕駛。'); }
       const fx = Math.sin(p.h), fz = Math.cos(p.h), into = -(mtv.x * fx + mtv.z * fz) / (mtv.d || 1);
       if (!PLAYER.ride) { } else if (into > 0.3) p.v *= -0.25; else p.v *= 0.85;               // 正面撞才反彈，側面擦過只減速
-      v.stopT = 1.5; v.cur = 0;
+      // 只有主角擋在車子前面時，車子才停下來；從後面或側面撞上，車子照常往前開（不會互相卡住）
+      const vfx = Math.sin(v.h), vfz = Math.cos(v.h), ahead = (p.x - (v.rx ?? v.x)) * vfx + (p.z - (v.rz ?? v.z)) * vfz;
+      if (ahead > 0 && !(v.hitCD > 0)) { v.stopT = 1.5; v.cur = 0; v.hitCD = 2.5; }
     }
   }
+}
+// 卡在障礙物裡（例如被車子擠進電線桿或牆邊）：往外找最近的空位，把主角移出來
+// 按著油門（或走路）卻一直原地不動超過 2.5 秒：自動把主角移到附近的空位，避免卡死
+const STUCK = { t: 0, x: 0, z: 0 };
+function antiStuck(dt, pushing) {
+  const p = PLAYER;
+  if (!pushing || PAUSE) { STUCK.t = 0; STUCK.x = p.x; STUCK.z = p.z; return; }
+  STUCK.t += dt;
+  if (STUCK.t < 2.5) return;
+  const moved = Math.hypot(p.x - STUCK.x, p.z - STUCK.z); STUCK.t = 0; STUCK.x = p.x; STUCK.z = p.z;
+  if (moved > 0.6) return;
+  const blocked = (x, z) => (p.ride ? playerHitsStatic(x, z, p.h) : collideCity(x, z, 0.28)) || VEH.some(v => v.m.visible && !v.off && Math.abs(v.x - x) + Math.abs(v.z - z) < 12 && obbMTV({ x, z, h: p.h, hw: p.ride ? PBOX.hw + 0.3 : 0.5, hl: p.ride ? PBOX.hl + 0.3 : 0.5 }, vBox(v)));
+  const fx = Math.sin(p.h), fz = Math.cos(p.h);
+  for (const r of [1, 1.6, 2.4, 3.2, 4.2]) for (const [a, b] of [[0, 1], [0, -1], [-1, 0], [1, 0], [-0.7, 0.7], [-0.7, -0.7], [0.7, 0.7], [0.7, -0.7]]) {
+    const x = p.x + (fx * a + fz * b) * r, z = p.z + (fz * a - fx * b) * r;
+    if (!blocked(x, z)) { p.x = x; p.z = z; p.v = 0; STUCK.n = (STUCK.n || 0) + 1; toast('好像卡住了，已經幫你移到旁邊'); return; }
+  }
+}
+function unstickPlayer() {
+  const p = PLAYER, hit = p.ride ? (x, z) => playerHitsStatic(x, z, p.h) : (x, z) => !!collideCity(x, z, 0.28);
+  if (!hit(p.x, p.z)) return false;
+  for (let r = 0.25; r <= 14; r += r < 4.5 ? 0.25 : 0.5) for (let k = 0; k < 16; k++) { const a = k / 16 * Math.PI * 2, x = p.x + Math.cos(a) * r, z = p.z + Math.sin(a) * r; if (!hit(x, z)) { p.x = x; p.z = z; return true; } }
+  return false;
 }
 // 靜態碰撞：沿車身取三個小圓
 function playerHitsStatic(x, z, h) {
@@ -4200,6 +4230,7 @@ function showTranscript(o) {
   const btns = [];
   btns.push({ label: o.st.letter ? '已留過開發信' : '在現址留開發信', sub: '不耗體力 · 屋主可能回電', dis: o.st.letter || o.st.signed, fn: () => { leaveLetter(o); closeModal(); } });
   btns.push({ label: o.hidden ? '前往戶籍地（地址隱匿）' : '前往戶籍地', sub: o.hidden ? '無法導航' : '設定導航', dis: o.hidden || o.st.signed, fn: () => { setTarget({ kind: 'hh', oid: o.id, bid: o.hh }); closeModal(); } });
+  if (o.st.urgent && !o.st.signed && !o.st.lost) btns.unshift({ label: '前往物件現場', sub: '急件屋主在那裡等你', fn: () => { setTarget({ kind: 'meet', oid: o.id, bid: o.bid }); closeModal(); } });
   if (o.st.clue && !o.st.signed) btns.push({ label: '前往屋主所在地', sub: '線索已取得', fn: () => { setTarget({ kind: 'loc', oid: o.id, bid: o.loc }); closeModal(); } });
   btns.push({ label: '關閉', cls: 'ghost', fn: closeModal });
   openModal(html + `<div class="mbtns">${btns.map((b, i) => `<button class="btn ${b.cls || ''}" data-i="${i}" ${b.dis ? 'disabled' : ''}>${b.label}<small>${b.sub || ''}</small></button>`).join('')}</div>`, 'paper');
@@ -4255,6 +4286,7 @@ function visitTarget() {
   const t = G.target; if (!t) return; const o = OWN[t.oid];
   if (o.st.signed) { toast('這位屋主已經委託給你了'); G.target = null; show('nav', false); return; }
   if (o.st.lost) { choice('來晚一步', `<p>${ownerName(o)}：「不好意思，我已經簽專任給大鴻房屋的阿豪了。」</p>`, [{ label: '下次要更快', fn: afterAction }]); G.target = null; show('nav', false); return; }
+  if (o.st.urgent && t.kind !== 'meet' && t.kind !== 'race') { G.target = null; show('nav', false); ROUTE.pts = []; choice('屋主不在這裡', `<p>${ownerName(o)}是急件屋主，今明兩天都在<b>出售的物件現場</b>等你。</p><p class="dim">${addrOf(BLD[o.bid])}</p>`, [{ label: '導航到物件現場', fn: () => { setTarget({ kind: 'meet', oid: o.id, bid: o.bid }); afterAction(); } }, { label: '稍後再去', cls: 'ghost', fn: afterAction }]); return; }
   // 到達目的地就結束導航（之後要再去，可以從謄本紀錄重新導航）
   VISIT_B = t.bid; G.target = null; show('nav', false); ROUTE.pts = [];
   if (t.kind === 'race') { const won = G.race && G.race.oid === o.id && G.race.st === 'on'; if (won) { G.race.st = 'won'; toast('搶先阿豪一步抵達！', 'star'); } return ownerBattle(o, { meet: true, race: won }); }
@@ -4316,6 +4348,7 @@ function talk(role, o, cb = {}) {
   // 同一個地點的人物固定（外觀、稱呼都一樣），不會每次換人
   const RND = Math.random; Math.random = mulberry32(o.id * 7919 + ({ owner: 1, guard: 2, neighbor: 3, clue: 4, stranger: 5, buyer: 6 }[role]) * 104729);
   const R_ = ROLE[role], style = role === 'buyer' ? cb.buyer.style : NPC_STYLES[role === 'owner' ? 'owner' : role]();
+  if (role === 'owner') { style.hairLong = !!o.g; if (!o.g) style.skirt = false; }   // 外觀跟屋主性別一致
   let res = R_.res;
   if (role === 'buyer') res = R_.res - photoStars(o.st.photo) * 4;
   if (role === 'owner') { res = o.tut ? Math.max(30, 46 - o.st.tries * 6) : Math.max(52, 100 - o.st.tries * 12 - (cb.meet ? 25 : 0) - (o.st.letter ? 5 : 0)); o.st.lastDay = G.day; }
@@ -4678,20 +4711,28 @@ function openMenu() {
 }
 function openRecords() {
   if (MODE !== 'city') return; sfx('click');
-  const list = OWN.filter(o => o.st.inv).sort((a, b) => (b.st.invT || 0) - (a.st.invT || 0));   // 最近調閱的排最上面
-  const dTxt = bid => { const q = BLD[bid].front, d = Math.hypot(q.x - PLAYER.x, q.z - PLAYER.z); return d < 1000 ? Math.round(d / 10) * 10 + ' 公尺' : (d / 1000).toFixed(1) + ' 公里'; };
+  // 進行中的排上面（最近調閱的在最前），已委託／已成交／被搶走的排最下面，也可以整個收起來
+  const done = o => o.st.signed || o.st.sold || o.st.lost, all = OWN.filter(o => o.st.inv);
+  const nDone = all.filter(done).length, hideDone = !!G.recHideDone;
+  const list = all.filter(o => !(hideDone && done(o))).sort((a, b) => (done(a) - done(b)) || ((b.st.invT || 0) - (a.st.invT || 0)));
+  // 距離用實際騎車路程（和導航同一套路網計算），不是直線距離
+  const A0 = nearestEdge(PLAYER.x, PLAYER.z), D0 = A0 ? dijkstra([[A0.e.a, A0.s], [A0.e.b, A0.e.len - A0.s]]) : null;
+  const roadDist = (x, z) => { const B = nearestEdge(x, z); if (!A0 || !B || !D0) return Math.hypot(x - PLAYER.x, z - PLAYER.z); const ends = (A0.d || 0) + (B.d || 0);
+    if (B.e === A0.e) return Math.abs(B.s - A0.s) + ends; const r = Math.min(D0.dist[B.e.a] + B.s, D0.dist[B.e.b] + B.e.len - B.s); return isFinite(r) ? r + ends : Math.hypot(x - PLAYER.x, z - PLAYER.z); };
+  const dTxt = bid => { const q = BLD[bid].front, d = roadDist(q.x, q.z); return d < 1000 ? Math.round(d / 10) * 10 + ' 公尺' : (d / 1000).toFixed(1) + ' 公里'; };
   const rows = list.length ? list.map(o => {
     const b = BLD[o.bid], chips = [o.st.signed ? '<i class="c ok">已委託</i>' : '', o.st.letter ? '<i class="c">已留信</i>' : '', o.hidden ? '<i class="c warn">戶籍隱匿</i>' : '', o.st.clue ? '<i class="c clue">有線索</i>' : '', o.st.tries ? `<i class="c">拒絕 ${o.st.tries} 次</i>` : '', o.st.lost ? '<i class="c warn">被阿豪搶走</i>' : '', o.st.perKnown ? `<i class="c clue">${PERS[o.per].name}</i>` : '', o.st.intel ? `<i class="c">情報 ${o.st.intel}</i>` : '', G.rival && G.rival.oid === o.id ? '<i class="c warn">阿豪鎖定中</i>' : '', o.st.urgent && !o.st.signed && !o.st.lost ? '<i class="c warn">急件</i>' : '', o.st.signed ? `<i class="c">開價 ${fmtWan(o.price)}</i>` : '', o.st.sold ? '<i class="c ok">已成交</i>' : '', buyerAt(o) ? '<i class="c ok">今日帶看</i>' : '', o.st.signed && !o.st.sold ? `<i class="c">照片 ${o.st.photo ? starStr(photoStars(o.st.photo)) : '未拍'}</i>` : ''].join('');
     const dist = [`物件 ${dTxt(o.bid)}`, o.hidden ? '戶籍地 隱匿' : `戶籍地 ${dTxt(o.hh)}`, o.st.clue && !o.st.signed ? `所在地 ${dTxt(o.loc)}` : ''].filter(Boolean).join('　·　');
-    return `<li><div class="rT"><b>${o.sn}＊＊</b><span>${addrOf(b, o.unit)}</span><div class="rD">距離你：${dist}</div><div>${chips}</div></div><div class="rB">
+    return `<li class="${done(o) ? 'done' : ''}"><div class="rT"><b>${o.sn}＊＊</b><span>${addrOf(b, o.unit)}</span>${done(o) ? '' : `<div class="rD">騎車路程：${dist}</div>`}<div>${chips}</div></div><div class="rB">
       <button class="btn sm" data-a="doc" data-o="${o.id}">謄本</button>
       <button class="btn sm" data-a="sale" data-o="${o.id}">物件</button>
       ${!o.hidden && !o.st.signed ? `<button class="btn sm" data-a="hh" data-o="${o.id}">戶籍地</button>` : ''}
       ${o.st.clue && !o.st.signed ? `<button class="btn sm" data-a="loc" data-o="${o.id}">所在地</button>` : ''}
       ${G.meet && G.meet.oid === o.id && !o.st.signed ? `<button class="btn sm" data-a="meet" data-o="${o.id}">約見</button>` : ''}</div></li>`;
   }).join('') : '<li class="empty">還沒有調閱過任何謄本。在掛著紅色「售」牌的房子前按「調閱電傳」。</li>';
-  openModal(`<h3>謄本紀錄 <small>${list.length} 筆</small></h3><ul class="recs">${rows}</ul><div class="mbtns"><button class="btn ghost" id="rClose">關閉</button></div>`, 'wide');
+  openModal(`<h3>謄本紀錄 <small>進行中 ${all.length - nDone} 筆 · 已完成 ${nDone} 筆</small></h3>${nDone ? `<button class="btn sm ghost" id="rDone">${hideDone ? `顯示已完成的 ${nDone} 筆` : '隱藏已完成'}</button>` : ''}<ul class="recs">${rows}</ul><div class="mbtns"><button class="btn ghost" id="rClose">關閉</button></div>`, 'wide');
   $('rClose').onclick = () => { sfx('cancel'); closeModal(); };
+  if ($('rDone')) $('rDone').onclick = () => { G.recHideDone = !hideDone; openRecords(); };
   $('mbox').querySelectorAll('[data-a]').forEach(el => el.onclick = () => {
     const o = OWN[+el.dataset.o], a = el.dataset.a; sfx('click');
     if (a === 'doc') return showTranscript(o);
@@ -4964,6 +5005,7 @@ function findAction() {
   const ni = nearInfra(); if (ni) return ni.kind === 'mrt' ? { kind: 'mrt', e: ni.e, label: '搭乘捷運', sub: `${ni.e.name}站 · ${ni.e.line.name}（${ni.e.line.kind}）` } : { kind: 'under', u: ni.u, label: '走地下道', sub: '到馬路對面' };
   let best = null, bd = 7.5;
   for (const o of OWN) { if (o.appear > G.day) continue; const b = BLD[o.bid], dd = d(b); if (dd < bd) { bd = dd; best = o; } }
+  if (best && best.st.urgent && !best.st.signed && !best.st.lost) return best.st.lastDay === G.day ? { kind: 'none', label: '急件屋主：今天談過了', sub: `明天再來（急件期限到第 ${best.st.urgent.until} 天）` } : { kind: 'urgent', o: best, label: '急件：和屋主面談', sub: `${ownerName(best)}就在門口等你 · 交談體力 -${TALK_COST}` };
   if (best && best.st.signed) { const by = buyerAt(best); return by ? { kind: 'show', o: best, by, label: '開始帶看', sub: `${by.name}（${by.kind}）· 體力 -${TALK_COST}` } : best.st.sold ? { kind: 'none', label: '日勝成交物件', sub: addrOf(BLD[best.bid]) + ` · 成交 ${fmtWan(best.st.dealPrice || best.price)}` } : { kind: 'photo', o: best, label: '拍攝屋況照片', sub: PLAYER.ride ? '先下車（F）才能拍照' : best.st.photo ? `目前最佳 ${starStr(photoStars(best.st.photo))}` : '好照片會帶來更多買方' }; }
   if (best) return best.st.signed ? { kind: 'none', label: '日勝專任物件', sub: addrOf(BLD[best.bid]) + ' · 已委託' } : best.st.lost ? { kind: 'none', label: '大鴻房屋專任', sub: '被阿豪搶走了' } : best.st.inv ? { kind: 'doc', o: best, label: '查看謄本', sub: '已調閱 · ' + addrOf(BLD[best.bid], best.unit) } : { kind: 'inv', o: best, label: '調閱電傳', sub: `體力 -${invCost()} · 查看二類謄本` };
   for (const b of STORES) if (d(b) < 6.5) return { kind: 'shop', label: '進入便利商店', sub: '買道具・補體力' };
@@ -4982,6 +5024,7 @@ function doAction() {
   else if (ACT.kind === 'chat') { if (ACT.npc.key === 'amy') { const n = ACT.npc; choice('家蓁（行政秘書）', '<p class="quote">「要聊聊，還是去公司福利社買點東西？」</p>', [{ label: '聊聊', fn: () => officeChat(n) }, { label: '領取派報 DM', sub: G.dm && G.dm.day === G.day ? '今天已經領過了' : '每天一疊，去社區發', fn: offerDM }, { label: '公司福利社', sub: `錢包 NT$${fmt(G.money)}`, fn: () => openShop('公司福利社') }, { label: '不用了', cls: 'ghost', fn: () => { } }]); } else officeChat(ACT.npc); }
   else if (ACT.kind === 'shop') openShop();
   else if (ACT.kind === 'show') startShowing(ACT.o, ACT.by);
+  else if (ACT.kind === 'urgent') { const o = ACT.o; if (G.target && G.target.oid === o.id) { G.target = null; show('nav', false); ROUTE.pts = []; } VISIT_B = o.bid; ownerBattle(o, { meet: true }); }
   else if (ACT.kind === 'photo') startPhoto(ACT.o);
 }
 const CHAT_DECK = {};
@@ -5026,6 +5069,7 @@ function updateWalk(dt) {
   if (Math.hypot(fw, sd) < 0.1 || inKey !== WALK_BASIS.key || CAM.drag) { WALK_BASIS.yaw = p.h + CAM.yaw; WALK_BASIS.key = inKey; }
   const cy = WALK_BASIS.yaw, fx = Math.sin(cy), fz = Math.cos(cy), rx = -fz, rz = fx;
   let mx = fx * fw + rx * sd, mz = fz * fw + rz * sd; const L = Math.min(1, Math.hypot(mx, mz)), u = WALKER.userData;
+  if (MODE === 'city') antiStuck(dt, !PAUSE && L > 0.1);
   if (!PAUSE && L > 0.1) {
     const n = Math.hypot(mx, mz); mx /= n; mz /= n; p.v = 4.2 * L;
     const nx = p.x + mx * p.v * dt, nz = p.z + mz * p.v * dt;
@@ -5041,6 +5085,7 @@ function updateWalk(dt) {
 }
 function updateCity(dt) {
   cheatTick();
+  if (!PAUSE && MODE === 'city') unstickPlayer();
   if (!PLAYER.ride) return updateCityView(dt);
   const up = KEY['w'] || KEY['arrowup'], dn = KEY['s'] || KEY['arrowdown'], lf = KEY['a'] || KEY['arrowleft'], rt = KEY['d'] || KEY['arrowright'];
   const keys = up || dn || lf || rt;
@@ -5068,6 +5113,7 @@ function updateCity(dt) {
     if (stickBrake) p.v *= Math.pow(0.03, dt);
     else if (thr > 0.1) p.v += 8.5 * (p.car ? 2.4 : 1) * thr * dt * (1 - p.v / MAX * 0.6); else if (thr < -0.1) p.v -= (p.v > 0 ? 18 : 5) * -thr * dt; else p.v *= Math.pow(0.35, dt);
     p.v = clamp(p.v, -3.5, MAX); if (Math.abs(p.v) < 0.03 && Math.abs(thr) < 0.1) p.v = 0;
+    antiStuck(dt, Math.abs(thr) > 0.5 || (JOY.on && JOY.mag > 0.4));
     p.steer = lerp(p.steer, st, 1 - Math.pow(0.001, dt));
     const h0 = p.h, turnK = touch && JOY.on ? clamp(Math.abs(p.v) / 3, 0.35, 1) : clamp(Math.abs(p.v) / 5, 0, 1);
     p.h += p.steer * 1.9 * dt * turnK * Math.sign(p.v || 1);
@@ -5237,7 +5283,7 @@ async function boot() {
   G = { day: 1, ap: 100, drift: 0, weather: { w: 'cloud', t: 29 } };
   setupSaleSigns(); G = null;
   $('boot').hidden = true; toTitle(); loop();
-  window.__fz = { MRT_EXITS, UNDER_EXITS, MRT_E, INFRA, makeVehMesh, makeHeavyMesh, makeMotoMesh, makePed, ACT: () => ACT, findAction, tutOwner, talk, BTg: () => BT, fillVars, AU, FROZEN: () => FROZEN, LAMPS, setupLampLights, BM, COPV: () => COPV, copWitness, KEY, updateCity, loop, playerHitsStatic, collideCity, pBox, OFF, makePerson, suitUp, scene, NODES, EDGES, FACES, LINES, H, CHUNKS, updateChunks, STREAM, nearestEdge, computeRoute, updateEvents, edgesNear, projectOnEdge, CORNERS, spawnPed, spawnVehicle, CAM, toggleRide, PARK, startPlayerChase, COP: () => COP, onNpcRedRun, EVENTS, rivalDayStart, openShop, openSkills, openAch, openBag, addXP, obbMTV, vBox, renderer, CORNER_BLD, PARKS, OFFICE: () => OFFICE, MRT_U, EXPWY, UNDERPASS, TSTAT, updateSignals, updateVehicles, updatePeds, PAUSE: () => PAUSE, BUB, say, camera, VEH, PEDS, TLC, BLD, OWN: () => OWN, G: () => G, POOLS, MODE: () => MODE, PLAYER, investigate, setTarget, visitTarget, endDay, ending, goalReached, OP, acctTest: { set: u => { USER = u; renderAccount(); }, sync: () => cloudSync(), cloud: () => CLOUD, err: () => CLOUD_ERR }, openSlots, slotRead, PORTAL: () => PORTAL, startDM, offerDM, updateDM, startRace, careerDayStart, newBuyer, startShowing, negotiate, closeDeal, startPhoto, photoShutter, endPhoto, scorePhoto, PHOTO: () => PHOTO, liKey, famOf, addFam, gainIntel, ownerBattle, syncBuyers, buyerAt, RV: () => RV, enterOffice, enterCity, morningLines, answer, BUYER_MESH, DM_SPR, rivalAttempt };
+  window.__fz = { MRT_EXITS, UNDER_EXITS, MRT_E, INFRA, makeVehMesh, makeHeavyMesh, makeMotoMesh, makePed, ACT: () => ACT, findAction, tutOwner, talk, BTg: () => BT, fillVars, AU, FROZEN: () => FROZEN, LAMPS, setupLampLights, BM, COPV: () => COPV, copWitness, KEY, updateCity, loop, playerHitsStatic, collideCity, pBox, OFF, makePerson, suitUp, scene, NODES, EDGES, FACES, LINES, H, CHUNKS, updateChunks, STREAM, nearestEdge, computeRoute, updateEvents, edgesNear, projectOnEdge, CORNERS, spawnPed, spawnVehicle, CAM, toggleRide, PARK, startPlayerChase, COP: () => COP, onNpcRedRun, EVENTS, rivalDayStart, openShop, openSkills, openAch, openBag, addXP, obbMTV, vBox, renderer, CORNER_BLD, PARKS, OFFICE: () => OFFICE, MRT_U, EXPWY, UNDERPASS, TSTAT, updateSignals, updateVehicles, updatePeds, PAUSE: () => PAUSE, BUB, say, camera, VEH, PEDS, TLC, BLD, OWN: () => OWN, G: () => G, POOLS, MODE: () => MODE, PLAYER, investigate, setTarget, visitTarget, endDay, ending, goalReached, OP, unstickPlayer, eP, STUCK, antiStuck, acctTest: { set: u => { USER = u; renderAccount(); }, sync: () => cloudSync(), cloud: () => CLOUD, err: () => CLOUD_ERR }, openSlots, slotRead, PORTAL: () => PORTAL, startDM, offerDM, updateDM, startRace, careerDayStart, newBuyer, startShowing, negotiate, closeDeal, startPhoto, photoShutter, endPhoto, scorePhoto, PHOTO: () => PHOTO, liKey, famOf, addFam, gainIntel, ownerBattle, syncBuyers, buyerAt, RV: () => RV, enterOffice, enterCity, morningLines, answer, BUYER_MESH, DM_SPR, rivalAttempt };
 }
 
 // ===================== 交通建設：高架捷運、地下捷運、高架快速道路、行人地下道 =====================
@@ -6133,6 +6179,21 @@ function careerMorning(L) {
   if (G.day === 2 && !G.cnt.dmDone) L.push({ name: S, text: '對了，櫃檯的家蓁那邊每天都有印好的 DM。去社區派報，大家認識你之後，屋主比較願意回電。' });
 }
 
+// 急件屋主站在出售物件的門口等（頭上有「急售屋主」標示）
+const URGENT_MESH = {};
+function syncUrgent() {
+  if (!G || !OWN.length) return;
+  const want = new Set(OWN.filter(o => o.st.urgent && !o.st.signed && !o.st.lost && o.appear <= G.day).map(o => o.id));
+  for (const k in URGENT_MESH) if (!want.has(+k)) { scene.remove(URGENT_MESH[k]); delete URGENT_MESH[k]; }
+  for (const id of want) {
+    if (URGENT_MESH[id]) continue;
+    const o = OWN[id], b = BLD[o.bid], RND = Math.random; Math.random = mulberry32(o.id * 7919 + 104729); const style = NPC_STYLES.owner(); Math.random = RND; style.hairLong = !!o.g; if (!o.g) style.skirt = false;
+    const m = makePerson(style), tg = tagSprite('急售屋主', 'rgba(200,22,29,.95)'); tg.position.y = 2.35; m.add(tg);
+    const q = { x: b.door.x + b.n.x * 1.5 - b.t.x * 0.9, z: b.door.z + b.n.z * 1.5 - b.t.z * 0.9 };
+    m.position.set(q.x, H(q.x, q.z) + 0.18, q.z); m.rotation.y = b.ry; scene.add(m); URGENT_MESH[id] = m;
+  }
+}
+
 // ---------- 搶件賽 ----------
 function canRace() { return G.rival && G.day >= 3 && !G.race && !G.target && hourNow() < 18 && !COP && !DLG; }
 function startRace() {
@@ -6335,11 +6396,13 @@ function careerTick(dt) {
   if (!G || !G.cnt) return;
   if (MODE === 'city' && !PAUSE) { updateDM(); updateRace(dt); }
   updateBuyers(loop.wt || 0);
+  careerTick.u = (careerTick.u || 0) - dt; if (careerTick.u <= 0) { careerTick.u = 1; syncUrgent(); }
+  for (const k in URGENT_MESH) URGENT_MESH[k].visible = MODE === 'city' || (MODE === 'talk' && !(BT && BT.o && BT.o.id === +k));
   if (DM_G) DM_G.visible = MODE === 'city' || MODE === 'talk';
   if (PHOTO && (MODE !== 'city' || PLAYER.ride)) endPhoto();
   if (PHOTO) { const t = CAM.pitch - 0.2, ok = Math.abs(t) < 0.06; $('phLevel').classList.toggle('ok', ok); $('phTilt').textContent = ok ? '水平' : (t < 0 ? '仰角 ' : '俯角 ') + Math.round(Math.abs(t) * 57.3) + '°'; }
 }
-function careerEnterCity() { syncDM(); syncBuyers(); }
+function careerEnterCity() { syncDM(); syncBuyers(); syncUrgent(); }
 
 // 拍照模式的按鈕
 $('phShot').onclick = () => photoShutter();
