@@ -3657,7 +3657,15 @@ function dynamicCollisions(dt) {
       if (PLAYER.ride ? playerHitsStatic(p.x, p.z, p.h) : collideCity(p.x, p.z, 0.28)) { p.x = ox; p.z = oz; }
       if (PLAYER.ride && Math.abs(p.v) > 3 && bumpCD <= 0) { bumpCD = 1.5; sfx('crash'); toast(v.moto ? '擦撞機車！騎慢一點。' : '撞到車子了！小心駕駛。'); }
       const fx = Math.sin(p.h), fz = Math.cos(p.h), into = -(mtv.x * fx + mtv.z * fz) / (mtv.d || 1);
-      if (!PLAYER.ride) { } else if (into > 0.3) p.v *= -0.25; else p.v *= 0.85;               // 正面撞才反彈，側面擦過只減速
+      if (!PLAYER.ride) { }
+      else if (into > 0.3 && (v.cur || 0) < 1.5 && Math.abs(p.v) < 6) {
+        // 頂到一台停著（或很慢）的車：往空間比較大的那一側慢慢繞過去，不會一直頂在原地
+        const rxv = Math.cos(p.h), rzv = -Math.sin(p.h), side = ((p.x - (v.rx ?? v.x)) * rxv + (p.z - (v.rz ?? v.z)) * rzv) >= 0 ? 1 : -1;
+        let done = false;
+        for (const sd of [side, -side]) { const nx = p.x + rxv * sd * 3.2 * dt, nz = p.z + rzv * sd * 3.2 * dt; if (!playerHitsStatic(nx, nz, p.h)) { p.x = nx; p.z = nz; done = true; break; } }
+        p.v *= done ? 0.6 : -0.25;
+      }
+      else if (into > 0.3) p.v *= -0.25; else p.v *= 0.85;               // 正面撞才反彈，側面擦過只減速
       // 只有主角擋在車子前面時，車子才停下來；從後面或側面撞上，車子照常往前開（不會互相卡住）
       const vfx = Math.sin(v.h), vfz = Math.cos(v.h), ahead = (p.x - (v.rx ?? v.x)) * vfx + (p.z - (v.rz ?? v.z)) * vfz;
       if (ahead > 0 && !(v.hitCD > 0)) { v.stopT = 1.5; v.cur = 0; v.hitCD = 2.5; }
@@ -3671,12 +3679,15 @@ function antiStuck(dt, pushing) {
   const p = PLAYER;
   if (!pushing || PAUSE) { STUCK.t = 0; STUCK.x = p.x; STUCK.z = p.z; return; }
   STUCK.t += dt;
-  if (STUCK.t < 2.5) return;
+  // 車頭前面貼著一台車（例如逆向騎進對向車道、跟對向車頂在一起）：1.5 秒就幫忙脫困
+  const fx0 = Math.sin(p.h), fz0 = Math.cos(p.h), carAhead = VEH.some(v => v.m.visible && !v.off && Math.hypot((v.rx ?? v.x) - p.x, (v.rz ?? v.z) - p.z) < (v.hl || 2) + 2.2 && ((v.rx ?? v.x) - p.x) * fx0 + ((v.rz ?? v.z) - p.z) * fz0 > 0);
+  if (STUCK.t < (carAhead ? 1.5 : 2.5)) return;
   const moved = Math.hypot(p.x - STUCK.x, p.z - STUCK.z); STUCK.t = 0; STUCK.x = p.x; STUCK.z = p.z;
   if (moved > 0.6) return;
-  const blocked = (x, z) => (p.ride ? playerHitsStatic(x, z, p.h) : collideCity(x, z, 0.28)) || VEH.some(v => v.m.visible && !v.off && Math.abs(v.x - x) + Math.abs(v.z - z) < 12 && obbMTV({ x, z, h: p.h, hw: p.ride ? PBOX.hw + 0.3 : 0.5, hl: p.ride ? PBOX.hl + 0.3 : 0.5 }, vBox(v)));
+  // 找空位時避開車子本身，也避開車頭前方那一段（不然一放下又被同一台車擋住）
+  const blocked = (x, z) => (p.ride ? playerHitsStatic(x, z, p.h) : collideCity(x, z, 0.28)) || VEH.some(v => v.m.visible && !v.off && Math.abs(v.x - x) + Math.abs(v.z - z) < 16 && obbMTV({ x, z, h: p.h, hw: p.ride ? PBOX.hw + 0.3 : 0.5, hl: p.ride ? PBOX.hl + 0.3 : 0.5 }, vBox(v, 0.4, 6)));
   const fx = Math.sin(p.h), fz = Math.cos(p.h);
-  for (const r of [1, 1.6, 2.4, 3.2, 4.2]) for (const [a, b] of [[0, 1], [0, -1], [-1, 0], [1, 0], [-0.7, 0.7], [-0.7, -0.7], [0.7, 0.7], [0.7, -0.7]]) {
+  for (const r of [1, 1.6, 2.2, 2.8, 3.4, 4.2, 5.2]) for (const [a, b] of [[0, 1], [0, -1], [-1, 0], [1, 0], [-0.7, 0.7], [-0.7, -0.7], [0.7, 0.7], [0.7, -0.7]]) {
     const x = p.x + (fx * a + fz * b) * r, z = p.z + (fz * a - fx * b) * r;
     if (!blocked(x, z)) { p.x = x; p.z = z; p.v = 0; STUCK.n = (STUCK.n || 0) + 1; toast('好像卡住了，已經幫你移到旁邊'); return; }
   }
@@ -5124,6 +5135,13 @@ function updateCity(dt) {
     if (!playerHitsStatic(nx, nz, p.h)) { p.x = nx; p.z = nz; moved = true; }
     else if (!playerHitsStatic(nx, p.z, p.h)) { p.x = nx; p.v *= 0.9; moved = true; }
     else if (!playerHitsStatic(p.x, nz, p.h)) { p.z = nz; p.v *= 0.9; moved = true; }
+    if (!moved && Math.abs(p.v) > 0.3) {
+      // 撞到障礙物（例如分隔島頭、路邊柱子）：順著邊緣偏開滑過去，不會正面卡死
+      const pref = p.steer >= 0 ? 1 : -1;
+      for (const a of [0.35, 0.7, 1.05, 1.4]) { for (const sg of [pref, -pref]) {
+        const hh = p.h + a * sg, k = Math.max(Math.abs(p.v) * dt * 0.7, 0.05) * Math.sign(p.v), sx = p.x + Math.sin(hh) * k, sz = p.z + Math.cos(hh) * k;
+        if (!playerHitsStatic(sx, sz, p.h) && !playerHitsStatic(sx, sz, p.h + a * sg * 0.3)) { p.x = sx; p.z = sz; p.h += a * sg * Math.min(1, dt * 5); p.v *= 0.92; moved = true; break; } } if (moved) break; }
+    }
     if (!moved) { if (Math.abs(p.v) > 5) { sfx('crash'); } p.v *= -0.2; }
     { const sx = Math.sin(p.h), sz = Math.cos(p.h), sl = (H(p.x + sx, p.z + sz) - H(p.x - sx, p.z - sz)) / 2; p.v -= sl * 4 * dt * Math.sign(p.v || 0); }   // 上坡會慢一點、下坡會快一點
     dynamicCollisions(dt);
@@ -5283,7 +5301,7 @@ async function boot() {
   G = { day: 1, ap: 100, drift: 0, weather: { w: 'cloud', t: 29 } };
   setupSaleSigns(); G = null;
   $('boot').hidden = true; toTitle(); loop();
-  window.__fz = { MRT_EXITS, UNDER_EXITS, MRT_E, INFRA, makeVehMesh, makeHeavyMesh, makeMotoMesh, makePed, ACT: () => ACT, findAction, tutOwner, talk, BTg: () => BT, fillVars, AU, FROZEN: () => FROZEN, LAMPS, setupLampLights, BM, COPV: () => COPV, copWitness, KEY, updateCity, loop, playerHitsStatic, collideCity, pBox, OFF, makePerson, suitUp, scene, NODES, EDGES, FACES, LINES, H, CHUNKS, updateChunks, STREAM, nearestEdge, computeRoute, updateEvents, edgesNear, projectOnEdge, CORNERS, spawnPed, spawnVehicle, CAM, toggleRide, PARK, startPlayerChase, COP: () => COP, onNpcRedRun, EVENTS, rivalDayStart, openShop, openSkills, openAch, openBag, addXP, obbMTV, vBox, renderer, CORNER_BLD, PARKS, OFFICE: () => OFFICE, MRT_U, EXPWY, UNDERPASS, TSTAT, updateSignals, updateVehicles, updatePeds, PAUSE: () => PAUSE, BUB, say, camera, VEH, PEDS, TLC, BLD, OWN: () => OWN, G: () => G, POOLS, MODE: () => MODE, PLAYER, investigate, setTarget, visitTarget, endDay, ending, goalReached, OP, unstickPlayer, eP, STUCK, antiStuck, acctTest: { set: u => { USER = u; renderAccount(); }, sync: () => cloudSync(), cloud: () => CLOUD, err: () => CLOUD_ERR }, openSlots, slotRead, PORTAL: () => PORTAL, startDM, offerDM, updateDM, startRace, careerDayStart, newBuyer, startShowing, negotiate, closeDeal, startPhoto, photoShutter, endPhoto, scorePhoto, PHOTO: () => PHOTO, liKey, famOf, addFam, gainIntel, ownerBattle, syncBuyers, buyerAt, RV: () => RV, enterOffice, enterCity, morningLines, answer, BUYER_MESH, DM_SPR, rivalAttempt };
+  window.__fz = { MRT_EXITS, UNDER_EXITS, MRT_E, INFRA, makeVehMesh, makeHeavyMesh, makeMotoMesh, makePed, ACT: () => ACT, findAction, tutOwner, talk, BTg: () => BT, fillVars, AU, FROZEN: () => FROZEN, LAMPS, setupLampLights, BM, COPV: () => COPV, copWitness, KEY, updateCity, loop, playerHitsStatic, collideCity, pBox, OFF, makePerson, suitUp, scene, NODES, EDGES, FACES, LINES, H, CHUNKS, updateChunks, STREAM, nearestEdge, computeRoute, updateEvents, edgesNear, projectOnEdge, CORNERS, spawnPed, spawnVehicle, CAM, toggleRide, PARK, startPlayerChase, COP: () => COP, onNpcRedRun, EVENTS, rivalDayStart, openShop, openSkills, openAch, openBag, addXP, obbMTV, vBox, renderer, CORNER_BLD, PARKS, OFFICE: () => OFFICE, MRT_U, EXPWY, UNDERPASS, TSTAT, updateSignals, updateVehicles, updatePeds, PAUSE: () => PAUSE, BUB, say, camera, VEH, PEDS, TLC, BLD, OWN: () => OWN, G: () => G, POOLS, MODE: () => MODE, PLAYER, investigate, setTarget, visitTarget, endDay, ending, goalReached, OP, unstickPlayer, eP, STUCK, antiStuck, simStep: (dt, t) => { updateCop(dt); updateCity(dt); updateWorld(dt, t); }, obbMTV, acctTest: { set: u => { USER = u; renderAccount(); }, sync: () => cloudSync(), cloud: () => CLOUD, err: () => CLOUD_ERR }, openSlots, slotRead, PORTAL: () => PORTAL, startDM, offerDM, updateDM, startRace, careerDayStart, newBuyer, startShowing, negotiate, closeDeal, startPhoto, photoShutter, endPhoto, scorePhoto, PHOTO: () => PHOTO, liKey, famOf, addFam, gainIntel, ownerBattle, syncBuyers, buyerAt, RV: () => RV, enterOffice, enterCity, morningLines, answer, BUYER_MESH, DM_SPR, rivalAttempt };
 }
 
 // ===================== 交通建設：高架捷運、地下捷運、高架快速道路、行人地下道 =====================
