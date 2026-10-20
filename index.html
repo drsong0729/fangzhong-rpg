@@ -7201,7 +7201,9 @@ const CHEATS = {
   'i am winner': () => { G.comm = Math.max(G.comm, 6); setTimeout(() => fadeTo(ending), 600); return '直接通關！'; },
   'fuck police': () => { G.cheat.nocop = true; if (COP) copToTraffic(); return '警察再也不會追你了'; },
   'everybody love me': () => { G.cheat.love = true; return '屋主和路人都超喜歡你：一開口就給委託、給線索'; },
+  'show me the show': () => { setTimeout(kzShow, 350); return '狂仲獎頒獎典禮，開演！'; },
 };
+const FREE_CHEATS = new Set(['show me the show']);   // 只是觀賞用，不影響成績
 const normCheat = s => s.toLowerCase().replace(/[’‘`´]/g, "'").replace(/[.!！。,，]+$/g, '').replace(/\s+/g, ' ').trim();
 let CHEAT_EL = null;
 function openCheat() {
@@ -7218,7 +7220,7 @@ function openCheat() {
     else if (e.key === 'Enter') {
       const fn = CHEATS[normCheat(inp.value)];
       if (!fn) { sfx('deny'); box.querySelector('#cheatMsg').textContent = '沒有這個密技'; inp.select(); return; }
-      G.cheat = G.cheat || {}; G.cheat.used = true; const msg = fn(); closeCheat(); sfx('quest'); toast('密技啟動：' + msg);
+      G.cheat = G.cheat || {}; if (!FREE_CHEATS.has(normCheat(inp.value))) G.cheat.used = true; const msg = fn(); closeCheat(); sfx('quest'); toast('密技啟動：' + msg);
     }
   });
   setTimeout(() => inp.focus(), 30);
@@ -8249,6 +8251,7 @@ function buildAwardScene() {
 const KZW_CAM = new THREE.Vector3(0, 3.9, 11), KZW_LOOK = new THREE.Vector3(0, 3.0, -2.2);
 function startAward(R) {
   if (!KZW.scene) buildAwardScene();
+  KZW.R = R;
   KZW.prev = { mode: MODE, scene: renderPass.scene, cam: camera.position.clone(), quat: camera.quaternion.clone(), hud: !$('hud').hidden, title: !$('title').hidden, music: AU.trackName };
   show('hud', false); show('title', false);
   MODE = 'award'; PAUSE = true; renderPass.scene = KZW.scene; KZW.t = 0; KZW.speed = 1;
@@ -8272,7 +8275,7 @@ function nextAwardStep() {
   s.t = 0; KZW.cur = s;
   const cap = $('awCap'), big = $('awBig');
   cap.hidden = true; big.hidden = true;
-  if (s.type === 'intro') { big.innerHTML = `<small>日勝國際不動產</small><b>狂仲獎頒獎典禮</b><span>${KZ_DATA ? KZ_DATA.wk.replace(/-/g, '/') + ' 起的一週' : ''}</span>`; big.hidden = false; applause(4, 0.5); }
+  if (s.type === 'intro') { big.innerHTML = `<small>日勝國際不動產</small><b>狂仲獎頒獎典禮</b><span>${KZW.R && KZW.R.demo ? '密技特別放映' : KZW.R ? KZW.R.wk.replace(/-/g, '/') + ' 起的一週' : ''}</span>`; big.hidden = false; applause(4, 0.5); }
   if (s.type === 'head') { big.innerHTML = `<b>${s.title}</b><span>${s.sub}</span>`; big.hidden = false; fanfare(); }
   if (s.type === 'end') { big.innerHTML = '<b>典禮圓滿結束</b><span>下週一見，繼續衝業績吧！</span>'; big.hidden = false; applause(3, 0.45); }
   if (s.type === 'win') {
@@ -8339,6 +8342,25 @@ function applause(sec, vol) {
 }
 function shutter() { const C = AU.ctx; if (!C) return; const t = C.currentTime; noise(t, 0.03, { vol: 0.12, f: 5200, type: 'bandpass', q: 2, dest: AU.sfx }); noise(t + 0.05, 0.04, { vol: 0.08, f: 3400, type: 'bandpass', q: 2, dest: AU.sfx }); }
 function fanfare() { const C = AU.ctx; if (!C) return; const t = C.currentTime; [[67, 0], [72, 0.16], [76, 0.32], [79, 0.48], [84, 0.72]].forEach(([m, d]) => tone(t + d, m, d === 0.72 ? 0.7 : 0.16, { type: 'sawtooth', vol: 0.05, cut: 2600, dest: AU.sfx })); }
+
+// 密技「show me the show」：有上週的真實結果就播真的，沒有就播一場示範典禮（主角當委託獎第 1 名）
+function kzDemo() {
+  const R = mulberry32(Date.now() % 1e9), pick = a => a[Math.floor(R() * a.length)];
+  const names = ['業務王小明', '房仲女神', 'Kevin', '小美', '阿豪', '王董', '陳經理', 'Amy', '林大哥', '張姐'];
+  const rl = () => [pick(['m', 'f']), Math.floor(R() * 20), Math.floor(R() * 8), Math.floor(R() * 4), Math.floor(R() * 10), Math.floor(R() * 4), Math.floor(R() * 10), Math.floor(R() * 10), R() < 0.5 ? 0 : Math.floor(R() * 15)].join('.');
+  const others = names.filter(n => !G || n !== G.name).sort(() => R() - 0.5);
+  const me = { pid: myPid(), name: G ? G.name : '你', look: lookCode(G && G.look), v: 0 };
+  const comm = [{ ...me, v: Math.max(G ? G.comm : 0, 16) }, ...others.slice(0, 4).map((n, i) => ({ pid: 'demo' + i, name: n, look: rl(), v: 14 - i * 2 - Math.floor(R() * 2) }))];
+  const perf = others.slice(4, 9).map((n, i) => ({ pid: 'demoP' + i, name: n, look: rl(), v: Math.round((3200000 - i * 450000 - R() * 200000) / 1000) * 1000 }));
+  return { wk: thisWk(), comm, perf, demo: true };
+}
+async function kzShow() {
+  let R = null;
+  try { R = await Promise.race([kzResults(lastWk()), new Promise((_, no) => setTimeout(() => no(new Error('timeout')), 5000))]); } catch (e) { R = null; }
+  if (!R || (!R.comm.length && !R.perf.length)) R = kzDemo();
+  if (ui.modalOpen) closeModalSoft();
+  startAward(R);
+}
 
 // ===================== 更新日誌：進入主畫面時顯示（勾「不再顯示」後，要等下一次更新才會再跳出） =====================
 const CHANGELOG_ON = true;   // Ryan 已確認內容（10/20）
