@@ -81,7 +81,7 @@ kbd{font-family:var(--f-num);font-size:.8em;border:1px solid var(--line);border-
 #commBadge b{font-family:var(--f-num);font-size:26px;vertical-align:-2px;margin-left:4px}
 #commBadge.done{background:var(--green)}
 #hudTL{position:absolute;top:max(14px,env(safe-area-inset-top));left:16px;display:flex;flex-direction:column;gap:10px;max-width:min(380px,calc(100vw - 230px))}
-#btnRow{display:flex;gap:6px;flex-wrap:wrap}
+#btnRow{display:flex;gap:6px;flex-wrap:wrap;width:max-content;max-width:calc(100vw - 230px)}
 #btnRow button{background:var(--panel);border:1px solid var(--line);padding:7px 11px;font-size:14px;font-weight:700;display:flex;gap:6px;align-items:center}
 #nav{background:var(--panel);border:1px solid var(--line);border-left:5px solid var(--violet);padding:9px 12px;display:grid;grid-template-columns:1fr auto;gap:2px 10px;font-size:13px}
 #navLbl{color:#c9b5ff;font-weight:700;font-size:12px;letter-spacing:.08em}
@@ -199,7 +199,9 @@ body.touch #dlg .dlgNext{display:none}
 .stats{list-style:none;padding:0;margin:8px 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px}
 .stats li{background:rgba(255,255,255,.05);padding:8px 10px;display:flex;flex-direction:column}
 .stats span{font-size:12px;color:var(--muted)}
-.stats b{font-family:var(--f-num);font-size:26px}
+.stats b{font-family:var(--f-num);font-size:26px;overflow-wrap:anywhere}
+.stats li{min-width:0}
+#endStats{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
 .vol{display:grid;grid-template-columns:6em 1fr 2.4em;align-items:center;gap:10px;font-size:14px}
 .vol output{font-family:var(--f-num);font-size:17px;text-align:right;font-variant-numeric:tabular-nums}
 .setGroup{display:flex;flex-direction:column;gap:9px;padding-block:6px;border-top:1px solid var(--line)}
@@ -257,7 +259,7 @@ input[type=range]{accent-color:var(--red);width:100%}
 #ending.pass #endTitle{color:var(--neon);text-shadow:0 0 30px rgba(255,207,58,.5)}
 #ending.fail #endTitle{color:#ff5a4a;font-family:var(--f-num)}
 #endSub{margin:0;color:var(--muted);font-size:16px}
-#endStats{max-width:560px}
+#endStats{max-width:680px}
 #endLines p{margin:.25em 0;font-size:clamp(17px,2.5vw,24px);font-family:var(--f-sign);font-weight:700;opacity:0;animation:lin 1s forwards}
 #endLines p.hl{color:var(--neon);font-size:clamp(20px,3vw,30px)}
 @keyframes lin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
@@ -540,6 +542,18 @@ body.photo #iWrap{display:none!important}
 .ulist li{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.05);padding:7px 10px}
 .ulist img{width:34px;height:34px;border-radius:50%;flex-shrink:0;background:#333}
 .ulist .ui{flex:1;min-width:0;display:flex;flex-direction:column}.ulist .ui b{font-size:14px}.ulist .ui small{font-size:11.5px;color:var(--muted);overflow-wrap:anywhere}
+
+.garage{display:flex;flex-wrap:wrap;gap:6px;align-items:center;background:rgba(255,255,255,.04);border:1px solid var(--line);padding:8px 10px}
+.garage > b{margin-right:4px}
+.shop li.cur{border-left:4px solid var(--neon)}
+.skills .skHead{grid-column:1/-1;background:none;padding:6px 0 0;font-size:12px;letter-spacing:.2em;color:var(--neon);display:block;border:0}
+
+#bTask{background:linear-gradient(180deg,#ffcf3a,#e0a800);color:#1b1a17;font-weight:900;border-color:#ffcf3a}
+#bTask kbd{color:#5a4200;border-color:#5a4200}
+#bTaskN{font-family:var(--f-num)}
+.missions li.act{border-left:4px solid var(--neon)}
+.missions li.done{opacity:.7}
+.mbar{height:8px;background:rgba(255,255,255,.1)}.mbar i{display:block;height:100%;background:linear-gradient(90deg,#3fd6ff,#ffcf3a)}
 </style>
 
 </head>
@@ -561,7 +575,7 @@ body.photo #iWrap{display:none!important}
       <button id="lvBox" aria-label="等級與技能"><span class="lvTag">Lv.<b id="lvNum">1</b><i id="spDot" hidden></i></span><span class="xpBar"><i id="xpFill"></i></span><span class="money">NT$ <b id="moneyNum">0</b></span></button>
     </div>
     <div id="hudTL">
-      <div id="btnRow"><button id="bMap">地圖 <kbd>M</kbd></button><button id="bRec">謄本紀錄 <kbd>R</kbd></button><button id="bBag">背包 <kbd>B</kbd></button><button id="bMenu">選單 <kbd>Esc</kbd></button></div>
+      <div id="btnRow"><button id="bMap">地圖 <kbd>M</kbd></button><button id="bRec">謄本紀錄 <kbd>R</kbd></button><button id="bBag">背包 <kbd>B</kbd></button><button id="bMenu">選單 <kbd>Esc</kbd></button><button id="bTask" hidden>任務 <b id="bTaskN"></b> <kbd>J</kbd></button></div>
       <div id="nav" hidden><div id="navLbl">導航</div><div id="navAddr"></div><div id="navDist"></div><button id="navX">取消</button></div>
       <div id="qBox" class="open"><button id="qHead"><span>今日任務</span><span id="qCount">0/3</span></button><ul id="qList"></ul></div>
     </div>
@@ -632,7 +646,7 @@ body.photo #iWrap{display:none!important}
 
   <div id="mapScr" hidden>
     <div class="mapHead"><h3>溪虹市地圖</h3>
-      <div class="legend"><span><i style="background:#e3242b"></i>未調閱</span><span><i style="background:#ff9a2e"></i>已調閱</span><span><i style="background:#2fbf71"></i>已委託</span><span><i style="background:#8b5cf6"></i>導航目標</span><span><i style="background:#3fd6ff"></i>路線</span><span><i style="background:#1f9a4a;border-radius:2px"></i>便利商店</span><span><i style="background:#c8161d;box-shadow:0 0 0 2px #ffcf3a"></i>阿豪</span><span><i style="background:#e3242b;box-shadow:0 0 0 2px #ff7a00"></i>阿豪鎖定</span><span><i style="background:#5a5f6a"></i>被搶走</span><span><i style="background:#ff3b6b"></i>圖釘</span><span><i style="background:#e0782a"></i>高架捷運</span><span><i style="background:#1f6fd0"></i>地下捷運</span><span><i style="background:#3f8cf0;border-radius:2px"></i>派報住戶</span><span><i style="background:transparent;box-shadow:0 0 0 2px #2fd07a"></i>今日帶看</span><span><i style="background:transparent;box-shadow:0 0 0 2px #ffcf3a"></i>急件</span></div>
+      <div class="legend"><span><i style="background:#e3242b"></i>未調閱</span><span><i style="background:#ff9a2e"></i>已調閱</span><span><i style="background:#2fbf71"></i>已委託</span><span><i style="background:#8b5cf6"></i>導航目標</span><span><i style="background:#3fd6ff"></i>路線</span><span><i style="background:#1f9a4a;border-radius:2px"></i>便利商店</span><span><i style="background:#c8161d;box-shadow:0 0 0 2px #ffcf3a"></i>阿豪</span><span><i style="background:#e3242b;box-shadow:0 0 0 2px #ff7a00"></i>阿豪鎖定</span><span><i style="background:#5a5f6a"></i>被搶走</span><span><i style="background:#ff3b6b"></i>圖釘</span><span><i style="background:#e0782a"></i>高架捷運</span><span><i style="background:#1f6fd0"></i>地下捷運</span><span><i style="background:#3f8cf0;border-radius:2px"></i>派報住戶</span><span><i style="background:transparent;box-shadow:0 0 0 2px #2fd07a"></i>今日帶看</span><span><i style="background:transparent;box-shadow:0 0 0 2px #ffcf3a"></i>急件</span><span><i style="background:#b3121a;border-radius:2px;box-shadow:0 0 0 1px #ffcf3a"></i>汽機車行</span></div>
       <div class="mapHint">點一下地圖任意位置放圖釘導航・再點圖釘可取消・拖曳移動地圖</div>
       <div class="mapTools"><button class="btn ghost sm" id="mapIn" aria-label="放大">＋</button><button class="btn ghost sm" id="mapOut" aria-label="縮小">－</button><button class="btn ghost sm" id="mapMe">回到我</button><button class="btn ghost sm" id="mapAll">全圖</button><button class="btn ghost sm" id="mapPinClr" hidden>清除圖釘</button><button class="btn sm" id="mapClose">關閉 <kbd>M</kbd></button></div></div>
     <canvas id="bigMap"></canvas>
@@ -3701,8 +3715,8 @@ function unstickPlayer() {
 // 靜態碰撞：沿車身取三個小圓
 function playerHitsStatic(x, z, h) {
   const fx = Math.sin(h), fz = Math.cos(h);
-  if (PLAYER.car) { for (const o of [-1.6, -0.8, 0, 0.8, 1.6]) if (collideCity(x + fx * o, z + fz * o, 0.9)) return true; return false; }
-  for (const o of [-0.56, 0, 0.56]) if (collideCity(x + fx * o, z + fz * o, 0.32)) return true;
+  const [os, r] = vehSpec().hit;
+  for (const o of os) if (collideCity(x + fx * o, z + fz * o, r)) return true;
   return false;
 }
 
@@ -4111,7 +4125,7 @@ function enterOffice(first) {
     { name: 'Simon 店長', text: '那間的屋主好說話，戶籍地也在附近。調完電傳就直接去敲門，紅色箭頭會一路帶你過去。' },
     { name: 'Simon 店長', text: '畫面下方會一步一步提示你。第一件簽到了，後面就簡單了！' }); }
   if (newDay) lines.push({ name: 'Simon 店長', text: '今天的任務我寫在左上角了：' + G.quests.map(q => QUESTS.find(x => x.id === q.id).text(q.n)).join('、') + '。做完有獎勵。' });
-  if (first) lines.push({ name: 'Simon 店長', text: '跑業務會累積經驗，升級可以學技能。簽到委託有獎金，可以去便利商店或找家蓁 買道具。' });
+  if (first) lines.push({ name: 'Simon 店長', text: '跑業務會累積經驗，升級可以學技能。簽到委託有獎金，可以去便利商店或找家蓁買道具。' });
   setTimeout(() => dialog(lines, () => { toast('可以找同事聊聊，走到出口（藍色光圈）就能出門'); }), 500);
 }
 function morningLines() {
@@ -4170,14 +4184,14 @@ function syncRideMeshes() {
   const city = MODE === 'city' || MODE === 'talk';
   PLAYER.mesh.visible = city && PLAYER.ride; WALKER.visible = city && !PLAYER.ride; PARKED.visible = city && !PLAYER.ride;
   PARKED.position.set(PARK.x, H(PARK.x, PARK.z) + 0.18, PARK.z); PARKED.rotation.y = PARK.h;
-  $('rideBtn').textContent = PLAYER.ride ? '下車' : '上車'; $('modeLbl').textContent = PLAYER.ride ? (PLAYER.car ? '敞篷車' : '機車') : '步行';
+  $('rideBtn').textContent = PLAYER.ride ? '下車' : '上車'; $('modeLbl').textContent = PLAYER.ride ? vehSpec().name : '步行';
 }
 function toggleRide() {
   if (MODE !== 'city' || PAUSE || !G) return;
   if (PLAYER.ride) {
     if (Math.abs(PLAYER.v) > 1.5) { toast('先停車再下車'); sfx('deny'); return; }
     PARK.x = PLAYER.x; PARK.z = PLAYER.z; PARK.h = PLAYER.h; PLAYER.ride = false; PLAYER.v = 0;
-    const rx = -Math.cos(PLAYER.h), rz = Math.sin(PLAYER.h), so = PLAYER.car ? 1.7 : 0.9;
+    const rx = -Math.cos(PLAYER.h), rz = Math.sin(PLAYER.h), so = vehSpec().box[0] + 0.75;
     for (const s_ of [-1, 1, 0]) { const x = PARK.x + rx * s_ * so, z = PARK.z + rz * s_ * so; if (!collideCity(x, z, 0.3)) { PLAYER.x = x; PLAYER.z = z; break; } }
     sfx('door'); engineUpdate(false, 0, 0);
   } else {
@@ -4193,7 +4207,7 @@ function updateHUD() {
   $('tmp').textContent = G.weather.t + '°'; $('wx').className = 'wx ' + G.weather.w;
   $('dateLine').textContent = `10月${String(G.day).padStart(2, '0')}日 · 第 ${G.day} / 30 天`;
   $('apNum').textContent = G.ap; $('apFill').style.width = Math.min(100, G.ap / apMax() * 100) + '%'; $('apFill').classList.toggle('low', G.ap <= 20); renderLv();
-  $('commNum').textContent = G.comm; $('commBadge').classList.toggle('done', G.comm >= 6);
+  $('commNum').textContent = G.comm; $('commBadge').classList.toggle('done', G.comm >= 6); updateTaskBtn();
   if (!updateHUD.q) { updateHUD.q = 1; renderQuests(); }
 }
 function spendAP(n) { if (G.cheat && G.cheat.super) { G.apUsed = (G.apUsed || 0) + n; updateHUD(); return true; } if (G.ap < n) { toast(`體力不足（需要 ${n} 點，剩 ${G.ap} 點）`); sfx('deny'); return false; } G.ap -= n; G.apUsed = (G.apUsed || 0) + n; updateHUD(); return true; }
@@ -4361,7 +4375,7 @@ function talk(role, o, cb = {}) {
   const R_ = ROLE[role], style = role === 'buyer' ? cb.buyer.style : NPC_STYLES[role === 'owner' ? 'owner' : role]();
   if (role === 'owner') { style.hairLong = !!o.g; if (!o.g) style.skirt = false; }   // 外觀跟屋主性別一致
   let res = R_.res;
-  if (role === 'buyer') res = R_.res - photoStars(o.st.photo) * 4;
+  if (role === 'buyer') res = R_.res - photoStars(o.st.photo) * 4 - (G.skills.show || 0) * 8;
   if (role === 'owner') { res = o.tut ? Math.max(30, 46 - o.st.tries * 6) : Math.max(52, 100 - o.st.tries * 12 - (cb.meet ? 25 : 0) - (o.st.letter ? 5 : 0)); o.st.lastDay = G.day; }
   const name = role === 'owner' ? ownerName(o) : role === 'guard' ? '管理員' + pk(['王伯', '李大哥', '陳伯', '林姐', '張伯', '黃大哥'], Math.random) : role === 'neighbor' ? pk(['隔壁阿姨', '隔壁阿伯', '鄰居太太', '鄰居先生'], Math.random) : role === 'clue' ? pk(['應門的年輕人', '應門的太太', '應門的阿姨', '房客'], Math.random) : role === 'buyer' ? cb.buyer.name : '住戶';
   Math.random = RND;
@@ -4559,6 +4573,7 @@ function endDay() {
     for (const o of shuffle(cands)) { const p = (o.st.letter ? (o.st.guardLetter ? 0.04 : 0.02) + G.contacts * 0.002 + G.skills.network * 0.01 + G.perm.card * 0.01 : 0.012) + famOwner(o) * 0.0004; if (Math.random() < p) { G.call = o.id; break; } }
   }
   sfx('chime');
+  G.safeStreak = !G.redRun && G.dayKm > 0.5 ? (G.safeStreak || 0) + 1 : 0;
   const safeQ = G.quests.find(q => q.id === 'safe' && !q.done && !q.fail);
   if (safeQ) { if (!G.redRun && G.dayKm > 0.5) emit('safe'); else { safeQ.fail = true; renderQuests(); } }
   checkAch();
@@ -4577,10 +4592,10 @@ function phoneCall() {
   const when = pk(['今天下午', '待會兒', '晚一點', '現在有空的話'], Math.random);
   openModal(`<div class="phone"><div class="ring">來電中</div><h3>${ownerName(o)}</h3><p class="dim">${o.phone}</p></div><div class="mbtns"><button class="btn" id="pAns">接聽</button></div>`, 'call');
   $('pAns').onclick = () => { sfx('confirm'); closeModalSoft(); G.call = null;
-    dialog([{ name: ownerName(o), text: `喂，你是日勝的${G.name}嗎？我收到你留的信了。` }, { name: ownerName(o), text: `${when}我在${addrOf(meetB)}，你過來聊聊吧。` }], () => setTarget({ kind: 'meet', oid: o.id, bid: meetB.id })); };
+    dialog([{ name: ownerName(o), text: o.st.referral ? `喂，你是日勝的${G.name}嗎？我朋友剛跟你買房子，說你很專業，叫我一定要找你。` : `喂，你是日勝的${G.name}嗎？我收到你留的信了。` }, { name: ownerName(o), text: `${when}我在${addrOf(meetB)}，你過來聊聊吧。` }], () => setTarget({ kind: 'meet', oid: o.id, bid: meetB.id })); };
 }
 function goalReached() {
-  G.goalShown = true; if (!G.goalDay) G.goalDay = G.day; sfx('win');
+  G.goalShown = true; updateTaskBtn(); setTimeout(() => toast('「選單」旁開放「任務」按鈕：挑戰百萬經紀人等更高的目標！', 'quest'), 1500); if (!G.goalDay) G.goalDay = G.day; sfx('win');
   choice('目標達成！', `<div class="bigwin">6 / 6</div><p>第 ${G.day} 天，你完成了本月 6 件委託的目標。</p><p class="dim">可以立即結算，或是繼續衝到第 30 天，簽得越多越好。</p>`, [
     { label: '立即結算', fn: () => fadeTo(ending) }, { label: '繼續衝刺', cls: 'ghost', fn: afterAction }], 'win');
 }
@@ -4589,7 +4604,7 @@ function ending() {
   const pass = G.comm >= 6; show('ending', true);
   $('endTitle').textContent = pass ? '恭喜通關' : 'GAME OVER'; $('ending').className = pass ? 'pass' : 'fail';
   $('endSub').textContent = pass ? `${G.name}，你在第 ${G.day} 天時共簽下 ${G.comm} 件委託。` : `${G.name}，三十天過去，你簽下了 ${G.comm} 件委託，離目標還差 ${6 - G.comm} 件。`;
-  $('endStats').innerHTML = `<li><span>調閱謄本</span><b>${G.stats.inv}</b></li><li><span>開發信</span><b>${G.stats.letters}</b></li><li><span>交談</span><b>${G.stats.talks}</b></li><li><span>委託</span><b>${G.comm}</b></li><li><span>等級</span><b>Lv.${G.lv}</b></li><li><span>存款</span><b>NT$${fmt(G.money)}</b></li><li><span>成就</span><b>${Object.keys(G.ach).length}/${ACH.length}</b></li><li><span>被搶走</span><b>${G.lost}</b></li><li><span>成交</span><b>${G.deals || 0} 件</b></li><li><span>成交總額</span><b>${fmt(G.dealAmt || 0)} 萬</b></li>`;
+  $('endStats').innerHTML = `<li><span>調閱謄本</span><b>${G.stats.inv}</b></li><li><span>開發信</span><b>${G.stats.letters}</b></li><li><span>交談</span><b>${G.stats.talks}</b></li><li><span>委託</span><b>${G.comm}</b></li><li><span>等級</span><b>Lv.${G.lv}</b></li><li><span>存款</span><b>NT$${fmt(G.money)}</b></li><li><span>成就</span><b>${Object.keys(G.ach).length}/${ACH.length}</b></li><li><span>被搶走</span><b>${G.lost}</b></li><li><span>成交</span><b>${G.deals || 0} 件</b></li><li><span>成交總額</span><b>${fmt(G.dealAmt || 0)} 萬</b></li><li><span>挑戰任務</span><b>${Object.keys((G.missions || {}).done || {}).length} 個</b></li>`;
   const L = ['房仲這份工作不只是出一張嘴', '還要有強大的毅力與抗壓力', '這只是一款遊戲', '現實會比這個更辛苦', '如果你想挑戰自己、獲取無上限的薪水', '歡迎加入日勝國際不動產！', '歡迎致電：0755-777-88'];
   $('endLines').innerHTML = L.map((l, i) => `<p style="animation-delay:${1.2 + i * 1.1}s" class="${i >= 5 ? 'hl' : ''}">${l}</p>`).join('');
   playMusic(pass ? 'ending' : 'sad'); sfx(pass ? 'win' : 'lose');
@@ -4840,6 +4855,7 @@ function drawMap(x, W, H, cx, cz, sc, big) {
     if (rad >= 6) { x.fillStyle = '#fff'; x.font = `900 ${rad * 1.2}px ${FONT_SANS}`; x.fillText(o.st.signed ? '✓' : o.st.lost ? '✕' : '售', mx, mz + 0.5); }
   }
   for (const L of [MRT_E, MRT_U]) for (const st of L.stations) { const mx = X(st.x), mz = Z(st.z); if (!inV(mx, mz)) continue; const r = big ? Math.max(7, Math.min(11, 3 * sc)) : 6; x.fillStyle = L === MRT_E ? '#e0782a' : '#1f6fd0'; x.strokeStyle = '#fff'; x.lineWidth = 2; x.beginPath(); x.arc(mx, mz, r, 0, 7); x.fill(); x.stroke(); x.fillStyle = '#fff'; x.font = `900 ${r * 1.1}px ${FONT_SANS}`; if (big) { x.fillText('M', mx, mz + 0.5); if (sc > BM.fit * 1.6) { x.font = `800 ${Math.round(11 * Math.min(devicePixelRatio, 2))}px ${FONT_SANS}`; x.fillStyle = '#fff'; x.fillText(st.name + '站', mx, mz + r + 10 * Math.min(devicePixelRatio, 2)); } } else miniUpright(x, mx, mz, () => x.fillText('M', 0, 0.5)); }
+  for (const b of DEALERS) { const mx = X(b.fx), mz = Z(b.fz); if (!inV(mx, mz)) continue; const r = big ? Math.max(7, Math.min(10, 2.6 * sc)) : 6; x.fillStyle = '#b3121a'; x.fillRect(mx - r, mz - r, r * 2, r * 2); x.strokeStyle = '#ffcf3a'; x.lineWidth = 2; x.strokeRect(mx - r, mz - r, r * 2, r * 2); x.fillStyle = '#fff'; x.font = `900 ${r * 1.2}px ${FONT_SANS}`; if (big) x.fillText('車', mx, mz + 0.5); else miniUpright(x, mx, mz, () => x.fillText('車', 0, 0.5)); }
   for (const b of STORES) { const mx = X(b.fx), mz = Z(b.fz); if (!inV(mx, mz)) continue; const r = big ? Math.max(5, Math.min(8, 2.2 * sc)) : 4.5; x.fillStyle = '#1f9a4a'; x.fillRect(mx - r, mz - r, r * 2, r * 2); x.strokeStyle = '#fff'; x.lineWidth = 1.5; x.strokeRect(mx - r, mz - r, r * 2, r * 2); }
   if (G.rival && RIVAL_MESH) { let rx = X(G.rival.x), rz = Z(G.rival.z); if (!big) [rx, rz] = miniEdge(W, rx, rz, 10); x.fillStyle = '#c8161d'; x.beginPath(); x.arc(rx, rz, big ? 8 : 6, 0, 7); x.fill(); x.strokeStyle = '#ffcf3a'; x.lineWidth = 2; x.stroke(); x.fillStyle = '#fff'; x.font = `900 ${big ? 10 : 8}px ${FONT_SANS}`; if (big) x.fillText('豪', rx, rz + 0.5); else miniUpright(x, rx, rz, () => x.fillText('豪', 0, 0.5)); }
   careerMap(x, X, Z, inV, big);
@@ -4880,7 +4896,7 @@ function miniEdge(W, px, pz, m) { const R = W / 2, dx = px - R, dz = pz - R, d =
 function drawSpeedo(kmh) {
   const c = $('speedo'), x = c.getContext('2d'), W = c.width, H = c.height, cx = W / 2, cy = H * 0.56, r = W * 0.4;
   x.clearRect(0, 0, W, H);
-  const a0 = Math.PI * 0.75, a1 = Math.PI * 2.25, k = clamp(kmh / (PLAYER.car ? 140 : 60), 0, 1);
+  const a0 = Math.PI * 0.75, a1 = Math.PI * 2.25, k = clamp(kmh / vehSpec().speedo, 0, 1);
   x.lineWidth = 10; x.strokeStyle = 'rgba(255,255,255,.15)'; x.beginPath(); x.arc(cx, cy, r, a0, a1); x.stroke();
   const g = x.createLinearGradient(0, 0, W, 0); g.addColorStop(0, '#3fd6ff'); g.addColorStop(1, '#ffcf3a');
   x.strokeStyle = g; x.beginPath(); x.arc(cx, cy, r, a0, a0 + (a1 - a0) * k); x.stroke();
@@ -4915,7 +4931,7 @@ addEventListener('keydown', e => {
   if (PHOTO && MODE === 'city') { if (k === ' ' || k === 'enter') { e.preventDefault(); photoShutter(); } else if (k === 'escape') endPhoto(); else if (k === 'z' || k === '-' || k === 'q') photoZoom(6); else if (k === 'x' || k === '=' || k === '+') photoZoom(-6); if (['arrowup', 'arrowdown', 'arrowleft', 'arrowright', ' '].includes(k)) e.preventDefault(); return; }
   if ((MODE === 'city' || MODE === 'office') && k === 't') { e.preventDefault(); openCheat(); return; }
   if (MODE === 'city') {
-    if (k === 'm') openMap(); else if (k === 'r') openRecords(); else if (k === 'b') openBag(); else if (k === 'k') openSkills(); else if (k === 'escape') openMenu();
+    if (k === 'j') openMissions(); else if (k === 'm') openMap(); else if (k === 'r') openRecords(); else if (k === 'b') openBag(); else if (k === 'k') openSkills(); else if (k === 'escape') openMenu();
     else if (k === 'e' || k === 'enter') { e.preventDefault(); doAction(); } else if (k === 'f') toggleRide(); else if (k === 'v' && !e.repeat) cycleView(); else if (k === ' ') { e.preventDefault(); if (PLAYER.ride) sfx('horn'); }
   } else if (MODE === 'office') { if (k === 'escape') openMenu(); else if (k === 'b') openBag(); else if (k === 'k') openSkills(); else if (k === 'e' || k === 'enter') { e.preventDefault(); doAction(); } }
   if (['arrowup', 'arrowdown', 'arrowleft', 'arrowright', ' '].includes(k)) e.preventDefault();
@@ -5019,6 +5035,7 @@ function findAction() {
   if (best && best.st.urgent && !best.st.signed && !best.st.lost) return best.st.lastDay === G.day ? { kind: 'none', label: '急件屋主：今天談過了', sub: `明天再來（急件期限到第 ${best.st.urgent.until} 天）` } : { kind: 'urgent', o: best, label: '急件：和屋主面談', sub: `${ownerName(best)}就在門口等你 · 交談體力 -${TALK_COST}` };
   if (best && best.st.signed) { const by = buyerAt(best); return by ? { kind: 'show', o: best, by, label: '開始帶看', sub: `${by.name}（${by.kind}）· 體力 -${TALK_COST}` } : best.st.sold ? { kind: 'none', label: '日勝成交物件', sub: addrOf(BLD[best.bid]) + ` · 成交 ${fmtWan(best.st.dealPrice || best.price)}` } : { kind: 'photo', o: best, label: '拍攝屋況照片', sub: PLAYER.ride ? '先下車（F）才能拍照' : best.st.photo ? `目前最佳 ${starStr(photoStars(best.st.photo))}` : '好照片會帶來更多買方' }; }
   if (best) return best.st.signed ? { kind: 'none', label: '日勝專任物件', sub: addrOf(BLD[best.bid]) + ' · 已委託' } : best.st.lost ? { kind: 'none', label: '大鴻房屋專任', sub: '被阿豪搶走了' } : best.st.inv ? { kind: 'doc', o: best, label: '查看謄本', sub: '已調閱 · ' + addrOf(BLD[best.bid], best.unit) } : { kind: 'inv', o: best, label: '調閱電傳', sub: `體力 -${invCost()} · 查看二類謄本` };
+  for (const b of DEALERS) if (d(b) < 7) return { kind: 'dealer', b, label: '進入汽機車行', sub: '買重機、小車、轎車、跑車' };
   for (const b of STORES) if (d(b) < 6.5) return { kind: 'shop', label: '進入便利商店', sub: '買道具・補體力' };
   if (d(OFFICE) < 7.5) return { kind: 'office', label: '回公司下班', sub: '提早結束今天' };
   return null;
@@ -5034,6 +5051,7 @@ function doAction() {
   else if (ACT.kind === 'portal') { if (PLAYER.ride) { toast('先下車（F）再進公司'); sfx('deny'); } else backToOffice(); }
   else if (ACT.kind === 'chat') { if (ACT.npc.key === 'amy') { const n = ACT.npc; choice('家蓁（行政秘書）', '<p class="quote">「要聊聊，還是去公司福利社買點東西？」</p>', [{ label: '聊聊', fn: () => officeChat(n) }, { label: '領取派報 DM', sub: G.dm && G.dm.day === G.day ? '今天已經領過了' : '每天一疊，去社區發', fn: offerDM }, { label: '公司福利社', sub: `錢包 NT$${fmt(G.money)}`, fn: () => openShop('公司福利社') }, { label: '不用了', cls: 'ghost', fn: () => { } }]); } else officeChat(ACT.npc); }
   else if (ACT.kind === 'shop') openShop();
+  else if (ACT.kind === 'dealer') openDealer(ACT.b);
   else if (ACT.kind === 'show') startShowing(ACT.o, ACT.by);
   else if (ACT.kind === 'urgent') { const o = ACT.o; if (G.target && G.target.oid === o.id) { G.target = null; show('nav', false); ROUTE.pts = []; } VISIT_B = o.bid; ownerBattle(o, { meet: true }); }
   else if (ACT.kind === 'photo') startPhoto(ACT.o);
@@ -5060,7 +5078,7 @@ const VIEWS = [{ n: '標準視角', k: 1 }, { n: '近一點', k: 0.58 }, { n: '�
 try { CAM.view = clamp(+localStorage.getItem('fzrpg3d.view') || 0, 0, VIEWS.length - 1); } catch (e) { }
 function cycleView() { CAM.view = (CAM.view + 1) % VIEWS.length; CAM.snap = true; try { localStorage.setItem('fzrpg3d.view', CAM.view); } catch (e) { } sfx('click'); toast('視角：' + VIEWS[CAM.view].n + '（V 切換）'); }
 // 第一人稱時主角（含機車／敞篷車）不畫在鏡頭裡，但車燈照常
-function fpLayers(on) { CAM.fp = on; CAM.fpMesh = PLAYER.mesh; [typeof SCOOTER_MESH !== 'undefined' && SCOOTER_MESH, typeof CAR_MESH !== 'undefined' && CAR_MESH, PLAYER.mesh, WALKER].forEach(m => m && m.traverse(o => { if (o.isMesh || o.isSprite) o.layers.set(on ? 1 : 0); })); }
+function fpLayers(on) { CAM.fp = on; CAM.fpMesh = PLAYER.mesh; [...Object.values(typeof VEH_MESH !== 'undefined' ? VEH_MESH : {}), PLAYER.mesh, WALKER].forEach(m => m && m.traverse(o => { if (o.isMesh || o.isSprite) o.layers.set(on ? 1 : 0); })); }
 {
   const g = $('gl'); g.addEventListener('contextmenu', e => e.preventDefault());
   g.addEventListener('pointerdown', e => { if (!(MODE === 'city' || MODE === 'office') || PAUSE) return; CAM.drag = { id: e.pointerId, x: e.clientX, y: e.clientY }; try { g.setPointerCapture(e.pointerId); } catch (_) { } g.classList.add('grabbing'); });
@@ -5122,7 +5140,7 @@ function updateCity(dt) {
   } else if (!keys && touch) stickBrake = true;
   if (!PAUSE) {
     if (stickBrake) p.v *= Math.pow(0.03, dt);
-    else if (thr > 0.1) p.v += 8.5 * (p.car ? 2.4 : 1) * thr * dt * (1 - p.v / MAX * 0.6); else if (thr < -0.1) p.v -= (p.v > 0 ? 18 : 5) * -thr * dt; else p.v *= Math.pow(0.35, dt);
+    else if (thr > 0.1) p.v += 8.5 * vehSpec().acc * thr * dt * (1 - p.v / MAX * 0.6); else if (thr < -0.1) p.v -= (p.v > 0 ? 18 : 5) * -thr * dt; else p.v *= Math.pow(0.35, dt);
     p.v = clamp(p.v, -3.5, MAX); if (Math.abs(p.v) < 0.03 && Math.abs(thr) < 0.1) p.v = 0;
     antiStuck(dt, Math.abs(thr) > 0.5 || (JOY.on && JOY.mag > 0.4));
     p.steer = lerp(p.steer, st, 1 - Math.pow(0.001, dt));
@@ -5183,7 +5201,7 @@ function updateCityView(dt, rode) {
       if (PHOTO && camera.fov !== PHOTO.fov) { camera.fov = PHOTO.fov; camera.updateProjectionMatrix(); }
       camera.lookAt(ex + Math.sin(yaw) * 10, ey - tilt, ez + Math.cos(yaw) * 10);
     } else {
-    const back = ((p.ride ? CAM.dist + (p.car ? 2.5 : 0) : CAM.dist * 0.72) + Math.abs(p.v) * (p.car ? 0.05 : 0.08)) * (V.k || 1);
+    const back = ((p.ride ? CAM.dist + vehSpec().cam : CAM.dist * 0.72) + Math.abs(p.v) * (p.car ? 0.05 : 0.08)) * (V.k || 1);
     let f = 1;
     for (const k of [1, 0.75, 0.55, 0.35]) { f = k; const hx = p.x - Math.sin(yaw) * back * Math.cos(CAM.pitch) * k, hz = p.z - Math.cos(yaw) * back * Math.cos(CAM.pitch) * k; if (!collideCity(hx, hz, 0.3, true)) break; }
     const gy0 = H(p.x, p.z), cx_ = p.x - Math.sin(yaw) * back * Math.cos(CAM.pitch) * f, cz_ = p.z - Math.cos(yaw) * back * Math.cos(CAM.pitch) * f;
@@ -5301,7 +5319,7 @@ async function boot() {
   G = { day: 1, ap: 100, drift: 0, weather: { w: 'cloud', t: 29 } };
   setupSaleSigns(); G = null;
   $('boot').hidden = true; toTitle(); loop();
-  window.__fz = { MRT_EXITS, UNDER_EXITS, MRT_E, INFRA, makeVehMesh, makeHeavyMesh, makeMotoMesh, makePed, ACT: () => ACT, findAction, tutOwner, talk, BTg: () => BT, fillVars, AU, FROZEN: () => FROZEN, LAMPS, setupLampLights, BM, COPV: () => COPV, copWitness, KEY, updateCity, loop, playerHitsStatic, collideCity, pBox, OFF, makePerson, suitUp, scene, NODES, EDGES, FACES, LINES, H, CHUNKS, updateChunks, STREAM, nearestEdge, computeRoute, updateEvents, edgesNear, projectOnEdge, CORNERS, spawnPed, spawnVehicle, CAM, toggleRide, PARK, startPlayerChase, COP: () => COP, onNpcRedRun, EVENTS, rivalDayStart, openShop, openSkills, openAch, openBag, addXP, obbMTV, vBox, renderer, CORNER_BLD, PARKS, OFFICE: () => OFFICE, MRT_U, EXPWY, UNDERPASS, TSTAT, updateSignals, updateVehicles, updatePeds, PAUSE: () => PAUSE, BUB, say, camera, VEH, PEDS, TLC, BLD, OWN: () => OWN, G: () => G, POOLS, MODE: () => MODE, PLAYER, investigate, setTarget, visitTarget, endDay, ending, goalReached, OP, unstickPlayer, eP, STUCK, antiStuck, simStep: (dt, t) => { updateCop(dt); updateCity(dt); updateWorld(dt, t); }, obbMTV, acctTest: { set: u => { USER = u; renderAccount(); }, sync: () => cloudSync(), cloud: () => CLOUD, err: () => CLOUD_ERR }, openSlots, slotRead, PORTAL: () => PORTAL, startDM, offerDM, updateDM, startRace, careerDayStart, newBuyer, startShowing, negotiate, closeDeal, startPhoto, photoShutter, endPhoto, scorePhoto, PHOTO: () => PHOTO, liKey, famOf, addFam, gainIntel, ownerBattle, syncBuyers, buyerAt, RV: () => RV, enterOffice, enterCity, morningLines, answer, BUYER_MESH, DM_SPR, rivalAttempt };
+  window.__fz = { MRT_EXITS, UNDER_EXITS, MRT_E, INFRA, makeVehMesh, makeHeavyMesh, makeMotoMesh, makePed, ACT: () => ACT, findAction, tutOwner, talk, BTg: () => BT, fillVars, AU, FROZEN: () => FROZEN, LAMPS, setupLampLights, BM, COPV: () => COPV, copWitness, KEY, updateCity, loop, playerHitsStatic, collideCity, pBox, OFF, makePerson, suitUp, scene, NODES, EDGES, FACES, LINES, H, CHUNKS, updateChunks, STREAM, nearestEdge, computeRoute, updateEvents, edgesNear, projectOnEdge, CORNERS, spawnPed, spawnVehicle, CAM, toggleRide, PARK, startPlayerChase, COP: () => COP, onNpcRedRun, EVENTS, rivalDayStart, openShop, openSkills, openAch, openBag, addXP, obbMTV, vBox, renderer, CORNER_BLD, PARKS, OFFICE: () => OFFICE, MRT_U, EXPWY, UNDERPASS, TSTAT, updateSignals, updateVehicles, updatePeds, PAUSE: () => PAUSE, BUB, say, camera, VEH, PEDS, TLC, BLD, OWN: () => OWN, G: () => G, POOLS, MODE: () => MODE, PLAYER, investigate, setTarget, visitTarget, endDay, ending, goalReached, OP, unstickPlayer, eP, STUCK, antiStuck, simStep: (dt, t) => { updateCop(dt); updateCity(dt); updateWorld(dt, t); }, obbMTV, acctTest: { set: u => { USER = u; renderAccount(); }, sync: () => cloudSync(), cloud: () => CLOUD, err: () => CLOUD_ERR }, openSlots, slotRead, PORTAL: () => PORTAL, startDM, offerDM, updateDM, startRace, careerDayStart, newBuyer, startShowing, negotiate, closeDeal, startPhoto, photoShutter, endPhoto, scorePhoto, PHOTO: () => PHOTO, liKey, famOf, addFam, gainIntel, ownerBattle, syncBuyers, buyerAt, RV: () => RV, enterOffice, enterCity, morningLines, answer, BUYER_MESH, DM_SPR, rivalAttempt, DEALERS, openDealer, switchVehicle, VEHS, vehSpec, curVeh, openMissions, missionCheck, MISSIONS, openUserList, exportUsers, updateTaskBtn };
 }
 
 // ===================== 交通建設：高架捷運、地下捷運、高架快速道路、行人地下道 =====================
@@ -5511,6 +5529,12 @@ const SKILLS = [
   { k: 'insight', name: '洞察', desc: l => `每回合 ${l * 15}% 機率看穿一個錯誤選項` },
   { k: 'network', name: '人脈', desc: l => `開發信回電機率 +${l}%、套話威力 +${l * 10}%` },
   { k: 'rider', name: '騎士', desc: l => `機車極速 +${l * 8}%` },
+  // 銷售技能
+  { k: 'show', cat: 'sale', name: '帶看話術', desc: l => `帶看時買方疑慮 -${l * 8}` },
+  { k: 'nego', cat: 'sale', name: '議價斡旋', desc: l => `議價時說服買方、屋主的成功率 +${l * 6}%` },
+  { k: 'ads', cat: 'sale', name: '行銷文案', desc: l => `委託物件每天有買方詢問的機率 +${l * 8}%` },
+  { k: 'photo', cat: 'sale', name: '攝影美學', desc: l => `屋況照片分數 +${l * 5}` },
+  { k: 'referral', cat: 'sale', name: '客戶經營', desc: l => `成交後 ${l * 20}% 機率由客戶轉介紹一位想賣房的屋主` },
 ];
 const SHOP = [
   { k: 'drink', name: '手搖飲', price: 60, desc: '交涉管理員、鄰居或應門的人時使用：對方戒心 -20' },
@@ -5572,6 +5596,7 @@ function ensureState() {
   d('quests', []); d('qDay', 0); d('qDone', 0); d('ach', {}); d('bonusAP', 0); d('coffeeToday', 0);
   d('cnt', {}); const c = G.cnt; ['rej', 'guardWin', 'clueWin', 'help', 'fines', 'km', 'perfect', 'intel', 'dog', 'beatRival', 'buy'].forEach(k => { if (c[k] == null) c[k] = 0; });
   if (!c.alleys) c.alleys = []; if (!c.chatWho) c.chatWho = {};
+  d('garage', ['scooter']); d('veh', 'scooter');
   d('redRun', false); d('dayKm', 0); d('evT', 50); d('rival', null); d('lost', 0); d('rivalNews', null);
   careerEnsure();
 }
@@ -5579,7 +5604,7 @@ function decorateOwners() { OWN.forEach(o => { o.per = PERS_KEYS[Math.floor(mulb
 const apMax = () => 100 + (G.skills ? G.skills.stamina * 10 : 0);
 const invCost = () => 10 - (G.skills ? G.skills.legs * 2 : 0);
 const TALK_COST = 20;
-const maxSpeed = () => G && G.cheat && G.cheat.car ? 36 : 15 * (1 + (G.skills ? G.skills.rider * 0.08 : 0) + (G.perm ? G.perm.moto * 0.1 : 0)) * (G.weather && G.weather.w === 'rain' ? 0.85 : 1);
+const maxSpeed = () => { const S = vehSpec(); return S.speed * (1 + (G && G.skills ? G.skills.rider * 0.08 : 0) + (G && G.perm && curVeh() === 'scooter' ? G.perm.moto * 0.1 : 0)) * (G && G.weather && G.weather.w === 'rain' ? (S.car ? 0.92 : 0.85) : 1); };
 
 // ---------- 事件匯流排 ----------
 function emit(type, d = {}) { if (!G || !G.cnt) return; questProgress(type, d); checkAch(); renderLv(); }
@@ -5602,7 +5627,7 @@ function renderLv() {
 // ---------- 技能頁 ----------
 function openSkills(back) {
   sfx('click');
-  const rows = SKILLS.map(s => { const l = G.skills[s.k]; return `<li><div class="skT"><b>${s.name}</b><span class="pips">${[0, 1, 2].map(i => `<i class="${i < l ? 'on' : ''}"></i>`).join('')}</span></div><p>${l ? s.desc(l) : '尚未學習'}${l < 3 ? `<br><small>下一級：${s.desc(l + 1)}</small>` : ''}</p><button class="btn sm" data-k="${s.k}" ${!G.sp || l >= 3 ? 'disabled' : ''}>${l >= 3 ? '已滿級' : '學習'}</button></li>`; }).join('');
+  const rows = SKILLS.map((s, i) => { const l = G.skills[s.k]; const head = i === 0 ? '<li class="skHead">開發技能</li>' : s.cat === 'sale' && SKILLS[i - 1].cat !== 'sale' ? '<li class="skHead">銷售技能</li>' : ''; return head + `<li><div class="skT"><b>${s.name}</b><span class="pips">${[0, 1, 2].map(i => `<i class="${i < l ? 'on' : ''}"></i>`).join('')}</span></div><p>${l ? s.desc(l) : '尚未學習'}${l < 3 ? `<br><small>下一級：${s.desc(l + 1)}</small>` : ''}</p><button class="btn sm" data-k="${s.k}" ${!G.sp || l >= 3 ? 'disabled' : ''}>${l >= 3 ? '已滿級' : '學習'}</button></li>`; }).join('');
   openModal(`<h3>技能 <small>Lv.${G.lv} · 可用技能點 ${G.sp}</small></h3><ul class="skills">${rows}</ul><div class="mbtns"><button class="btn ghost" id="skBack">關閉</button></div>`, 'wide');
   $('mbox').querySelectorAll('[data-k]').forEach(b => b.onclick = () => { const k = b.dataset.k; if (!G.sp || G.skills[k] >= 3) return; G.sp--; G.skills[k]++; sfx('levelup'); if (k === 'stamina') { G.ap += 10; updateHUD(); } openSkills(back); });
   $('skBack').onclick = () => { sfx('cancel'); closeModalSoft(); back ? back() : closeModal(); };
@@ -5621,9 +5646,10 @@ function openShop(title = '好鄰居便利商店') {
 function openBag() {
   if (!G || (MODE !== 'city' && MODE !== 'office')) return; sfx('click');
   const rows = SHOP.map(it => { const n = it.perm ? G.perm[it.k] : G.inv[it.k]; return `<li><div class="shT"><b>${it.name}</b><span>${it.perm ? `等級 ${n}/${it.perm}` : `× ${n}`}</span></div><p>${it.desc}</p>${it.k === 'coffee' ? `<button class="btn sm" id="useCoffee" ${!n || G.coffeeToday >= 2 ? 'disabled' : ''}>喝一罐</button>` : ''}</li>`; }).join('');
-  openModal(`<h3>背包 <small>錢包 NT$${fmt(G.money)}</small></h3><ul class="shop">${rows}</ul><p class="dim">手搖飲、伴手禮、實價登錄表要在交涉畫面裡使用。便利商店（地圖上的綠點）和公司櫃檯的家蓁 都能補貨。</p><div class="mbtns"><button class="btn" id="bagSkill">技能${G.sp ? `（${G.sp} 點可用）` : ''}</button><button class="btn ghost" id="bagBack">關閉</button></div>`, 'wide');
+  openModal(`<h3>背包 <small>錢包 NT$${fmt(G.money)}</small></h3><ul class="shop">${rows}</ul>${garageHtml()}<p class="dim">手搖飲、伴手禮、實價登錄表要在交涉畫面裡使用。便利商店（地圖上的綠點）和公司櫃檯的家蓁都能補貨。</p><div class="mbtns"><button class="btn" id="bagSkill">技能${G.sp ? `（${G.sp} 點可用）` : ''}</button><button class="btn ghost" id="bagBack">關閉</button></div>`, 'wide');
   const c = $('useCoffee'); if (c) c.onclick = () => { G.inv.coffee--; G.coffeeToday++; G.ap = Math.min(apMax() + 30, G.ap + 15); sfx('good'); updateHUD(); toast('喝了罐裝咖啡，體力 +15'); openBag(); };
   $('bagSkill').onclick = () => openSkills(openBag);
+  $('mbox').querySelectorAll('[data-g]').forEach(b => b.onclick = () => { switchVehicle(b.dataset.g); openBag(); });
   $('bagBack').onclick = () => { sfx('cancel'); closeModal(); };
 }
 
@@ -5954,6 +5980,9 @@ function setupStores() {
     if (STORES.length >= 30) break;
     if (STORES.some(s => Math.hypot(s.fx - b.fx, s.fz - b.fz) < 220)) continue;
     b.store = true; STORES.push(b);
+  }
+  pickDealers();   // 其中兩間改成汽機車行（仍然不會成為掛售物件，舊存檔的屋主不受影響）
+  for (const b of STORES) {
     const m = new THREE.Mesh(new THREE.PlaneGeometry(Math.min(b.w - 0.4, 7.6), 1.2), mat);
     m.position.set(b.fx + b.n.x * 0.14, b.y + 4.98, b.fz + b.n.z * 0.14); m.rotation.y = b.ry; scene.add(m);
     const st = new THREE.Mesh(new THREE.PlaneGeometry(b.w - 0.3, 0.35), new THREE.MeshBasicMaterial({ color: '#1f9a4a' })); st.position.set(b.fx + b.n.x * 0.05, b.y + 3.9, b.fz + b.n.z * 0.05); st.rotation.y = b.ry; scene.add(st);
@@ -6117,6 +6146,7 @@ function careerBattleSetup() {
     const f = Math.round(famOwner(o) * 0.2); if (f) { cut += f; notes.push(`社區熟悉度 -${f}`); }
     if (o.st.jobK) { cut += 10; notes.push(OWNER_JOBS[o.job].prep + ' -10'); }
     if (o.st.urgent) { cut += 15; notes.push('屋主急著賣 -15'); }
+    if (o.st.referral) { cut += 20; notes.push('老客戶轉介紹 -20'); }
     if (BT.cb.race) { cut += 12; notes.push('搶先阿豪一步 -12'); }
     BT.tabooRound = ri(2, 4, Math.random); BT.hobUsed = false;
   } else if (BT.role === 'guard' || BT.role === 'neighbor' || BT.role === 'clue') {
@@ -6182,7 +6212,7 @@ function careerDayStart() {
   for (const o of shuffle(OWN.filter(o => o.st.signed && !o.st.sold && (o.st.signDay || 0) < G.day))) {
     if (n >= 2 || G.buyers.some(b => b.oid === o.id)) continue;
     const stars = photoStars(o.st.photo);
-    if (Math.random() < 0.3 + stars * 0.09) { n++; G.buyers.push(newBuyer(o)); G.buyerNew.push(o.id); }
+    if (Math.random() < 0.3 + stars * 0.09 + (G.skills.ads || 0) * 0.08) { n++; G.buyers.push(newBuyer(o)); G.buyerNew.push(o.id); }
   }
 }
 function careerMorning(L) {
@@ -6284,7 +6314,7 @@ function negotiate(o, by) {
   if (N.log.includes(fmtWan(0))) N.log = `${by.name}看完房子很喜歡，開口出價 ${fmtWan(N.B)}。`;
   const known = o.st.intel >= 2 || o.st.perKnown && o.st.jobK;
   const stars = photoStars(o.st.photo);
-  const pB = clamp(0.45 + (by.conf || 50) / 250 + stars * 0.03 + (N.dep ? 0.1 : 0), 0.3, 0.88), pO = clamp(0.4 + (o.st.intel || 0) * 0.07 + (o.st.perKnown ? 0.05 : 0) + famOwner(o) * 0.002, 0.3, 0.85);
+  const sk = (G.skills.nego || 0) * 0.06, pB = clamp(0.45 + (by.conf || 50) / 250 + stars * 0.03 + (N.dep ? 0.1 : 0) + sk, 0.3, 0.92), pO = clamp(0.4 + (o.st.intel || 0) * 0.07 + (o.st.perKnown ? 0.05 : 0) + famOwner(o) * 0.002 + sk, 0.3, 0.9);
   const gap = N.F - N.B, gapPct = clamp(gap / P, -0.1, 0.15), pip = n => '●'.repeat(n) + '○'.repeat(3 - n);
   const html = `<div class="neg"><div class="negRow"><div><small>開價</small><b>${fmtWan(P)}</b></div><div class="nb"><small>買方出價</small><b>${fmtWan(N.B)}</b></div><div class="no"><small>屋主底價</small><b>${known ? fmtWan(N.F) : '？？？'}</b></div></div>
     <div class="negBar"><i style="left:${clamp((N.B / P - 0.8) / 0.25 * 100, 0, 100)}%" class="b"></i><i style="left:${clamp((N.F / P - 0.8) / 0.25 * 100, 0, 100)}%" class="o${known ? '' : ' unk'}"></i></div>
@@ -6309,7 +6339,9 @@ function closeDeal(o, by, D) {
   by.st = 'done'; o.st.sold = true; o.st.dealPrice = D; G.deals++; G.dealAmt += D; G.cnt.deal++; refreshSign(o); syncBuyers();
   // 服務費 6% → 業績分成 80% → 其中 72% 是業務實際拿到的錢
   const fee = Math.round(D * 10000 * 0.06), share = Math.round(fee * 0.8), bonus = Math.round(share * 0.72 / 100) * 100;
-  addMoney(bonus); addXP(220); sfx('sign'); emit('deal'); closeModalSoft();
+  addMoney(bonus); addXP(220); sfx('sign'); emit('deal'); closeModalSoft(); G.perf = (G.perf || 0) + fee;
+  // 客戶經營：成交的買方介紹想賣房的親友
+  if (G.skills.referral && Math.random() < G.skills.referral * 0.2 && G.call == null) { const c = activeOwners().filter(x => !x.st.signed && !x.st.lost && !x.st.urgent); if (c.length) { const r = pk(c, Math.random); r.st.referral = true; G.call = r.id; setTimeout(() => { toast(`${by.name}說要介紹想賣房的親友給你，等一下會打電話來`, 'phone'); if (MODE === 'city') setTimeout(phoneCall, 4000); }, 2500); } }
   choice('成交！', `<div class="bigwin">成交</div><p>${addrOf(BLD[o.bid])}以 <b>${fmtWan(D)}</b> 成交（開價 ${fmtWan(o.price)}）。</p><p class="quote">${by.name}：「謝謝你，我們終於有自己的家了！」</p><ul class="stats two"><li><span>公司服務費（6%）</span><b>NT$${fmt(fee)}</b></li><li><span>業績分成（80%）</span><b>NT$${fmt(share)}</b></li><li><span>實際入帳（分成的 72%）</span><b>NT$${fmt(bonus)}</b></li><li><span>本月成交</span><b>${G.deals} 件</b></li></ul>`, [{ label: '太好了', fn: afterAction }], 'win wide');
 }
 
@@ -6380,6 +6412,7 @@ function scorePhoto(b) {
       const h = rc.intersectObjects(scene.children, true).find(i => i.object.isMesh && i.object.visible !== false); if (h && h.distance < L - 2.2) hitN++; }
     PHOTO_RC.__occ = n + ':' + hitN;
     if (n && hitN) { const f = hitN / n; score -= Math.round(36 * f); tips.push('電線桿、號誌或路樹擋到房子了：換個位置再拍。'); } }
+  if (score > 0) score += (G.skills.photo || 0) * 5;
   score = Math.round(clamp(score, 0, 100));
   if (!tips.length) tips.push('構圖完整、光線充足，這張可以直接放上網！');
   return { score, tips: tips.slice(0, 3), dbg: { inside: +inside.toFixed(2), fill: +fill.toFixed(2), off: +off.toFixed(2), face: +face.toFixed(2), tilt: +tilt.toFixed(2), blk, occ: PHOTO_RC && PHOTO_RC.__occ } };
@@ -6414,7 +6447,7 @@ function careerTick(dt) {
   if (!G || !G.cnt) return;
   if (MODE === 'city' && !PAUSE) { updateDM(); updateRace(dt); }
   updateBuyers(loop.wt || 0);
-  careerTick.u = (careerTick.u || 0) - dt; if (careerTick.u <= 0) { careerTick.u = 1; syncUrgent(); }
+  careerTick.u = (careerTick.u || 0) - dt; if (careerTick.u <= 0) { careerTick.u = 1; syncUrgent(); missionCheck(); }
   for (const k in URGENT_MESH) URGENT_MESH[k].visible = MODE === 'city' || (MODE === 'talk' && !(BT && BT.o && BT.o.id === +k));
   if (DM_G) DM_G.visible = MODE === 'city' || MODE === 'talk';
   if (PHOTO && (MODE !== 'city' || PLAYER.ride)) endPhoto();
@@ -6717,10 +6750,21 @@ function closeCheat() { if (!CHEAT_EL) return; CHEAT_EL.remove(); CHEAT_EL = nul
 // 手機：連點時鐘 5 下打開密技
 { let taps = []; const clk = $('clk'); if (clk) clk.parentElement.addEventListener('click', () => { const t = performance.now(); taps = taps.filter(x => t - x < 2500); taps.push(t); if (taps.length >= 5) { taps = []; openCheat(); } }); }
 
-// ---------- 藍色敞篷車 ----------
-let SCOOTER_MESH = null, CAR_MESH = null, PARKED_CAR = null;
-function makeConvertible(withDriver) {
-  const g = new THREE.Group(), P_ = [], B = '#1f5fd8', DK = '#163f94';
+// ---------- 主角的交通工具：機車、重機、小車、轎車、跑車（密技：藍色敞篷車） ----------
+// speed：極速（公尺/秒）；acc：加速倍率；box：碰撞半寬／半長；hit：靜態碰撞取樣點與半徑；front：車燈位置
+const VEHS = {
+  scooter: { name: '機車', price: 0, car: false, speed: 15, acc: 1, box: [0.31, 0.84], hit: [[-0.56, 0, 0.56], 0.32], cam: 0, speedo: 60, front: [1.2, 0.6], desc: '公司配發的代步機車，靈活好停。' },
+  heavy: { name: '重型機車', price: 180000, car: false, speed: 24, acc: 1.7, box: [0.36, 1.05], hit: [[-0.7, 0, 0.7], 0.34], cam: 0.6, speedo: 120, front: [1.25, 0.85], desc: '大排氣量重機，加速猛、極速高，一樣能鑽車縫。' },
+  mini: { name: '小車', price: 450000, car: true, speed: 19, acc: 1.5, box: [0.78, 1.75], hit: [[-1.0, 0, 1.0], 0.78], cam: 1.4, speedo: 120, front: [0.8, 1.85], desc: '小巧的國民車，下雨不用穿雨衣，巷子也進得去。' },
+  sedan: { name: '普通轎車', price: 900000, car: true, speed: 24, acc: 1.9, box: [0.95, 2.22], hit: [[-1.6, -0.8, 0, 0.8, 1.6], 0.9], cam: 2.5, speedo: 160, front: [0.75, 2.3], desc: '舒適穩重的房仲標配，載客戶看屋最體面。' },
+  sports: { name: '跑車', price: 3500000, car: true, speed: 33, acc: 2.7, box: [0.95, 2.25], hit: [[-1.6, -0.8, 0, 0.8, 1.6], 0.9], cam: 2.5, speedo: 200, front: [0.78, 2.35], desc: '紅色敞篷跑車，全城最快。頂尖業務的象徵。' },
+  cheat: { name: '藍色敞篷車', price: 0, car: true, speed: 36, acc: 2.4, box: [0.95, 2.25], hit: [[-1.6, -0.8, 0, 0.8, 1.6], 0.9], cam: 2.5, speedo: 140, front: [0.78, 2.35], desc: '' },
+};
+const VEH_ORDER = ['scooter', 'heavy', 'mini', 'sedan', 'sports'];
+const curVeh = () => G && G.cheat && G.cheat.car ? 'cheat' : (G && G.veh) || 'scooter';
+const vehSpec = () => VEHS[curVeh()] || VEHS.scooter;
+function makeConvertible(withDriver, B = '#1f5fd8', DK = '#163f94') {
+  const g = new THREE.Group(), P_ = [];
   g.rotation.order = 'YXZ';
   P_.push(cbox(1.9, 0.55, 4.5, 0, 0.6, 0, B));                         // 車身
   P_.push(cbox(1.86, 0.2, 1.5, 0, 0.95, 1.4, B)); P_.push(cbox(1.86, 0.2, 1.2, 0, 0.95, -1.6, B));   // 引擎蓋、後車廂
@@ -6742,25 +6786,176 @@ function makeConvertible(withDriver) {
   }
   return g;
 }
-function applyCarCheat() {
-  if (!PLAYER.mesh) return;
-  const on = !!(G && G.cheat && G.cheat.car);
-  if (!SCOOTER_MESH) SCOOTER_MESH = PLAYER.mesh;
-  if (on && !CAR_MESH) { CAR_MESH = makeConvertible(true); PARKED_CAR = makeConvertible(false); PARKED_CAR.position.y = -0.18; PARKED.add(PARKED_CAR); }
-  const want = on ? CAR_MESH : SCOOTER_MESH;
-  PLAYER.car = on; PBOX.hw = on ? 0.95 : 0.31; PBOX.hl = on ? 2.25 : 0.84;
-  if (PARKED_CAR) { PARKED_CAR.visible = on; PARKED.children[0].visible = !on; }
-  if (PLAYER.mesh === want) return;
-  const old = PLAYER.mesh, kids = old.children.filter(c => c === PLAYER.light || c === PLAYER.light.target);
-  kids.forEach(c => { old.remove(c); want.add(c); });
-  // 車燈：敞篷車放在車頭保險桿上方（機車維持原位），燈光才會從車頭照出去，不會照亮座艙
-  if (on) { PLAYER.light.position.set(0, 0.78, 2.35); PLAYER.light.target.position.set(0, 0, 14); PLAYER.light.angle = 0.62; }
-  else { PLAYER.light.position.set(0, 1.2, 0.6); PLAYER.light.target.position.set(0, 0, 12); PLAYER.light.angle = 0.5; }
-  want.position.copy(old.position); want.rotation.copy(old.rotation); want.visible = old.visible;
-  scene.remove(old); scene.add(want); PLAYER.mesh = want; if (typeof syncRideMeshes === 'function' && (MODE === 'city' || MODE === 'talk')) syncRideMeshes();
+// 重機（主角穿西裝騎）
+function makePlayerHeavy(withRider) {
+  const g = new THREE.Group(), P_ = [], col = '#c8161d'; g.rotation.order = 'YXZ';
+  P_.push(cbox(0.38, 0.3, 0.62, 0, 0.98, 0.18, col)); P_.push(cbox(0.42, 0.36, 0.62, 0, 0.62, 0.05, '#3a3a3e'));
+  P_.push(cbox(0.32, 0.12, 0.72, 0, 1.06, -0.45, '#151515')); P_.push(cbox(0.3, 0.2, 0.5, 0, 0.98, -0.95, col));
+  P_.push(cbox(0.5, 0.48, 0.28, 0, 1.18, 0.66, col)); P_.push(cbox(0.42, 0.22, 0.04, 0, 1.48, 0.76, '#5a6a7a'));
+  P_.push(cbox(0.06, 0.6, 0.06, -0.12, 0.62, 0.78, '#bbb')); P_.push(cbox(0.06, 0.6, 0.06, 0.12, 0.62, 0.78, '#bbb'));
+  P_.push(cbox(0.1, 0.1, 0.7, 0.26, 0.5, -0.6, '#c8c8c8'));
+  P_.push(cbox(0.13, 0.68, 0.68, 0, 0.34, 0.86, '#121212')); P_.push(cbox(0.14, 0.3, 0.3, 0, 0.34, 0.86, '#9aa0a8'));
+  P_.push(cbox(0.15, 0.7, 0.7, 0, 0.35, -0.9, '#121212')); P_.push(cbox(0.16, 0.3, 0.3, 0, 0.35, -0.9, '#9aa0a8'));
+  const b = new THREE.Mesh(mergeGeometries(P_), MAT.col); b.castShadow = true; g.add(b);
+  const hl = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.14, 0.05), MAT.headlight); hl.position.set(0, 1.12, 0.81); g.add(hl);
+  const tl = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.08, 0.04), MAT.taillight); tl.position.set(0, 1.0, -1.21); g.add(tl); g.userData.tail = tl;
+  const pon = withRider ? makePoncho('#114f9c') : new THREE.Group(); g.add(pon); g.userData.poncho = pon; pon.visible = false;
+  if (withRider) { const p = makePerson(suitUp({})), u = p.userData; p.position.set(0, 0.62, -0.2); p.rotation.x = 0.25; u.legL.rotation.x = u.legR.rotation.x = -1.2; u.armL.rotation.x = u.armR.rotation.x = -1.25; g.add(p); g.userData.rider = p; }
+  return g;
 }
+// 小車（國民車）
+function makeMiniCar() {
+  const g = new THREE.Group(), P_ = [], col = '#f2c94c', dk = '#c79a1c'; g.rotation.order = 'YXZ';
+  P_.push(cbox(1.56, 0.62, 3.4, 0, 0.6, 0, col)); P_.push(cbox(1.46, 0.66, 2.1, 0, 1.24, -0.3, col));
+  P_.push(cbox(1.48, 0.46, 1.9, 0, 1.26, -0.3, '#1c2430')); P_.push(cbox(1.3, 0.46, 0.05, 0, 1.22, 0.76, '#2a3646')); P_.push(cbox(1.3, 0.4, 0.05, 0, 1.22, -1.36, '#2a3646'));
+  P_.push(cbox(1.58, 0.14, 0.12, 0, 0.36, 1.7, '#2a2a2a')); P_.push(cbox(1.58, 0.14, 0.12, 0, 0.36, -1.7, '#2a2a2a')); P_.push(cbox(1.58, 0.04, 3.42, 0, 0.9, 0, dk));
+  for (const [x, z] of [[-0.72, 1.08], [0.72, 1.08], [-0.72, -1.08], [0.72, -1.08]]) wheelGeos(P_, x, z, 0.3, 0.2);
+  const b = new THREE.Mesh(mergeGeometries(P_), MAT.col); b.castShadow = true; g.add(b);
+  for (const sx of [-1, 1]) { const hl = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.18, 0.06), MAT.headlight); hl.position.set(sx * 0.52, 0.72, 1.72); g.add(hl); }
+  const tl = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.12, 0.05), MAT.taillight); tl.position.set(0, 0.76, -1.72); g.add(tl); g.userData.tail = tl;
+  g.userData.poncho = new THREE.Group(); g.add(g.userData.poncho); return g;
+}
+function makeSedanCar() {
+  const { g } = makeVehMesh('sedan', '#2b2f3a'); g.rotation.order = 'YXZ';
+  g.userData.poncho = new THREE.Group(); g.add(g.userData.poncho); return g;
+}
+const VEH_MESH = {}, VEH_PARKED = {};
+function vehMeshes(k) {
+  if (VEH_MESH[k]) return [VEH_MESH[k], VEH_PARKED[k]];
+  let m, pm;
+  if (k === 'scooter') { m = SCOOTER_MESH0 || PLAYER.mesh; pm = PARKED.children[0]; }
+  else if (k === 'heavy') { m = makePlayerHeavy(true); pm = makePlayerHeavy(false); }
+  else if (k === 'mini') { m = makeMiniCar(); pm = makeMiniCar(); }
+  else if (k === 'sedan') { m = makeSedanCar(); pm = makeSedanCar(); }
+  else if (k === 'sports') { m = makeConvertible(true, '#d0191f', '#8e0f13'); pm = makeConvertible(false, '#d0191f', '#8e0f13'); }
+  else { m = makeConvertible(true); pm = makeConvertible(false); }
+  if (k !== 'scooter') { pm.position.y = -0.18; PARKED.add(pm); }
+  VEH_MESH[k] = m; VEH_PARKED[k] = pm; return [m, pm];
+}
+let SCOOTER_MESH0 = null;
+function applyVehicle() {
+  if (!PLAYER.mesh) return;
+  if (!SCOOTER_MESH0) SCOOTER_MESH0 = PLAYER.mesh;
+  vehMeshes('scooter'); const k = curVeh(), S = vehSpec(), [want, park] = vehMeshes(k);
+  PLAYER.car = S.car; PLAYER.vk = k; PBOX.hw = S.box[0]; PBOX.hl = S.box[1];
+  for (const kk in VEH_PARKED) if (VEH_PARKED[kk]) VEH_PARKED[kk].visible = kk === k;
+  if (PLAYER.mesh !== want) {
+    const old = PLAYER.mesh, kids = old.children.filter(c => c === PLAYER.light || c === PLAYER.light.target);
+    kids.forEach(c => { old.remove(c); want.add(c); });
+    want.position.copy(old.position); want.rotation.copy(old.rotation); want.visible = old.visible;
+    scene.remove(old); scene.add(want); PLAYER.mesh = want;
+  }
+  // 車燈放在車頭（機車維持原位），燈光才會從車頭照出去
+  PLAYER.light.position.set(0, S.front[1] < 1 ? 1.2 : 0.78, S.front[1] < 1 ? 0.6 : S.front[1]); PLAYER.light.target.position.set(0, 0, 14); PLAYER.light.angle = S.car ? 0.62 : 0.5;
+  if (typeof syncRideMeshes === 'function' && (MODE === 'city' || MODE === 'talk')) syncRideMeshes();
+}
+function applyCarCheat() { applyVehicle(); }
 // 每一幀：無限體力
 function cheatTick() { if (G && G.cheat && G.cheat.super && G.ap < apMax()) { G.ap = apMax(); updateHUD(); } }
+
+// ===================== 汽機車行：買重機、小車、轎車、跑車 =====================
+const DEALERS = [];
+function pickDealers() {
+  const ok = STORES.filter(b => !b.alley && ['avenue', 'road'].includes(ROAD_CLASS[b.street]) && b.w >= 9);
+  const dO = b => Math.hypot(b.fx - OFFICE.fx, b.fz - OFFICE.fz);
+  const a = ok.filter(b => dO(b) >= 150).sort((x, y) => dO(x) - dO(y))[0]; if (!a) return;
+  const b2 = ok.filter(b => b !== a && Math.hypot(b.fx, b.fz) < 850).sort((x, y) => Math.hypot(y.fx - a.fx, y.fz - a.fz) - Math.hypot(x.fx - a.fx, x.fz - a.fz))[0];
+  for (const d of [a, b2]) { if (!d) continue; d.dealer = true; DEALERS.push(d); STORES.splice(STORES.indexOf(d), 1); }
+  // 招牌：紅底白字＋車子圖示
+  const c = cvs(1024, 160), x = c.getContext('2d'); x.fillStyle = '#b3121a'; x.fillRect(0, 0, 1024, 160); x.fillStyle = '#ffcf3a'; x.fillRect(0, 140, 1024, 20);
+  x.fillStyle = '#fff'; x.beginPath(); x.moveTo(60, 104); x.lineTo(80, 70); x.lineTo(150, 62); x.lineTo(185, 82); x.lineTo(215, 86); x.lineTo(222, 108); x.lineTo(60, 108); x.fill();
+  x.fillStyle = '#b3121a'; for (const cx of [95, 190]) { x.beginPath(); x.arc(cx, 110, 15, 0, 7); x.fill(); } x.fillStyle = '#fff'; for (const cx of [95, 190]) { x.beginPath(); x.arc(cx, 110, 9, 0, 7); x.fill(); }
+  x.font = `900 92px ${FONT_SANS}`; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('飛馳汽機車行', 620, 78);
+  const tex = texFrom(c, false), mat = new THREE.MeshStandardMaterial({ map: tex, emissiveMap: tex, emissive: 0xffffff, emissiveIntensity: 0.55, roughness: 0.5 });
+  for (const b of DEALERS) {
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(Math.min(b.w - 0.4, 8.4), 1.3), mat); m.position.set(b.fx + b.n.x * 0.14, b.y + 4.98, b.fz + b.n.z * 0.14); m.rotation.y = b.ry; scene.add(m);
+    const st = new THREE.Mesh(new THREE.PlaneGeometry(b.w - 0.3, 0.35), new THREE.MeshBasicMaterial({ color: '#b3121a' })); st.position.set(b.fx + b.n.x * 0.05, b.y + 3.9, b.fz + b.n.z * 0.05); st.rotation.y = b.ry; scene.add(st);
+  }
+}
+const kmh = k => Math.round(VEHS[k].speed * 3.6 / 5) * 5;
+function openDealer(dealer) {
+  sfx('door'); let ask = '';
+  const draw = () => {
+    const rows = VEH_ORDER.map(k => {
+      const V = VEHS[k], own = G.garage.includes(k), cur = curVeh() === k, stars = '★'.repeat(Math.round(V.acc * 1.8)).slice(0, 5);
+      const btn = own ? `<button class="btn sm" data-u="${k}" ${cur ? 'disabled' : ''}>${cur ? '使用中' : '換這台'}</button>` : `<button class="btn sm${ask === k ? ' warn' : ''}" data-b="${k}" ${G.money < V.price ? 'disabled' : ''}>${ask === k ? '確定購買？' : 'NT$' + fmt(V.price)}</button>`;
+      return `<li class="${cur ? 'cur' : ''}"><div class="shT"><b>${V.name}</b><span>${own ? '已擁有' : ''}</span></div><p>${V.desc}<br><small>極速約 ${kmh(k)} km/h · 加速 ${stars}${V.car ? ' · 汽車：下雨不用穿雨衣，車身較寬' : ' · 兩輪：能鑽車縫'}</small></p>${btn}</li>`;
+    }).join('');
+    openModal(`<h3>飛馳汽機車行 <small>錢包 NT$${fmt(G.money)}</small></h3><p class="dim">業績做起來，換台好車跑業務！買過的車可以隨時在背包的「我的車庫」切換。</p><ul class="shop">${rows}</ul><div class="mbtns"><button class="btn ghost" id="dlBack">離開</button></div>`, 'wide');
+    $('dlBack').onclick = () => { sfx('cancel'); closeModal(); };
+    $('mbox').querySelectorAll('[data-u]').forEach(b => b.onclick = () => { switchVehicle(b.dataset.u, dealer); draw(); });
+    $('mbox').querySelectorAll('[data-b]').forEach(b => b.onclick = () => {
+      const k = b.dataset.b, V = VEHS[k]; if (G.money < V.price) return sfx('deny');
+      if (ask !== k) { ask = k; sfx('click'); return draw(); }
+      ask = ''; G.money -= V.price; G.garage.push(k); renderLv(); sfx('coin'); G.cnt.buyVeh = (G.cnt.buyVeh || 0) + 1; checkAch();
+      switchVehicle(k, dealer); toast(`恭喜交車！${V.name}已經停在車行門口`, 'star'); draw();
+    });
+  };
+  draw();
+}
+// 換車：騎著的時候直接換；走路時新車停到車行門口（或原本停車的位置）
+function switchVehicle(k, dealer) {
+  if (!G.garage.includes(k)) return;
+  if (PLAYER.ride && Math.abs(PLAYER.v) > 1) { toast('先停下來再換車'); sfx('deny'); return; }
+  if (G.cheat && G.cheat.car) G.cheat.car = false;
+  G.veh = k; sfx('confirm');
+  if (!PLAYER.ride && dealer && MODE === 'city') { const b = dealer; PARK.h = Math.atan2(b.t.x, b.t.z); PARK.x = b.fx + b.n.x * (SW + 1.6); PARK.z = b.fz + b.n.z * (SW + 1.6); }
+  applyVehicle(); updateHUD();
+  if (MODE === 'city' && PLAYER.ride) unstickPlayer();
+}
+function garageHtml() {
+  return `<div class="garage"><b>我的車庫</b>${G.garage.map(k => `<button class="btn sm ${curVeh() === k ? '' : 'ghost'}" data-g="${k}" ${curVeh() === k ? 'disabled' : ''}>${VEHS[k].name}${curVeh() === k ? '（使用中）' : ''}</button>`).join('')}${G.garage.length < 2 ? '<span class="dim">地圖上的「車」是汽機車行，可以買重機和汽車。</span>' : ''}</div>`;
+}
+
+// ===================== 挑戰任務：簽滿 6 件委託後開放 =====================
+const fullCards = () => OWN.filter(o => o.st.perKnown && o.st.jobK && o.st.hobK && o.st.tabK).length;
+// rel：接下任務之後才開始累計；沒有 rel 的是本月累計
+const MISSIONS = [
+  { k: 'million', name: '百萬經紀人', desc: '本月業績（成交服務費）累計達 NT$1,000,000', goal: 1000000, money: true, prog: g => g.perf || 0, reward: 200000, title: '百萬經紀人' },
+  { k: 'deal3', name: '成交達人', desc: '接下任務後再成交 3 間房子', goal: 3, rel: true, prog: g => g.deals || 0, reward: 100000 },
+  { k: 'comm10', name: '委託王', desc: '本月累計簽下 10 件委託', goal: 10, prog: g => g.comm, reward: 50000 },
+  { k: 'comm15', name: '開發之神', desc: '本月累計簽下 15 件委託', goal: 15, prog: g => g.comm, reward: 150000, title: '開發之神' },
+  { k: 'urgent3', name: '急件救火隊長', desc: '接下任務後再簽下 3 件限時急件', goal: 3, rel: true, prog: g => g.cnt.urgentWin || 0, reward: 60000 },
+  { k: 'race3', name: '搶件之王', desc: '接下任務後再贏 3 場搶件賽', goal: 3, rel: true, prog: g => g.cnt.raceWin || 0, reward: 60000 },
+  { k: 'card5', name: '情報大師', desc: '接下任務後再集滿 5 位屋主的四張情報卡', goal: 5, rel: true, prog: () => fullCards(), reward: 40000 },
+  { k: 'dm5', name: '社區之星', desc: '接下任務後再發完 5 條派報路線', goal: 5, rel: true, prog: g => g.cnt.dmDone || 0, reward: 40000 },
+  { k: 'photo3', name: '金牌攝影師', desc: '接下任務後再拍出 3 張五星屋況照', goal: 3, rel: true, prog: g => g.cnt.photo5 || 0, reward: 40000 },
+  { k: 'safe7', name: '模範騎士', desc: '連續 7 天一次紅燈都不闖（下班時結算）', goal: 7, prog: g => g.safeStreak || 0, reward: 50000 },
+  { k: 'sedan', name: '有車階級', desc: '在汽機車行買下自己的汽車（小車、轎車或跑車）', goal: 1, prog: g => (g.garage || []).some(k => VEHS[k] && VEHS[k].car) ? 1 : 0, reward: 30000 },
+  { k: 'rich', name: '千萬身家', desc: '存款達到 NT$10,000,000', goal: 10000000, money: true, prog: g => g.money, reward: 0, title: '千萬業務' },
+];
+const MAX_ACTIVE = 3;
+function missionsUnlocked() { return !!G && (G.goalDay || G.comm >= 6); }
+function ensureMissions() { if (!G.missions) G.missions = { active: [], base: {}, done: {} }; return G.missions; }
+function missionProg(m) { const M = ensureMissions(), v = m.prog(G); return Math.max(0, m.rel ? v - (M.base[m.k] || 0) : v); }
+const mFmt = (m, v) => m.money ? 'NT$' + fmt(Math.floor(v)) : String(Math.floor(v));
+function updateTaskBtn() { const b = $('bTask'); if (!b) return; const on = missionsUnlocked() && (MODE === 'city' || MODE === 'office'); b.hidden = !on; if (on) { const n = ensureMissions().active.length; $('bTaskN').textContent = n ? `${n}/${MAX_ACTIVE}` : ''; } }
+function openMissions() {
+  if (!G || !missionsUnlocked()) return; sfx('click');
+  const M = ensureMissions(), left = 30 - G.day;
+  const rows = MISSIONS.map(m => {
+    const done = M.done[m.k], act = M.active.includes(m.k), v = missionProg(m), pct = Math.min(100, v / m.goal * 100);
+    const btn = done ? `<button class="btn sm" disabled>已完成（第 ${done} 天）</button>` : act ? `<button class="btn sm ghost" data-q="${m.k}">放棄</button>` : `<button class="btn sm" data-a="${m.k}" ${M.active.length >= MAX_ACTIVE ? 'disabled' : ''}>接下任務</button>`;
+    return `<li class="${act ? 'act' : ''}${done ? ' done' : ''}"><div class="shT"><b>${m.name}</b><span>${m.reward ? '獎金 NT$' + fmt(m.reward) : ''}${m.title ? `${m.reward ? ' · ' : ''}稱號「${m.title}」` : ''}</span></div><p>${m.desc}</p>${act || done ? `<div class="mbar"><i style="width:${done ? 100 : pct}%"></i></div><small>${done ? '達成！' : `${mFmt(m, v)} / ${mFmt(m, m.goal)}`}</small>` : ''}${btn}</li>`;
+  }).join('');
+  openModal(`<h3>挑戰任務 <small>第 ${G.day} 天 · 本月還剩 ${left} 天</small></h3><p class="dim">恭喜達成 6 件委託！接下來挑戰更高的目標。最多同時接 ${MAX_ACTIVE} 個任務，月底（第 30 天）前完成就能領獎金。${M.titles && M.titles.length ? `<br>你的稱號：${M.titles.map(t => `「${t}」`).join('')}` : ''}</p><ul class="shop missions">${rows}</ul><div class="mbtns"><button class="btn ghost" id="msBack">關閉</button></div>`, 'wide');
+  $('msBack').onclick = () => { sfx('cancel'); closeModal(); };
+  $('mbox').querySelectorAll('[data-a]').forEach(b => b.onclick = () => { const m = MISSIONS.find(x => x.k === b.dataset.a); if (M.active.length >= MAX_ACTIVE) return; M.active.push(m.k); M.base[m.k] = m.prog(G); sfx('quest'); toast(`接下任務：${m.name}`, 'quest'); missionCheck(); updateTaskBtn(); openMissions(); });
+  $('mbox').querySelectorAll('[data-q]').forEach(b => b.onclick = () => { M.active = M.active.filter(k => k !== b.dataset.q); sfx('cancel'); updateTaskBtn(); openMissions(); });
+}
+function missionCheck() {
+  if (!G || !G.missions) return;
+  const M = G.missions;
+  for (const k of M.active.slice()) {
+    const m = MISSIONS.find(x => x.k === k); if (!m || missionProg(m) < m.goal) continue;
+    M.active = M.active.filter(x => x !== k); M.done[k] = G.day;
+    if (m.reward) addMoney(m.reward); addXP(150);
+    if (m.title) { M.titles = M.titles || []; M.titles.push(m.title); }
+    sfx('win'); toast(`挑戰任務完成：${m.name}！${m.reward ? '獎金 NT$' + fmt(m.reward) : ''}${m.title ? `，獲得稱號「${m.title}」` : ''}`, 'star');
+    updateTaskBtn();
+  }
+}
+$('bTask').onclick = () => openMissions();
 
 // ===================== 排行榜：誰用最少天數簽到 6 件委託 =====================
 // 共用 2D 版的 Firebase 專案（集合 leaderboard，規則只允許新增、欄位 name/days/signed/ts）
@@ -7000,10 +7195,38 @@ async function openUserList() {
   shell('<p class="dim">讀取中……</p>');
   try {
     let rows = [], tok = '';
-    for (let i = 0; i < 10; i++) { const j = await cloudReq('GET', `/users?pageSize=300${tok ? '&pageToken=' + encodeURIComponent(tok) : ''}`); rows = rows.concat((j.documents || []).map(d => { const f = d.fields || {}, g = k => (f[k] || {}).stringValue || '', n = k => +((f[k] || {}).integerValue || 0); return { name: g('name'), email: g('email'), photo: g('photo'), first: n('firstAt'), last: n('lastAt') }; })); tok = j.nextPageToken; if (!tok) break; }
+    for (let i = 0; i < 10; i++) { const j = await cloudReq('GET', `/users?pageSize=300${tok ? '&pageToken=' + encodeURIComponent(tok) : ''}`); rows = rows.concat((j.documents || []).map(d => { const f = d.fields || {}, g = k => (f[k] || {}).stringValue || '', n = k => +((f[k] || {}).integerValue || 0); return { uid: (d.name || '').split('/').pop(), name: g('name'), email: g('email'), photo: g('photo'), first: n('firstAt'), last: n('lastAt'), consent: n('consentAt') }; })); tok = j.nextPageToken; if (!tok) break; }
     rows.sort((a, b) => b.last - a.last);
-    shell(`<p class="dim">共 ${rows.length} 個帳號，依最近登入排序。</p><ul class="ulist">${rows.map(r => `<li>${r.photo ? `<img src="${escA(r.photo)}" alt="" referrerpolicy="no-referrer">` : '<span class="gIco" aria-hidden="true">G</span>'}<div class="ui"><b>${escA(r.name || '（未提供名字）')}</b><small>${escA(r.email)}</small><small>首次綁定 ${fmtTime(r.first) || '—'}　最近登入 ${fmtTime(r.last) || '—'}</small></div></li>`).join('') || '<li>還沒有人綁定。</li>'}</ul>`);
+    shell(`<p class="dim">共 ${rows.length} 個帳號，依最近登入排序。</p>${rows.length ? '<div class="mbtns" style="justify-content:flex-start"><button class="btn sm" id="ulXls">輸出成 Excel</button></div>' : ''}<ul class="ulist">${rows.map(r => `<li>${r.photo ? `<img src="${escA(r.photo)}" alt="" referrerpolicy="no-referrer">` : '<span class="gIco" aria-hidden="true">G</span>'}<div class="ui"><b>${escA(r.name || '（未提供名字）')}</b><small>${escA(r.email)}</small><small>首次綁定 ${fmtTime(r.first) || '—'}　最近登入 ${fmtTime(r.last) || '—'}</small></div></li>`).join('') || '<li>還沒有人綁定。</li>'}</ul>`);
+    const x = $('ulXls'); if (x) x.onclick = () => exportUsers(rows, x);
   } catch (e) { shell(`<p>讀取失敗：${e.message === 'PERM' ? 'Firestore 規則還沒開放開發者讀取 users 集合' : escA(e.message)}</p>`); }
+}
+
+// 匯出 Excel：SheetJS 用到才載入；載不到就改存 CSV（Excel 也能直接開）
+const XLSX_URL = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+function loadXLSX() {
+  if (window.XLSX) return Promise.resolve(window.XLSX);
+  return loadXLSX.p || (loadXLSX.p = new Promise((ok, no) => { const sc = document.createElement('script'); sc.src = XLSX_URL; sc.onload = () => window.XLSX ? ok(window.XLSX) : no(new Error('XLSX')); sc.onerror = () => { loadXLSX.p = null; no(new Error('XLSX')); }; document.head.appendChild(sc); setTimeout(() => no(new Error('timeout')), 15000); }));
+}
+function exportUsers(rows, btn) {
+  sfx('click');
+  const d = new Date(), stamp = `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
+  const head = ['名字', 'Email', '首次綁定', '最近登入', '同意書同意時間', 'UID'];
+  const data = rows.map(r => [r.name, r.email, fmtTime(r.first) || '', fmtTime(r.last) || '', fmtTime(r.consent) || '', r.uid]);
+  const save = (blob, name) => { const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000); };
+  if (btn) { btn.disabled = true; btn.textContent = '產生中……'; }
+  const done = msg => { if (btn) { btn.disabled = false; btn.textContent = '輸出成 Excel'; } toast(msg); };
+  loadXLSX().then(X => {
+    const ws = X.utils.aoa_to_sheet([head, ...data]);
+    ws['!cols'] = [{ wch: 16 }, { wch: 30 }, { wch: 18 }, { wch: 18 }, { wch: 18 }, { wch: 30 }];
+    const wb = X.utils.book_new(); X.utils.book_append_sheet(wb, ws, '已綁定帳號');
+    X.writeFile(wb, `已綁定帳號_${stamp}.xlsx`);
+    done(`已輸出 ${rows.length} 筆帳號（Excel）`);
+  }).catch(() => {
+    const q = v => `"${String(v).replace(/"/g, '""')}"`;
+    save(new Blob(['\ufeff' + [head, ...data].map(r => r.map(q).join(',')).join('\r\n')], { type: 'text/csv;charset=utf-8' }), `已綁定帳號_${stamp}.csv`);
+    done(`Excel 元件載入失敗，改輸出 CSV（${rows.length} 筆，可用 Excel 開啟）`);
+  });
 }
 
 // ---------- 主畫面右上角的帳號鈕 ----------
