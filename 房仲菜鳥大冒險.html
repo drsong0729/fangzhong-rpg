@@ -548,8 +548,10 @@ body.photo #iWrap{display:none!important}
 .shop li.cur{border-left:4px solid var(--neon)}
 .skills .skHead{grid-column:1/-1;background:none;padding:6px 0 0;font-size:12px;letter-spacing:.2em;color:var(--neon);display:block;border:0}
 
-#bTask{background:linear-gradient(180deg,#ffcf3a,#e0a800);color:#1b1a17;font-weight:900;border-color:#ffcf3a}
-#bTask kbd{color:#5a4200;border-color:#5a4200}
+#btnRow #bTask{background:linear-gradient(180deg,#ffcf3a,#e0a800);color:#1b1a17;font-weight:900;border-color:#ffcf3a}
+#btnRow #bTask kbd{color:#5a4200;border-color:#5a4200}
+#btnRow #bTask.locked{background:#3a3d44;color:#8b8f98;border-color:#4a4e57;font-weight:700}
+#btnRow #bTask.locked kbd{color:#8b8f98;border-color:#5a5e67}
 #bTaskN{font-family:var(--f-num)}
 .missions li.act{border-left:4px solid var(--neon)}
 .missions li.done{opacity:.7}
@@ -1782,9 +1784,11 @@ function laneFor(cls, moto, k = 0) {
 }
 // ---------- 地形：幾座丘陵＋緩坡，道路、建築、車輛、行人都貼著地面 ----------
 const HILLS = [[360, -300, 34, 220], [-480, 430, 28, 210], [-200, -600, 22, 180], [640, 540, 24, 200], [-700, -140, 18, 160], [120, 760, 15, 150]];
+// 地形高度（建城時會被呼叫上百萬次，所以寫得精簡：離山丘超過 4.6 個標準差的貢獻不到 2 公釐，直接略過）
+const HILL_F = new Float64Array(HILLS.flatMap(([cx, cz, a, s]) => [cx, cz, a, 1 / (2 * s * s), (4.6 * s) * (4.6 * s)]));
 function H(x, z) {
   let h = 0;
-  for (const [cx, cz, a, s] of HILLS) { const dx = x - cx, dz = z - cz; h += a * Math.exp(-(dx * dx + dz * dz) / (2 * s * s)); }
+  for (let i = 0; i < HILL_F.length; i += 5) { const dx = x - HILL_F[i], dz = z - HILL_F[i + 1], d2 = dx * dx + dz * dz; if (d2 < HILL_F[i + 4]) h += HILL_F[i + 2] * Math.exp(-d2 * HILL_F[i + 3]); }
   return h + 2.2 * Math.sin(x / 190) * Math.cos(z / 230);
 }
 const gy = (x, z) => H(x, z);
@@ -2297,37 +2301,64 @@ function matOf(k) {
     || (k.startsWith('store') ? MAT.store[+k.slice(5)] : k.startsWith('cfac') ? MAT.fac[+k.slice(4)] : MAT.fac[+k.slice(3)]);
 }
 const FLAT_K = ['lines', 'pool', 'rtext', 'arrow', 'wait', 'pave', 'grass', 'mbox'];
-function buildChunk(c) {
-  const save = RC; RC = mulberry32(c.k * 7919 + 13); ACC = {};
-  for (const f of c.gens) { try { f(); } catch (err) { console.warn('chunk gen', err); } }
-  RC = save; c.meshes = [];
-  for (const k in ACC) {
-    const L = ACC[k]; let geo = null;
-    try { geo = L.length === 1 ? L[0] : mergeGeometries(L); } catch (err) { geo = null; }
-    if (L.length > 1) L.forEach(g => g.dispose());
-    if (!geo) { console.warn('merge fail', k); continue; }
-    const m = new THREE.Mesh(geo, matOf(k)), flat = FLAT_K.includes(k);
-    m.castShadow = !flat && !k.startsWith('sign') && !k.startsWith('store') && k !== 'lamp' && k !== 'plate' && !k.startsWith('speed') && !k.startsWith('tl');
-    m.receiveShadow = k !== 'lamp' && k !== 'pool' && !k.startsWith('tl');
-    if (k === 'pool') m.renderOrder = 2; if (k === 'mbox' || k === 'rtext' || k === 'arrow' || k === 'wait') m.renderOrder = 1;
-    m.matrixAutoUpdate = false; m.updateMatrix();
-    scene.add(m); c.meshes.push(m);
-  }
-  ACC = null;
+// 分區建造拆成小步驟：每個畫面只做幾毫秒，騎車經過新區域時就不會一次卡住
+function chunkJob(c) { return { c, rc: mulberry32(c.k * 7919 + 13), acc: {}, i: 0, keys: null, ki: 0, meshes: [] }; }
+function chunkMesh(k, L) {
+  let geo = null;
+  try { geo = L.length === 1 ? L[0] : mergeGeometries(L); } catch (err) { geo = null; }
+  if (L.length > 1) L.forEach(g => g.dispose());
+  if (!geo) { console.warn('merge fail', k); return null; }
+  const m = new THREE.Mesh(geo, matOf(k)), flat = FLAT_K.includes(k); m.name = k;
+  m.castShadow = !flat && !k.startsWith('sign') && !k.startsWith('store') && k !== 'lamp' && k !== 'plate' && !k.startsWith('speed') && !k.startsWith('tl');
+  m.receiveShadow = k !== 'lamp' && k !== 'pool' && !k.startsWith('tl');
+  if (k === 'pool') m.renderOrder = 2; if (k === 'mbox' || k === 'rtext' || k === 'arrow' || k === 'wait') m.renderOrder = 1;
+  m.userData.detail = DETAIL_K(k);
+  m.matrixAutoUpdate = false; m.updateMatrix();
+  return m;
 }
+// 遠處看不清楚的小東西（標線、路燈、號誌、招牌……）超過一定距離就不畫
+const DETAIL_K = k => ['lines', 'lamp', 'plate', 'pool', 'rtext', 'arrow', 'wait', 'mbox', 'signH', 'signV'].includes(k) || k.startsWith('tl') || k.startsWith('speed') || k.startsWith('store');
+function stepChunk(J, until) {
+  const T0 = performance.now();
+  if (J.i < J.c.gens.length) {
+    const sRC = RC, sACC = ACC; RC = J.rc; ACC = J.acc;
+    do { try { J.c.gens[J.i](); } catch (err) { console.warn('chunk gen', err); } J.i++; } while (J.i < J.c.gens.length && performance.now() < until);
+    RC = sRC; ACC = sACC;
+    STREAM.tot = (STREAM.tot || 0) + performance.now() - T0;
+    if (J.i < J.c.gens.length) return false;
+  }
+  if (!J.keys) J.keys = Object.keys(J.acc);
+  const T1 = performance.now();
+  while (J.ki < J.keys.length) { const k = J.keys[J.ki++], m = chunkMesh(k, J.acc[k]); if (m) J.meshes.push(m); if (performance.now() >= until) break; }
+  STREAM.tot = (STREAM.tot || 0) + performance.now() - T1;
+  if (J.ki < J.keys.length) return false;
+  J.c.meshes = J.meshes; J.c.job = null; for (const m of J.meshes) { m.visible = !m.userData.detail || J.c.dist < STREAM.detail; scene.add(m); }
+  STREAM.built++; return true;
+}
+function buildChunk(c) { const J = c.job || chunkJob(c); c.job = J; stepChunk(J, Infinity); }
+function cancelJob(c) { const J = c.job; if (!J) return; for (const k in J.acc) J.acc[k].forEach(g => g.dispose && g.dispose()); J.meshes.forEach(m => m.geometry.dispose()); c.job = null; }
 function dropChunk(c) { for (const m of c.meshes) { scene.remove(m); m.geometry.dispose(); } c.meshes = null; }
-const STREAM = { rad: 420, built: 0 };
+const STREAM = { rad: 420, built: 0, budget: 4, detail: 230, job: null, dt: 0 };
 function updateChunks(x, z, all) {
   const need = [];
   for (const c of CHUNKS.values()) {
-    const d = Math.hypot(c.cx - x, c.cz - z) - CH * 0.71;
+    const d = Math.hypot(c.cx - x, c.cz - z) - CH * 0.71; c.dist = d;
     if (d < STREAM.rad) { if (!c.meshes) need.push([d, c]); }
-    else if (c.meshes && d > STREAM.rad + 110) dropChunk(c);
+    else if (d > STREAM.rad + 110) { if (c.meshes) dropChunk(c); if (c.job) { cancelJob(c); if (STREAM.job && STREAM.job.c === c) STREAM.job = null; } }
   }
+  // 遠近細節：每 0.3 秒檢查一次
+  STREAM.dt -= 1;
+  if (STREAM.dt <= 0 || all) { STREAM.dt = 18; for (const c of CHUNKS.values()) if (c.meshes) { const on = c.dist < STREAM.detail; if (c.dOn !== on) { c.dOn = on; for (const m of c.meshes) if (m.userData.detail) m.visible = on; } } }
   if (!need.length) return 0;
   need.sort((a, b) => a[0] - b[0]);
-  let n = 0; const t0 = performance.now();
-  for (const [, c] of need) { if (!all && n >= 1 && performance.now() - t0 > 6) break; buildChunk(c); n++; STREAM.built++; }
+  let n = 0;
+  // 傳送後：附近的區塊一次蓋好（畫面在淡出時進行），遠的之後慢慢蓋
+  if (all) for (const [d, c] of need) if (d < 200) { if (STREAM.job && STREAM.job.c === c) STREAM.job = null; buildChunk(c); c.dOn = undefined; n++; }
+  const until = performance.now() + STREAM.budget;
+  while (performance.now() < until) {
+    if (!STREAM.job || STREAM.job.c.meshes) { const nx = need.find(([, c]) => !c.meshes); if (!nx) break; const c = nx[1]; STREAM.job = c.job || (c.job = chunkJob(c)); }
+    if (stepChunk(STREAM.job, until)) { n++; STREAM.job.c.dOn = undefined; STREAM.job = null; }
+  }
   return n;
 }
 
@@ -2342,7 +2373,34 @@ function buildTerrain(scene) {
   g.setAttribute('color', new THREE.BufferAttribute(col, 3)); g.computeVertexNormals();
   const t = MAT.road.map.clone(); t.needsUpdate = true; t.repeat.set(1, 1);
   MAT.terrain = new THREE.MeshStandardMaterial({ map: t, vertexColors: true, roughness: 0.95 });
-  const m = new THREE.Mesh(g, MAT.terrain); m.receiveShadow = true; scene.add(m); TERRAIN = m;
+  // 切成多塊：鏡頭看不到的部分整塊略過不畫
+  TERRAIN = splitGeo(g, 300).map(tg => { const m = new THREE.Mesh(tg, MAT.terrain); m.receiveShadow = true; m.matrixAutoUpdate = false; scene.add(m); return m; });
+  g.dispose();
+}
+// 把一個大網格依三角形中心切成 T×T 公尺的小塊（各自做視錐裁切）
+function splitGeo(g, T) {
+  if (!g) return [];
+  if (!g.index) { const n = g.attributes.position.count, a = []; for (let i = 0; i < n; i++) a.push(i); g.setIndex(a); }
+  const idx = g.index.array, pos = g.attributes.position.array, names = Object.keys(g.attributes), B = new Map();
+  for (let t = 0; t < idx.length; t += 3) {
+    const a = idx[t] * 3, b = idx[t + 1] * 3, c = idx[t + 2] * 3;
+    const k = Math.floor((pos[a] + pos[b] + pos[c]) / 3 / T) + ',' + Math.floor((pos[a + 2] + pos[b + 2] + pos[c + 2]) / 3 / T);
+    let L = B.get(k); if (!L) B.set(k, L = []); L.push(t);
+  }
+  const out = [];
+  for (const L of B.values()) {
+    const remap = new Map(), ni = [];
+    for (const t of L) for (let j = 0; j < 3; j++) { const v = idx[t + j]; let n = remap.get(v); if (n === undefined) { n = remap.size; remap.set(v, n); } ni.push(n); }
+    const ng = new THREE.BufferGeometry();
+    for (const nm of names) {
+      const at = g.attributes[nm], sz = at.itemSize, src = at.array, dst = new Float32Array(remap.size * sz);
+      for (const [o, n] of remap) for (let q = 0; q < sz; q++) dst[n * sz + q] = src[o * sz + q];
+      ng.setAttribute(nm, new THREE.BufferAttribute(dst, sz));
+    }
+    ng.setIndex(remap.size > 65535 ? new THREE.Uint32BufferAttribute(ni, 1) : new THREE.Uint16BufferAttribute(ni, 1));
+    ng.computeBoundingSphere(); out.push(ng);
+  }
+  return out;
 }
 let TERRAIN = null;
 
@@ -2841,8 +2899,10 @@ function initCityGfx(scene) {
     const far = faceRing(o, e => e.hw + SW + DEP + 16), gb = new GB();
     terrainPoly(gb, far, (x, z) => H(x, z) + 0.18, 0.5, 9, [o.curb]);
     const gc = new GB('#9a968c'); polyWalls(gc, o.curb, (x, z) => H(x, z) - 0.3, (x, z) => H(x, z) + 0.18, 2, 2);
-    const m = new THREE.Mesh(gb.geo(), MAT.pave); m.receiveShadow = true; scene.add(m);
-    const m2 = new THREE.Mesh(gc.geo(), MAT.col); m2.receiveShadow = true; scene.add(m2);
+    const g1 = gb.geo(), g2 = gc.geo();
+    for (const tg of splitGeo(g1, 240)) { const m = new THREE.Mesh(tg, MAT.pave); m.receiveShadow = true; m.matrixAutoUpdate = false; scene.add(m); }
+    for (const tg of splitGeo(g2, 240)) { const m = new THREE.Mesh(tg, MAT.col); m.receiveShadow = true; m.matrixAutoUpdate = false; scene.add(m); }
+    if (g1) g1.dispose(); if (g2) g2.dispose();
   }
 }
 
@@ -3749,14 +3809,16 @@ const POOLS = {
 // ===================== 基本場景 =====================
 const $ = id => document.getElementById(id);
 const canvas = $('gl');
-const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
+// 畫面都經過後製（EffectComposer）輸出，畫布本身的反鋸齒用不到，關掉省記憶體與頻寬
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, powerPreference: 'high-performance' });
+renderer.debug.checkShaderErrors = false;   // 不逐一讀取著色器編譯紀錄（那會讓瀏覽器同步等待編譯，造成卡頓）
 renderer.setPixelRatio(Math.min(devicePixelRatio, 1.75));
 renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.0;
 const camera = new THREE.PerspectiveCamera(62, 1, 0.1, 620);
 const scene = new THREE.Scene();
 const MAT = {};
-let SIGNS, PLATES, composer, renderPass, bloom;
+let SIGNS, PLATES, composer, renderPass, bloom, HEADRIG = null;
 
 function initMaterials() {
   const R = mulberry32(5);
@@ -3816,7 +3878,7 @@ function applyTime(h) {
   MAT.headlight.color.set('#fff8e0').multiplyScalar(1 + nf * 2);
   MAT.taillight.color.set('#ff2a2a').multiplyScalar(1 + nf * 1.5);
   if (bloom) bloom.strength = 0.1 + nf * 0.5;
-  if (PLAYER.light) PLAYER.light.intensity = nf * 60;
+  if (PLAYER.light) PLAYER.light.intensity = PLAYER.ride && (MODE === 'city' || MODE === 'talk') ? nf * 60 : 0;
   SALE_MATS.forEach(m => m.emissiveIntensity = 0.25 + nf * 0.9);
   if (OFFICE_SIGN) OFFICE_SIGN.material.emissiveIntensity = 0.4 + nf * 1.2;
 }
@@ -4110,7 +4172,7 @@ $('nameForm').addEventListener('submit', e => {
 // ===================== 辦公室流程 =====================
 function enterOffice(first) {
   G.midOffice = false;
-  MODE = 'office'; renderPass.scene = OFF.scene; show('hud', true); $('hud').classList.add('office'); playMusic('office');
+  MODE = 'office'; renderPass.scene = OFF.scene; show('hud', true); $('hud').classList.add('office'); playMusic('office'); updateTaskBtn();
   // 起始位置：長桌與椅子前方的空地，不會被卡住
   OP.x = -1.0; OP.z = 4.8; OP.h = Math.PI; OFF.me.position.set(OP.x, 0, OP.z); CAM.yaw = 0; CAM.pitch = 0.24;
   camera.position.set(OP.x, 7, OP.z + 9);
@@ -4144,7 +4206,7 @@ function morningLines() {
 
 // ===================== 城市流程 =====================
 function enterCity(fromLoad) {
-  MODE = 'city'; PAUSE = false; renderPass.scene = scene; show('hud', true); $('hud').classList.remove('office');
+  MODE = 'city'; PAUSE = false; renderPass.scene = scene; show('hud', true); $('hud').classList.remove('office'); updateTaskBtn();
   const b = OFFICE, ax = b.t.x, az = b.t.z;
   updateChunks(b.fx, b.fz, true);
   // 走出店門：人在騎樓，機車停在門口人行道邊（車頭順著右側車流方向）
@@ -4654,12 +4716,26 @@ const QUALITY = {
 };
 let COARSE = false; try { COARSE = matchMedia('(pointer: coarse)').matches; } catch (e) { }
 const SETTINGS = { quality: COARSE ? 'mid' : 'high' };
-try { const d = JSON.parse(localStorage.getItem(SET_KEY) || 'null'); if (d) { Object.assign(SETTINGS, { quality: d.quality || SETTINGS.quality, cops: d.cops !== false }); Object.assign(AU.vol, d.vol || {}); } } catch (e) { }
-function saveSettings() { try { localStorage.setItem(SET_KEY, JSON.stringify({ quality: SETTINGS.quality, cops: SETTINGS.cops !== false, vol: AU.vol })); } catch (e) { } }
+try { const d = JSON.parse(localStorage.getItem(SET_KEY) || 'null'); if (d) { Object.assign(SETTINGS, { quality: d.quality || SETTINGS.quality, cops: d.cops !== false, dyn: d.dyn !== false }); Object.assign(AU.vol, d.vol || {}); } } catch (e) { }
+function saveSettings() { try { localStorage.setItem(SET_KEY, JSON.stringify({ quality: SETTINGS.quality, cops: SETTINGS.cops !== false, dyn: SETTINGS.dyn !== false, vol: AU.vol })); } catch (e) { } }
+// ===================== 自動調整解析度：掉幀時暫時降低解析度，順了再慢慢調回來 =====================
+const DYN = { base: 1, scale: 1, min: 0.55, acc: 0, n: 0, good: 0, last: null, lock: 0 };
+function applyPR() { const pr = Math.max(0.5, DYN.base * DYN.scale); renderer.setPixelRatio(pr); if (composer) composer.setPixelRatio(pr); }
+function dynRes(raw) {
+  if (SETTINGS.dyn === false || PAUSE || document.hidden || raw > 0.25 || MODE === 'boot') { DYN.acc = 0; DYN.n = 0; return; }
+  DYN.acc += raw; DYN.n++; if (DYN.acc < 1.5) return;
+  const fps = DYN.n / DYN.acc, now = performance.now(); DYN.acc = 0; DYN.n = 0;
+  // 上一次降解析度卻沒有變順（例如螢幕或省電模式把畫面鎖在 30fps）→ 調回去，一陣子內不再降
+  if (DYN.last && fps < DYN.last.fps * 1.08) { DYN.scale = DYN.last.scale; DYN.last = null; DYN.lock = now + 45000; applyPR(); return; }
+  DYN.last = null;
+  if (fps < 45 && now > DYN.lock && DYN.scale > DYN.min) { DYN.last = { fps, scale: DYN.scale }; DYN.scale = Math.max(DYN.min, DYN.scale - (fps < 30 ? 0.2 : 0.1)); DYN.good = 0; applyPR(); }
+  else if (fps > 56 && DYN.scale < 1) { if (++DYN.good >= 3) { DYN.scale = Math.min(1, DYN.scale + 0.1); DYN.good = 0; applyPR(); } }
+  else DYN.good = 0;
+}
 function applyQuality() {
   const q = QUALITY[SETTINGS.quality] || QUALITY.high;
   const pr = SETTINGS.quality === 'low' ? Math.min(devicePixelRatio, 1) * q.pr : Math.min(devicePixelRatio, q.pr);
-  renderer.setPixelRatio(pr); if (composer) composer.setPixelRatio(pr);
+  DYN.base = pr; DYN.scale = 1; DYN.lock = 0; applyPR();
   sun.castShadow = q.shadow > 0;
   if (q.shadow && sun.shadow.mapSize.x !== q.shadow) { if (sun.shadow.map) { sun.shadow.map.dispose(); sun.shadow.map = null; } sun.shadow.mapSize.set(q.shadow, q.shadow); }
   const ext = SETTINGS.quality === 'ultra' ? 70 : 45; Object.assign(sun.shadow.camera, { left: -ext, right: ext, top: ext, bottom: -ext }); sun.shadow.camera.updateProjectionMatrix();
@@ -4668,8 +4744,9 @@ function applyQuality() {
   PEDS.forEach((p, i) => { const off = i >= q.peds; if (off && !p.off) p.m.visible = false; p.off = off; });
   let vk = 0;   // 警車、救護車、消防車與阿豪不受畫質數量限制
   VEH.forEach(v => { const off = v.hold ? true : (v.copV || v.emg || v.rival) ? false : vk++ >= q.veh; if (off) v.m.visible = false; v.off = off; });
-  camera.far = q.far + 120; scene.fog.far = q.far * 0.88; camera.updateProjectionMatrix();
-  STREAM.rad = q.far * 0.92 + 30;
+  // 霧的盡頭之後什麼都看不到：鏡頭最遠距離、區塊載入範圍都只到霧外一點點，少畫很多東西
+  scene.fog.far = q.far * 0.88; camera.far = scene.fog.far + 50; camera.updateProjectionMatrix(); skyMesh.scale.setScalar(camera.far * 0.9 / 480);
+  STREAM.rad = scene.fog.far + 15; STREAM.detail = { low: 160, mid: 200, high: 240, ultra: 300 }[SETTINGS.quality] || 240;
   if (composer) resize();
 }
 function openSettings(back) {
@@ -4680,7 +4757,9 @@ function openSettings(back) {
     <div class="setGroup"><div class="setLbl">音量</div>
       ${slider('vMas', '主音量', 'master')}${slider('vMus', '背景音樂', 'music')}${slider('vSfx', '音效', 'sfx')}${slider('vAmb', '引擎環境音', 'amb')}</div>
     <div class="setGroup"><div class="setLbl">遊戲畫質</div><div class="segs" role="group" aria-label="遊戲畫質">${qBtns}</div>
-      <p class="dim" id="qNote"></p></div>
+      <p class="dim" id="qNote"></p>
+      <div class="segs two" role="group" aria-label="自動調整解析度" style="margin-top:8px"><button class="seg dyn ${SETTINGS.dyn !== false ? 'on' : ''}" data-d="1" aria-pressed="${SETTINGS.dyn !== false}">自動調整解析度：開</button><button class="seg dyn ${SETTINGS.dyn === false ? 'on' : ''}" data-d="0" aria-pressed="${SETTINGS.dyn === false}">關</button></div>
+      <p class="dim">開啟時，畫面一卡就先暫時降低解析度，順了再自動調回來。</p></div>
     <div class="setGroup"><div class="setLbl">Google 帳號</div><div class="acctBox">${acctHtml()}</div></div>
     <div class="setGroup"><div class="setLbl">闖紅燈被警察追捕</div><div class="segs two" role="group" aria-label="闖紅燈被警察追捕"><button class="seg cop ${SETTINGS.cops !== false ? 'on' : ''}" data-c="1" aria-pressed="${SETTINGS.cops !== false}">開啟</button><button class="seg cop ${SETTINGS.cops === false ? 'on' : ''}" data-c="0" aria-pressed="${SETTINGS.cops === false}">關閉</button></div>
       <p class="dim" id="cNote"></p></div>
@@ -4688,10 +4767,11 @@ function openSettings(back) {
   const note = () => { const q = QUALITY[SETTINGS.quality]; $('qNote').textContent = `解析度 ×${q.pr}　陰影 ${q.shadow ? q.shadow + 'px' : '關閉'}　光暈 ${q.bloom ? '開' : '關'}　行人 ${q.peds}　車輛 ${q.veh}　視距 ${q.far} 公尺`; };
   note();
   wireAcct($('mbox'));
+  $('mbox').querySelectorAll('.seg.dyn').forEach(b => b.onclick = () => { SETTINGS.dyn = b.dataset.d === '1'; $('mbox').querySelectorAll('.seg.dyn').forEach(x => { x.classList.toggle('on', x === b); x.setAttribute('aria-pressed', x === b); }); sfx('confirm'); DYN.scale = 1; DYN.last = null; applyPR(); saveSettings(); });
   const cNote = () => { $('cNote').textContent = SETTINGS.cops !== false ? '闖紅燈被交通警察看到會追你，被攔下要繳罰單。' : '闖紅燈不會被警察追（「今天一次紅燈都不闖」的任務還是照算）。'; }; cNote();
   $('mbox').querySelectorAll('.seg.cop').forEach(b => b.onclick = () => { SETTINGS.cops = b.dataset.c === '1'; $('mbox').querySelectorAll('.seg.cop').forEach(x => { x.classList.toggle('on', x === b); x.setAttribute('aria-pressed', x === b); }); sfx('confirm'); if (!SETTINGS.cops && typeof COP !== 'undefined' && COP) copToTraffic(); saveSettings(); cNote(); });
   [['vMas', 'master'], ['vMus', 'music'], ['vSfx', 'sfx'], ['vAmb', 'amb']].forEach(([id, k]) => $(id).oninput = e => { AU.vol[k] = +e.target.value; $(id + 'o').textContent = Math.round(AU.vol[k] * 100); setVolumes(); if (k === 'sfx' || k === 'master') sfx('click'); saveSettings(); });
-  $('mbox').querySelectorAll('.seg[data-q]').forEach(b => b.onclick = () => { SETTINGS.quality = b.dataset.q; $('mbox').querySelectorAll('.seg[data-q]').forEach(x => { x.classList.toggle('on', x === b); x.setAttribute('aria-pressed', x === b); }); sfx('confirm'); applyQuality(); saveSettings(); note(); });
+  $('mbox').querySelectorAll('.seg[data-q]').forEach(b => b.onclick = () => { SETTINGS.quality = b.dataset.q; $('mbox').querySelectorAll('.seg[data-q]').forEach(x => { x.classList.toggle('on', x === b); x.setAttribute('aria-pressed', x === b); }); sfx('confirm'); applyQuality(); saveSettings(); note(); warmShaders(); });
   $('sBack').onclick = () => { sfx('cancel'); closeModalSoft(); back ? back() : (MODE === 'title' ? null : closeModal()); };
 }
 const fsEl = () => document.fullscreenElement || document.webkitFullscreenElement;
@@ -5268,7 +5348,7 @@ function updateTitle(dt) {
 }
 function loop() {
   requestAnimationFrame(loop); loop.n = (loop.n || 0) + 1;
-  const dt = Math.min(clock.getDelta(), 0.05);
+  const raw = clock.getDelta(), dt = Math.min(raw, 0.05); dynRes(raw);
   if (FROZEN && ui.modalOpen) { sirenUpdate(0, 'police'); engineUpdate(false, 0, 0); updateTouchUI(); composer.render(); return; }
   if (FROZEN) FROZEN = false;
   loop.wt = (loop.wt || 0) + dt; const t = loop.wt;
@@ -5283,7 +5363,35 @@ function loop() {
   updatePortal(t);
   updateTouchUI();
   if (window.__camOv) { const o = window.__camOv; camera.position.set(o[0], o[1], o[2]); camera.lookAt(o[3], o[4], o[5]); }
+  if (HEADRIG && PLAYER.mesh) { HEADRIG.position.copy(PLAYER.mesh.position); HEADRIG.quaternion.copy(PLAYER.mesh.quaternion); }
   composer.render(); photoAfterRender();
+}
+// ===================== 預先編譯著色器：避免騎車途中第一次看到某種物件時卡一下 =====================
+async function warmScene(S, lampsOn) {
+  const stage = new THREE.Group(); S.add(stage);
+  // 只在需要時才產生的物件（各種車、狗、雨絲……）先放進來一起編譯（three 的 compile 會走訪所有物件，不論是否顯示）
+  if (S === scene) {
+    try { VEH_ORDER.concat('cheat').forEach(k => vehMeshes(k).forEach(m => { if (m && !m.parent) { m.userData.__warm = true; stage.add(m); } })); } catch (e) { }
+    try { stage.add(makeDog()); } catch (e) { }
+    try { if (!RAIN) { setRain(true); setRain(false); } } catch (e) { }
+  }
+  const L = S === scene ? LAMPL : [], was = L.map(l => l.visible); L.forEach(l => l.visible = !!lampsOn);
+  // 晚上多了路燈（光源數量不同）就是不同的著色器，白天、晚上兩種都先編好
+
+  let p = null; const rt0 = renderer.getRenderTarget();
+  // 遊戲畫面是先畫進後製用的緩衝區（線性色彩、不做色調映射），編譯時也要用同樣的輸出設定，否則編到的是用不到的版本
+  if (composer) renderer.setRenderTarget(composer.renderTarget1);
+  try { p = renderer.compileAsync ? renderer.compileAsync(S, camera) : (renderer.compile(S, camera), null); } catch (e) { }
+  renderer.setRenderTarget(rt0);
+  L.forEach((l, i) => l.visible = was[i]);
+  stage.children.slice().forEach(m => { stage.remove(m); if (m.userData.__warm) delete m.userData.__warm; });
+  S.remove(stage);
+  if (p) await Promise.race([p, new Promise(r => setTimeout(r, 8000))]).catch(() => { });
+}
+async function warmShaders() {
+  const t0 = performance.now();
+  try { await warmScene(OFF.scene); for (const lamps of [false, true]) await warmScene(scene, lamps); } catch (e) { console.warn('warm', e); }
+  warmShaders.ms = Math.round(performance.now() - t0);
 }
 function resize() {
   const w = innerWidth, h = innerHeight; renderer.setSize(w, h, false); composer.setSize(w, h); camera.aspect = w / h; camera.fov = w < h ? 75 : 62; camera.updateProjectionMatrix();
@@ -5310,7 +5418,8 @@ async function boot() {
   { const c = cvs(320, 96), x = c.getContext('2d'); x.fillStyle = 'rgba(17,79,156,.95)'; x.fillRect(0, 0, 320, 72); x.beginPath(); x.moveTo(140, 72); x.lineTo(160, 94); x.lineTo(180, 72); x.fill(); x.fillStyle = '#fff'; x.font = `900 40px ${FONT_SANS}`; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('你的機車', 160, 38);
     PARK_TAG = new THREE.Sprite(new THREE.SpriteMaterial({ map: texFrom(c, false), depthTest: false, transparent: true })); PARK_TAG.scale.set(1.25, 0.375, 1); PARK_TAG.position.y = 2.45; PARK_TAG.renderOrder = 6; PARKED.add(PARK_TAG); }
   scene.add(PARKED);
-  const spot = new THREE.SpotLight(0xfff2d0, 0, 40, 0.5, 0.6, 1.2); spot.position.set(0, 1.2, 0.6); const st = new THREE.Object3D(); st.position.set(0, 0, 12); PLAYER.mesh.add(spot, st); spot.target = st; PLAYER.light = spot;
+  const spot = new THREE.SpotLight(0xfff2d0, 0, 40, 0.5, 0.6, 1.2); spot.position.set(0, 1.2, 0.6); const st = new THREE.Object3D(); st.position.set(0, 0, 12); HEADRIG = new THREE.Group(); HEADRIG.add(spot, st); scene.add(HEADRIG);   // 車燈獨立掛在場景上、永遠在光源清單裡：上下車時光源數量不變，不必重新編譯著色器
+  spot.target = st; PLAYER.light = spot;
   spawnPeds(scene, 110); spawnTraffic(scene, 40, 30); buildInfra(scene); initBubbles(); buildStaticMap();
   PORTAL = makePortal();
   composer = new EffectComposer(renderer); renderPass = new RenderPass(scene, camera); composer.addPass(renderPass);
@@ -5318,8 +5427,10 @@ async function boot() {
   applyQuality(); setVolumes();
   G = { day: 1, ap: 100, drift: 0, weather: { w: 'cloud', t: 29 } };
   setupSaleSigns(); G = null;
+  $('bootMsg').textContent = '正在準備畫面……'; await new Promise(r => setTimeout(r, 30));
+  await warmShaders();
   $('boot').hidden = true; toTitle(); loop();
-  window.__fz = { MRT_EXITS, UNDER_EXITS, MRT_E, INFRA, makeVehMesh, makeHeavyMesh, makeMotoMesh, makePed, ACT: () => ACT, findAction, tutOwner, talk, BTg: () => BT, fillVars, AU, FROZEN: () => FROZEN, LAMPS, setupLampLights, BM, COPV: () => COPV, copWitness, KEY, updateCity, loop, playerHitsStatic, collideCity, pBox, OFF, makePerson, suitUp, scene, NODES, EDGES, FACES, LINES, H, CHUNKS, updateChunks, STREAM, nearestEdge, computeRoute, updateEvents, edgesNear, projectOnEdge, CORNERS, spawnPed, spawnVehicle, CAM, toggleRide, PARK, startPlayerChase, COP: () => COP, onNpcRedRun, EVENTS, rivalDayStart, openShop, openSkills, openAch, openBag, addXP, obbMTV, vBox, renderer, CORNER_BLD, PARKS, OFFICE: () => OFFICE, MRT_U, EXPWY, UNDERPASS, TSTAT, updateSignals, updateVehicles, updatePeds, PAUSE: () => PAUSE, BUB, say, camera, VEH, PEDS, TLC, BLD, OWN: () => OWN, G: () => G, POOLS, MODE: () => MODE, PLAYER, investigate, setTarget, visitTarget, endDay, ending, goalReached, OP, unstickPlayer, eP, STUCK, antiStuck, simStep: (dt, t) => { updateCop(dt); updateCity(dt); updateWorld(dt, t); }, obbMTV, acctTest: { set: u => { USER = u; renderAccount(); }, sync: () => cloudSync(), cloud: () => CLOUD, err: () => CLOUD_ERR }, openSlots, slotRead, PORTAL: () => PORTAL, startDM, offerDM, updateDM, startRace, careerDayStart, newBuyer, startShowing, negotiate, closeDeal, startPhoto, photoShutter, endPhoto, scorePhoto, PHOTO: () => PHOTO, liKey, famOf, addFam, gainIntel, ownerBattle, syncBuyers, buyerAt, RV: () => RV, enterOffice, enterCity, morningLines, answer, BUYER_MESH, DM_SPR, rivalAttempt, DEALERS, openDealer, switchVehicle, VEHS, vehSpec, curVeh, openMissions, missionCheck, MISSIONS, openUserList, exportUsers, updateTaskBtn };
+  window.__fz = { MRT_EXITS, UNDER_EXITS, MRT_E, INFRA, makeVehMesh, makeHeavyMesh, makeMotoMesh, makePed, ACT: () => ACT, findAction, tutOwner, talk, BTg: () => BT, fillVars, AU, FROZEN: () => FROZEN, LAMPS, setupLampLights, BM, COPV: () => COPV, copWitness, KEY, updateCity, loop, playerHitsStatic, collideCity, pBox, OFF, makePerson, suitUp, scene, NODES, EDGES, FACES, LINES, H, CHUNKS, updateChunks, STREAM, nearestEdge, computeRoute, updateEvents, edgesNear, projectOnEdge, CORNERS, spawnPed, spawnVehicle, CAM, toggleRide, PARK, startPlayerChase, COP: () => COP, onNpcRedRun, EVENTS, rivalDayStart, openShop, openSkills, openAch, openBag, addXP, obbMTV, vBox, renderer, CORNER_BLD, PARKS, OFFICE: () => OFFICE, MRT_U, EXPWY, UNDERPASS, TSTAT, updateSignals, updateVehicles, updatePeds, PAUSE: () => PAUSE, BUB, say, camera, VEH, PEDS, TLC, BLD, OWN: () => OWN, G: () => G, POOLS, MODE: () => MODE, PLAYER, investigate, setTarget, visitTarget, endDay, ending, goalReached, OP, unstickPlayer, eP, STUCK, antiStuck, simStep: (dt, t) => { updateCop(dt); updateCity(dt); updateWorld(dt, t); }, obbMTV, acctTest: { set: u => { USER = u; renderAccount(); }, sync: () => cloudSync(), cloud: () => CLOUD, err: () => CLOUD_ERR }, openSlots, slotRead, PORTAL: () => PORTAL, startDM, offerDM, updateDM, startRace, careerDayStart, newBuyer, startShowing, negotiate, closeDeal, startPhoto, photoShutter, endPhoto, scorePhoto, PHOTO: () => PHOTO, liKey, famOf, addFam, gainIntel, ownerBattle, syncBuyers, buyerAt, RV: () => RV, enterOffice, enterCity, morningLines, answer, BUYER_MESH, DM_SPR, rivalAttempt, DEALERS, openDealer, switchVehicle, VEHS, vehSpec, curVeh, openMissions, missionCheck, MISSIONS, openUserList, exportUsers, updateTaskBtn, warmMs: () => warmShaders.ms, DYN, dynRes };
 }
 
 // ===================== 交通建設：高架捷運、地下捷運、高架快速道路、行人地下道 =====================
@@ -6829,7 +6940,7 @@ function vehMeshes(k) {
   else if (k === 'sedan') { m = makeSedanCar(); pm = makeSedanCar(); }
   else if (k === 'sports') { m = makeConvertible(true, '#d0191f', '#8e0f13'); pm = makeConvertible(false, '#d0191f', '#8e0f13'); }
   else { m = makeConvertible(true); pm = makeConvertible(false); }
-  if (k !== 'scooter') { pm.position.y = -0.18; PARKED.add(pm); }
+  if (k !== 'scooter') { pm.position.y = -0.18; pm.visible = curVeh() === k; PARKED.add(pm); }
   VEH_MESH[k] = m; VEH_PARKED[k] = pm; return [m, pm];
 }
 let SCOOTER_MESH0 = null;
@@ -6840,8 +6951,7 @@ function applyVehicle() {
   PLAYER.car = S.car; PLAYER.vk = k; PBOX.hw = S.box[0]; PBOX.hl = S.box[1];
   for (const kk in VEH_PARKED) if (VEH_PARKED[kk]) VEH_PARKED[kk].visible = kk === k;
   if (PLAYER.mesh !== want) {
-    const old = PLAYER.mesh, kids = old.children.filter(c => c === PLAYER.light || c === PLAYER.light.target);
-    kids.forEach(c => { old.remove(c); want.add(c); });
+    const old = PLAYER.mesh;
     want.position.copy(old.position); want.rotation.copy(old.rotation); want.visible = old.visible;
     scene.remove(old); scene.add(want); PLAYER.mesh = want;
   }
@@ -6929,9 +7039,16 @@ function missionsUnlocked() { return !!G && (G.goalDay || G.comm >= 6); }
 function ensureMissions() { if (!G.missions) G.missions = { active: [], base: {}, done: {} }; return G.missions; }
 function missionProg(m) { const M = ensureMissions(), v = m.prog(G); return Math.max(0, m.rel ? v - (M.base[m.k] || 0) : v); }
 const mFmt = (m, v) => m.money ? 'NT$' + fmt(Math.floor(v)) : String(Math.floor(v));
-function updateTaskBtn() { const b = $('bTask'); if (!b) return; const on = missionsUnlocked() && (MODE === 'city' || MODE === 'office'); b.hidden = !on; if (on) { const n = ensureMissions().active.length; $('bTaskN').textContent = n ? `${n}/${MAX_ACTIVE}` : ''; } }
+function updateTaskBtn() {
+  const b = $('bTask'); if (!b || !G) return; const on = missionsUnlocked(); b.hidden = false;
+  b.classList.toggle('locked', !on); b.setAttribute('aria-disabled', String(!on));
+  const n = on ? ensureMissions().active.length : 0, t = on ? (n ? `${n}/${MAX_ACTIVE}` : '') : '🔒';
+  if ($('bTaskN').textContent !== t) $('bTaskN').textContent = t;
+}
 function openMissions() {
-  if (!G || !missionsUnlocked()) return; sfx('click');
+  if (!G) return;
+  if (!missionsUnlocked()) { sfx('deny'); toast(`委託還沒達成 6 件（目前 ${G.comm} / 6），簽滿 6 件就能挑戰任務`); return; }
+  sfx('click');
   const M = ensureMissions(), left = 30 - G.day;
   const rows = MISSIONS.map(m => {
     const done = M.done[m.k], act = M.active.includes(m.k), v = missionProg(m), pct = Math.min(100, v / m.goal * 100);
